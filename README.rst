@@ -1,61 +1,69 @@
-# Linguistic Diagnostics Toolkit
+==============================
+Linguistic Diagnostics Toolkit
+==============================
 
-The only way of exploring linguistic relations in a distributional space that
-is currently used are various techniques for evaluating distances between word
-(sentence, morpheme) vectors. The intuition is that words that are more
-similar, and therefore occur in similar contexts, should also be closer in the
-space than unrelated words: e.g. *cat* should be closer to *dog* than to
-*banana*. However, there are two problems with such distributional similarity:
+**TLDR**: LDT is a shiny new Python library for doing two things:
 
- * Unless the model has been previously specialized, the distributional
-   similarity conflates a wide range of linguistic relations: e.g. *cats*,
-   *kitten*, *milk* and *chase* could all be expected to be closer to *cat*
-   than to *dog*.
- * While both humans and word embeddings are generally good at distinguishing
-   related from unrelated words, ranking the middle ground is more problematic.
-   For example, should *cat* be closer to *tiger* or to *purr*?
+------------
 
-LDT is based on the idea that all the different relations in distributional
-similarity are all useful in different contexts (i.e. extrinsic tasks), and
-the different algorithms that produce them should be studied from the point of
-view of their favoring certain types of relations over the others. The only
-way to do this is to look into the output of the model and find out what
-exactly it is doing.
+    * querying lots of dictionaries from a unified interface:
+      spelling normalization, lemmatization, morphological analysis, WordNet,
+      Wiktionary, BabelNet, and a lot more.
+    * using the above to explore and profile word embeddings, i.e. the cool
+      distributional representations of words as vectors. If you have never
+      heard the word "word2vec" but are intrigued, here's `an introduction
+      <https://www.shanelynn.ie/get-busy-with-word-embeddings-introduction/>`_.
+      If you have, head over to the `project website <ldtoolkit.space>`_. If
+      you don't care about word embeddings, you can just use LDT as a
+      supplement to NLTK, SpaCy, and other great NLP tools.
 
-To this end, LDT provides a set of tools for automatic annotation of a wide
-range of distributional and linguistic relations between words and their
-neighbors in the distributional space. It currently handles the following
-types of relations between a target word and its neighbor:
+------------
 
- * misspellings (*cat : kat*);
- * inflected forms (*cat : cats*);
- * derivational relations (*cat : catness*);
- * lexicographic semantic relations:
-   - synonymy (*cat : pussycat*);
-   - antonymy (*black : white*);
-   - hyperonymy (*cat : feline*);
-   - hyponymy (*feline : cat*);
-   - co-hyponymy (*cat : dog*);
-   - meronymy (*cat : tail*)
- * psychological association norms (cat : mouse)
- * corpus-based statistics (e.g. for *cat : mouse* pair the frequency of
-   *mouse* in the corpus in general and in the context of *cat* in particular);
- * broad world knowledge (*cat : breed*, *cat : owner*, *cat : milk*)
+Current functionality:
 
-LDT achieves the above by combining several resources, including dictionaries
-(WordNet, Wiktionary, BabelNet), psychological association norms resources
-(Edinburgh Associative Thesaurus, University of South Florida Free
-Association Norms), data from several corpora, including Wikipidea and Gogle
-Ngrams, and custom routines for advanced morphological analysis,
-lemmatization, compound splitting, and identification of productive affixes.
+* A unified interface for querying a vast array of resources for natural
+  language processing, including Wiktionary, BabelNet, WordNet, and a lot of
+  new custom routines:
 
-In addition to being useful in research and for exploratory purposes, LDT can
-be viewed as a method of intrinsic evaluation of word emeddings. While there
-is a range of intrinsic tasks that such models are traditionally evaluated
-on (correlation with human similarity judgements or word analogy task),
-these approaches have failed to be good predictors of how a given model
-would perform on particular task. Furthermore, they offer little insight
-about what kind of linguistic information such models actually capture. Since
-LDT provides that information, it could be used to estimate to what extent a
-given model should be useful for a task that relies e.g. on morphological
-knowledge.
+     * misspellings (*cat : kat*);
+     * inflected forms (*cat : cats*);
+     * derivational relations (*cat : catness*);
+     * lexicographic semantic relations:
+       - synonymy (*cat : pussycat*);
+       - antonymy (*black : white*);
+       - hyperonymy (*cat : feline*);
+       - hyponymy (*feline : cat*);
+       - co-hyponymy (*cat : dog*);
+       - meronymy (*cat : tail*)
+     * psychological association norms (cat : mouse)
+     * corpus-based statistics (e.g. for *cat : mouse* pair the frequency of
+       *mouse* in the corpus in general and in the context of *cat* in
+       particular);
+
+* Using the above for large-scale analysis of potential relations between pairs
+  of words
+
+* Full setup for experimenting with your favorite word embeddings: loading
+  them, drawing balanced vocab samples, and profiling them for the kinds of
+  information that they encode.
+
+That last step can help you predict how your model will do on a particular
+task, and also give some ideas about how it can be improved. Check out the
+`results of a large-scale experiment with 60 embeddings and 21 datasets.
+<http://ldtoolkit.space/analysis/correlation/>`_
+
+Quick links:
+
+ * Installation
+ * Tutorial
+ * API reference
+ * Published research results
+ * Word embeddings leaderboard
+
+If something doesn't work: open an issue on GitHub.
+
+On multilinguality: for semantic analysis, LDT supports the largest
+available multilingual resources (Wiktionary and BabelNet). Many of the
+other modules are language-specific, and only English is fully supported at
+the moment, but the infrastructure for going multilingual is already in
+place. Get in touch if you'd like to get involved.
