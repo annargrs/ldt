@@ -1,0 +1,18 @@
+path_to_resources: /the/path/for/cache/and/resources
+lowercasing: True
+default_language: English
+babelnet_key: 354adce2-c891-4454-822f-ce619dd8d85a
+split_mwu: False
+wiktionary_cache: False
+
+language_resources:
+  en:
+    names: names.vocab
+    numbers: numbers.vocab
+    associations: associations.json
+
+corpus_resources:
+  Wiki201308:
+    freqdict: Wiki201308.freqdict
+    vocabulary: Wiki201308.vocab
+    co-occurrence_data: 3gram.json

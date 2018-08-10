@@ -1,4 +1,4 @@
-from __future__ import print_function
+# from __future__ import print_function
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 import io
@@ -40,7 +40,7 @@ setup(
     license='Apache Software License',
     author='Anna Rogers',
     tests_require=['pytest'],
-    install_requires=["nltk>=3.2.5"],
+    install_requires=["ruamel.yaml"],
     cmdclass={'test': PyTest},
     author_email='anna_rogers@uml.edu',
     description='Linguistic diagnostics for word embeddings',

@@ -9,3 +9,6 @@ sphinx
 extras
 __pycache__/
 docs/_build/
+.eggs
+.pytest_cache
+ldt.egg-info
