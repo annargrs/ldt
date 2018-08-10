@@ -13,6 +13,7 @@ Todo:
 import os
 import warnings
 import sys
+import shutil
 
 import ruamel.yaml as yaml
 
@@ -21,15 +22,19 @@ import ruamel.yaml as yaml
 warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
 
 TESTFILE = os.path.dirname(os.path.realpath(__file__)).strip("ldt")
-TESTFILE = os.path.join(TESTFILE, "test/sample_files/sample_config.yaml")
+TESTFILE = os.path.join(TESTFILE, "test/sample_files/.ldt-config.yaml")
 
 
 if "unittest" in sys.modules:
     CONFIGPATH = TESTFILE
 else:
-    CONFIGPATH = None
+    CONFIGPATH = os.path.expanduser('~/.ldt-config.yaml')
 
-def load_config(path=None):
+if not os.path.exists(CONFIGPATH):
+    print("Creating a sample configuration file in", CONFIGPATH)
+    shutil.copyfile(TESTFILE, CONFIGPATH)
+
+def load_config(path=CONFIGPATH):
     """Loading config file from either the user home directory or the test
     directory"""
     if not path:
@@ -49,8 +54,8 @@ def load_config(path=None):
             #     "Something is wrong with the configuration yaml file.")
 
     if "unittest" in sys.modules:
-        options["path_to_resources"] = TESTFILE.strip("sample_config.yaml")
+        options["path_to_resources"] = TESTFILE.strip(".ldt-config.yaml")
     return options
 
 #pylint: disable=invalid-name
-config = load_config(CONFIGPATH)
+config = load_config()
