@@ -15,17 +15,17 @@ space than unrelated words: e.g. *cat* should be closer to *dog* than to
    related from unrelated words, ranking the middle ground is more problematic.
    For example, should *cat* be closer to *tiger* or to *purr*?
 
- LDT is based on the idea that all the different relations in distributional
- similarity are all useful in different contexts (i.e. extrinsic tasks), and
- the different algorithms that produce them should be studied from the point of
- view of their favoring certain types of relations over the others. The only
- way to do this is to look into the output of the model and find out what
- exactly it is doing.
+LDT is based on the idea that all the different relations in distributional
+similarity are all useful in different contexts (i.e. extrinsic tasks), and
+the different algorithms that produce them should be studied from the point of
+view of their favoring certain types of relations over the others. The only
+way to do this is to look into the output of the model and find out what
+exactly it is doing.
 
- To this end, LDT provides a set of tools for automatic annotation of a wide
- range of distributional and linguistic relations between words and their
- neighbors in the distributional space. It currently handles the following
- types of relations between a target word and its neighbor:
+To this end, LDT provides a set of tools for automatic annotation of a wide
+range of distributional and linguistic relations between words and their
+neighbors in the distributional space. It currently handles the following
+types of relations between a target word and its neighbor:
 
  * misspellings (*cat : kat*);
  * inflected forms (*cat : cats*);
