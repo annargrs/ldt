@@ -2,13 +2,17 @@
 Linguistic Diagnostics Toolkit
 ==============================
 
-TLDR: LDT is a shiny new Python library for doing two things:
+.. image:: https://travis-ci.com/ookimi/ldt.svg?token=vNtsLg9GAp2WkcBr9HBr&branch=master
+   :target: https://travis-ci.com/ookimi/ldt
+   :alt: Build Status
+
+**TLDR**: LDT is a shiny new Python library for doing two things:
 
 * querying lots of dictionaries from a unified interface:
-  spelling normalization, lemmatization, morphological analysis, WordNet,
-  Wiktionary, BabelNet, and a lot more.
+  **spelling normalization, lemmatization, morphological analysis, WordNet,
+  Wiktionary, BabelNet, and a lot more**.
 
-* using the above to explore and profile word embeddings, i.e. the cool
+* using the above to **explore and profile word embeddings**, i.e. the cool
   distributional representations of words as vectors. If you have never
   heard the word "word2vec", you're missing out, and here's `an introduction
   <https://www.shanelynn.ie/get-busy-with-word-embeddings-introduction/>`_.
