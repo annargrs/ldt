@@ -17,6 +17,8 @@ import shutil
 
 import ruamel.yaml as yaml
 
+from ldt._version import __version__
+
 # from ldt.helpers.exceptions import ResourceError as ResourceError
 
 warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
@@ -24,6 +26,9 @@ warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
 TESTFILE = os.path.dirname(os.path.realpath(__file__)).strip("ldt")
 TESTFILE = os.path.join(TESTFILE, "test/sample_files/.ldt-config.yaml")
 
+if not os.path.exists(TESTFILE):
+    egg = "/ldt-"+__version__+"-py3.5/"
+    TESTFILE = TESTFILE.replace("/ldt/", egg)
 
 if "unittest" in sys.modules:
     CONFIGPATH = TESTFILE
@@ -37,9 +42,6 @@ if not os.path.exists(CONFIGPATH):
 def load_config(path=CONFIGPATH):
     """Loading config file from either the user home directory or the test
     directory"""
-    if not path:
-        path = os.path.expanduser('~/.ldt-config.yaml')
-        print("Loading config from default location in", path)
 
     if not os.path.isfile(path):
         # raise ResourceError("User configuration file not found at path "+path)
