@@ -1,0 +1,11 @@
+venv
+conf.py
+ldt.analysis.rst
+ldt.rst
+modules.rst
+Makefile
+build
+sphinx
+extras
+__pycache__/
+docs/_build/
