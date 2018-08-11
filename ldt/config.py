@@ -5,9 +5,6 @@ LDT has a number of module-wide variables for default parameters. They can
 also be overridden in most modules when instantiating resource objects. See
 tutorial for explanation of parameters and a sample.
 
-Todo:
-    * create default config path on the first run
-
 """
 
 import os
@@ -23,9 +20,9 @@ from ldt._version import __version__
 
 warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
 
-# TESTFILE = os.path.dirname(os.path.realpath(__file__))
-# TESTFILE = os.path.join(TESTFILE, "test/sample_files/.ldt-config.yaml")
-TESTFILE = os.path.abspath("../test/sample_files/.ldt-config.yaml")
+TESTFILE = os.path.dirname(os.path.realpath(__file__))
+TESTFILE = os.path.join(TESTFILE, "test/sample_files/.ldt-config.yaml")
+# TESTFILE = os.path.abspath(".test/sample_files/.ldt-config.yaml")
 
 # if not os.path.exists(TESTFILE):
 #     egg = "/ldt-"+__version__+"-py3.5/"
