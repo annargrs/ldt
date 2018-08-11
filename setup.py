@@ -46,6 +46,10 @@ setup(
     long_description=long_description,
     packages=['ldt'],
     include_package_data=True,
+    package_data={'': ['*.yaml', '*.txt', '*.py', '*.vocab', '*.tsv',
+                       '*.json', '*.frqdict']},
+    entry_points={},
+    zip_safe=False,
     platforms='any',
     test_suite='ldt.test.test_ldt',
     classifiers = [
