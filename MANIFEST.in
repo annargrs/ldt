@@ -1,2 +1,2 @@
-include README LICENSE
-recursive-include ldt/tests *
+include README.rst LICENSE
+recursive-include ldt/test/sample_files *
