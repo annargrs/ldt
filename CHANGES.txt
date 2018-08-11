@@ -1,1 +1,9 @@
-v<version>, <date> -- Initial release.
+v 0.1.0, 2018-08-15 -- Initial release.
+
+* Retrieving lexicographic information from BabelNet, Wiktionary, Wikisaurus and English WordNet;
+* Retrieving morphological information from the same resources;
+* Lemmatization with WordNet and custom rules for English;
+* Custom rule-based analysis of productive suffixes and prefixes for English;
+* Parsing Wiktionary etymologies
+* Custom compound splitting routines with filtering by subword length;
+* 4 custom patterns for fixing frequent spelling mistakes.

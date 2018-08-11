@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-""" Loading config file
+""" Loading configuration file
 
 LDT has a number of module-wide variables for default parameters. They can
 also be overridden in most modules when instantiating resource objects. See

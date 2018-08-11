@@ -16,11 +16,17 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
+#%%%
+import os
+import sys
+import shutil
 # sys.path.insert(0, os.path.abspath('.'))
 from ldt import __version__
+# print(os.path.abspath((".")))
+# requirements_path = os.path.join(os.path.abspath('.'), "requirements.txt")
+
+#%%
+# ldt_root = os.path.abspath('.').strip("/docs/source")
 
 # -- General configuration ------------------------------------------------
 
@@ -32,7 +38,7 @@ from ldt import __version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc',
-    #'sphinx.ext.autosummary',
+    'sphinx.ext.autosummary',
     'sphinx.ext.napoleon',
     'sphinx.ext.doctest',
     'sphinx.ext.todo',
@@ -109,7 +115,7 @@ html_theme_options = {
 "sidebar_includehidden": True,
 "show_powered_by": False,
 "sidebar_collapse": True,
-"show_relbars": True,
+# "show_relbars": True,
 "font_size": "0.93em",
 "code_font_size": "0.85em",
 "sidebar_width":  "25em",
