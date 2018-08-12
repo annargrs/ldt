@@ -20,16 +20,11 @@ Package requirements:
 
 For spellchecker engines, LDT currently relies on the `pyenchant <https://github.com/rfk/pyenchant>`_ library, which
 provides an interface to the system spellcheckers such aspell, hunspell etc. Aspell worked the best in our tests,
-although any other engine can also be used. To install them on your system,
+although any other engine can also be used. Enchant needs to be installed for this to work.
 
-Dictionaries for US and UK English, German, and French are included in
-pyenchant distribution. If you need other languages, you will need to do the
-following:
-
-* Windows: just copy OpenOffice dictionary files to pyenchant folder (
-  advice from here `this <https://faculty.math.illinois.edu/~gfrancis/illimath
-  /windows/aszgard_mini/movpy-2.0.0-py2.4.4/manuals/PyEnchant/PyEnchant
-  %20Tutorial.htm>`_, not tested by LDT developers).
 * Mac: install enchant with brew (http://macappstore.org/enchant/)
 * Linux: enchant should be available from your distribution repository.
   E.g. on Ubuntu you should be able to just `sudo apt-get install enchant`.
+* Windows: we did not test this, but a binary package should be available from PyPi upon installation of pyenchant, and
+  it should be possible to copy any required OpenOffice spellchecker dictionaries into pyenchant folder (advice from
+  `here <https://faculty.math.illinois.edu/~gfrancis/illimath/windows/aszgard_mini/movpy-2.0.0-py2.4.4/manuals/PyEnchant/PyEnchant%20Tutorial.htm>`_.

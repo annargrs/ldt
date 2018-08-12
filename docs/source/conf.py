@@ -121,7 +121,7 @@ html_theme_options = {
 "sidebar_includehidden": True,
 "show_powered_by": False,
 "sidebar_collapse": True,
-"show_relbars": True,
+# "show_relbars": True,
 "font_size": "0.93em",
 "code_font_size": "0.85em",
 "sidebar_width":  "25em",

@@ -2,7 +2,7 @@
 Get in touch
 ============
 
-If something doesn't work: open an issue on `Github <github.com/ookimi/ldt>`_.
+If something doesn't work: open an issue on `Github <https://github.com/ookimi/ldt>`_.
 
 If you'd like to help with supporting your language X: `get in touch <http://www.cs.uml.edu/~arogers/>`_.
 The infrastructure for adding other languages is already mostly in place.
