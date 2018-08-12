@@ -15,6 +15,7 @@ install:
   - pip install -U coveralls
   - pip install -U coverage
   - pip install -U pylint
+  - pip install pyenchant
 
 before_script: # configure a headless display to test plot generation
 - "export DISPLAY=:99.0"
