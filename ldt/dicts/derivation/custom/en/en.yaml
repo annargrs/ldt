@@ -1,0 +1,82 @@
+---
+vowels: [a, i, e, o, u, y]
+# productive prefixes, list derived on the basis of http://morphoquantics.co.uk/ BNC data
+prefixes: [a, aero, afro, agro, all, ambi, anglo, ant, anti, aqua, aqui, arch, astro, audio, auto, bi, bin, bio, con, contra, counter, cross, de, dis, eco, electro, en, equi, euro, extra, fore, geo, grand, great, half, heter, hetero, hyper, idio, il, im, in, indo, infra, inter, intra, intro, ir, kilo, mega, meta, micro, mid, mini, mis, mono, morpho, multi, nano, neo, neuro, non, off, omni, on, out, over, pan, photo, poly, post, pre, pseudo, psycho, quasi, radio, re, retro, self, semi, socio, step, stereo, sub, super, techno, tele, trans, tri, turbo, ultra, un, under, vice, mis, re, non]
+
+suffixes: [ication, ation, ition, ed, ing, ability, able, ably, ant, ibility, ible, ubility, uble, ance, ancy, ant,  ence, ency, ent, ic, ical, ically, ism, ist, ative, itive, ive, ively, ivity, a, acy, age, aholic, al, ally, an, ar, arian, ary, ate, atic, ator, ee, eer, en, ennial, eous, er, ern, ery, ese, ess, ette, ety, i, ial, ian, iana, ice, ician, icity, ics, ie, ier, iety, ify, inal, ious, ion, ise, ish, ity, ize, or, ory, ous, ual, y, free, like, stricken, burger, cracy, cy, dom, fest, fic, fold, ful, graph, hood, less, let, ling, logy, ly, manship, mania, ment, mobile, most, ness, nik, phone, proof, scape, ship, sick, some, ster, th, ty, ville, ward, ways, wise, worthy, -free, -in, -like, -stricken, -to-be]
+
+suffix_families:
+   ce: [ction]
+   able: [ability, ably]
+   ible: [ibility]
+   uble: [ubility]
+   ant: [ance, ancy]
+   ent: [ence, ency]
+   ct: [xion]
+   ate: [ation]
+   ite: [ition]
+   ute: [ution]
+
+# spelling changes *before* vowel suffixes
+replacements_before_vowels:
+   - [ie, y] # lie > lying
+   - [c, ck] # panic > panicking
+
+replacements_before_consonants:
+   - [y, i]  # happy > happily
+
+replacements_in_suffixes:
+  - [y, i] #history > historic
+
+replacements_in_prefixes:
+  - []
+
+insertions_before_vowels: [e]
+
+insertions_before_consonants: []
+
+# in some languages compounds can be joined with an extra symbols, like "s" in German or "o" in Russian
+replacements_in_compounds: []
+
+#in some languages the stem preceding another stem in a compound may undergo changes (e.g. Russian ь > е)
+# expected format: [[normal_ending, altered_ending], [normal_ending, altered_ending]]
+insertions_in_compounds: []
+
+#  Annoyingly, *long:length* kind of derivation pairs are not covered in either WordNet or Wiktionary.
+#  LDT lists 6 unproductive patterns, including *belief:believe*, *long:length*, *doom:deem*, *bath:bathe*, *lie:lay*.
+#  The pairs were collected from multiple resources like `this <https://learningenglishgrammar.wordpress.com/suffixes/suffixes-and-how-they-form-abstract-nouns/>`_.
+
+exceptions:
+  -th:
+    filth: foul
+    health: hale
+    length: long
+    sloth: slow
+    strength: strong
+    width: wide
+    breadth: broad
+    depth: deep
+  -f(e):
+    belief: believe
+    grief: grieve
+    proof: prove
+    relief: relieve
+    strife: strive
+    life: live
+  -e:
+     envelope: envelop
+     bathe: bath
+     breathe: breath
+  etc:
+     knowledge: know
+     edible: eat
+  root_vowel_n/a>v:
+     doom: deem
+     food: feed
+     tale: tell
+     full: fill
+     blood: bleed
+     hale: heal
+  root_vowel_v>v:
+     lie: lay
+     rise: raise
