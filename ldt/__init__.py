@@ -13,12 +13,12 @@ from ._version import __version__
 # from .load_config import config
 
 import ldt.helpers
-# import ldt.dicts
-import ldt.dicts.semantics
-import ldt.dicts.spellcheck
-import ldt.dicts.morphology
-import ldt.dicts.derivation
-import ldt.dicts.base
+import ldt.dicts
+# import ldt.dicts.semantics
+# import ldt.dicts.spellcheck
+# import ldt.dicts.morphology
+# import ldt.dicts.derivation
+# import ldt.dicts.base
 
 # from .helpers import loading, formatting, wiktionary_cache, resources
 #
