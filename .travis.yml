@@ -12,6 +12,7 @@ os:
 
 addons:
   apt:
+    update: true
     packages:
     - enchant
 #    - libenchant-dev
@@ -27,7 +28,7 @@ install:
   - pip install -U pylint
 
 before_script: # configure a headless display to test plot generation
-- sudo apt-get install -y enchant libenchant-dev
+- sudo apt-get install -y enchant #libenchant-dev
 - "export DISPLAY=:99.0"
 - "sh -e /etc/init.d/xvfb start"
 - sleep 3 # give xvfb some time to start
