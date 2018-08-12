@@ -13,7 +13,7 @@ from ._version import __version__
 # from .load_config import config
 
 import ldt.helpers
-import ldt.dicts
+# import ldt.dicts
 import ldt.dicts.semantics
 import ldt.dicts.spellcheck
 import ldt.dicts.morphology

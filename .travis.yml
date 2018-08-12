@@ -19,6 +19,9 @@ addons:
 
 install:
   - pip install -U pip
+  - pip install nltk
+  - python -m nltk.downloader stopwords
+  - python -m nltk.downloader wordnet
   - pip install -r requirements.txt
   - pip install -U coveralls
   - pip install -U coverage
