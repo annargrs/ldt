@@ -11,7 +11,7 @@ os:
 - linux
 
 install:
-  - apt-get install enchant
+  - yum install enchant
   - pip install -r requirements.txt
   - pip install -U coveralls
   - pip install -U coverage
