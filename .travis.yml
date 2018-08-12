@@ -10,10 +10,10 @@ python:
 os:
 - linux
 
-#addons:
-#  apt:
-#    packages:
-#    - enchant
+addons:
+  apt:
+    packages:
+    - enchant
 #    - libenchant-dev
 
 install:
