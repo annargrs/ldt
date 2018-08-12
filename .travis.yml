@@ -10,12 +10,11 @@ python:
 os:
 - linux
 
-addons:
-  apt:
-    update: true
-    packages:
-    - enchant
-    - libenchant-dev
+#addons:
+#  apt:
+#    packages:
+#    - enchant
+#    - libenchant-dev
 
 install:
   - pip install -U pip
