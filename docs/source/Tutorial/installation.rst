@@ -27,4 +27,4 @@ although any other engine can also be used. Enchant needs to be installed for th
   E.g. on Ubuntu you should be able to just `sudo apt-get install enchant`.
 * Windows: we did not test this, but a binary package should be available from PyPi upon installation of pyenchant, and
   it should be possible to copy any required OpenOffice spellchecker dictionaries into pyenchant folder (advice from
-  `here <https://faculty.math.illinois.edu/~gfrancis/illimath/windows/aszgard_mini/movpy-2.0.0-py2.4.4/manuals/PyEnchant/PyEnchant%20Tutorial.htm>`_.
+  `here <https://faculty.math.illinois.edu/~gfrancis/illimath/windows/aszgard_mini/movpy-2.0.0-py2.4.4/manuals/PyEnchant/PyEnchant%20Tutorial.htm>`_).
