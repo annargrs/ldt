@@ -11,7 +11,7 @@ import os
 import warnings
 import sys
 import shutil
-
+# import nltk
 import ruamel.yaml as yaml
 
 from ldt._version import __version__
@@ -22,8 +22,8 @@ warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
 
 # downloading NLTK resources
 
-nltk.download("wordnet")
-nltk.download("stopwords")
+# nltk.download("wordnet")
+# nltk.download("stopwords")
 
 TESTFILE = os.path.dirname(os.path.realpath(__file__))
 TESTFILE = os.path.join(TESTFILE, "tests/sample_files/.ldt-config.yaml")
