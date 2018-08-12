@@ -11,11 +11,11 @@ os:
 - linux
 
 install:
+  - apt-get install enchant
   - pip install -r requirements.txt
   - pip install -U coveralls
   - pip install -U coverage
   - pip install -U pylint
-  - yum install enchant
 
 before_script: # configure a headless display to test plot generation
 - "export DISPLAY=:99.0"
