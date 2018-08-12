@@ -22,8 +22,14 @@ import sys
 import shutil
 # sys.path.insert(0, os.path.abspath('.'))
 from ldt import __version__
-# print(os.path.abspath((".")))
-# requirements_path = os.path.join(os.path.abspath('.'), "requirements.txt")
+
+# root = os.path.abspath(".")
+root = os.path.dirname(os.path.realpath(__file__))
+# root = root.rstrip("/")
+tutorial_path = os.path.join(root, "Tutorial/resources/.ldt-config.yaml")
+root = root.rstrip("/docs/source")
+sample_file = os.path.join(root, "ldt/test/sample_files/.ldt-config.yaml")
+shutil.copyfile(sample_file, tutorial_path)
 
 #%%
 # ldt_root = os.path.abspath('.').strip("/docs/source")
@@ -115,7 +121,7 @@ html_theme_options = {
 "sidebar_includehidden": True,
 "show_powered_by": False,
 "sidebar_collapse": True,
-# "show_relbars": True,
+"show_relbars": True,
 "font_size": "0.93em",
 "code_font_size": "0.85em",
 "sidebar_width":  "25em",

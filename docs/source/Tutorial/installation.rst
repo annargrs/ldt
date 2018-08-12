@@ -2,10 +2,6 @@
 Installing Linguistic Diagnostics Toolkit
 =========================================
 
-------------
-Requirements
-------------
-
 You need Python 3.5 or above.
 
 .. code-block:: python
