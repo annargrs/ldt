@@ -1,1 +1,4 @@
 ruamel.yaml
+pyenchant
+wiktionaryparser
+hurry.filesize

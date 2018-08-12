@@ -16,12 +16,17 @@ import ruamel.yaml as yaml
 
 from ldt._version import __version__
 
-# from ldt.helpers.exceptions import ResourceError as ResourceError
+from ldt.helpers.exceptions import ResourceError as ResourceError
 
 warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
 
+# downloading NLTK resources
+
+nltk.download("wordnet")
+nltk.download("stopwords")
+
 TESTFILE = os.path.dirname(os.path.realpath(__file__))
-TESTFILE = os.path.join(TESTFILE, "test/sample_files/.ldt-config.yaml")
+TESTFILE = os.path.join(TESTFILE, "tests/sample_files/.ldt-config.yaml")
 # TESTFILE = os.path.abspath(".test/sample_files/.ldt-config.yaml")
 
 # if not os.path.exists(TESTFILE):
@@ -43,18 +48,19 @@ def load_config(path=CONFIGPATH):
 
     if not os.path.isfile(path):
         # raise ResourceError("User configuration file not found at path "+path)
-        print("Something is wrong with the configuration yaml file.")
+        raise ResourceError("Configuration yaml file was not found at "+path)
 
     with open(path) as stream:
         try:
             options = yaml.safe_load(stream)
         except yaml.YAMLError:
-            print("Something is wrong with the configuration yaml file.")
-            # raise ResourceError(
-            #     "Something is wrong with the configuration yaml file.")
+            # print("Something is wrong with the configuration yaml file.")
+            raise ResourceError("Something is wrong with the configuration "
+                                "yaml file.")
 
     if "unittest" in sys.modules:
         options["path_to_resources"] = TESTFILE.strip(".ldt-config.yaml")
+    options["path_to_cache"] = options["path_to_resources"]+"cache"
     return options
 
 #pylint: disable=invalid-name
