@@ -48,18 +48,19 @@ def get_object_size(obj, seen=None):
 
 
 #todo add lowercasing
-def load_resource(path, format = "infer", lowercasing = True):
+def load_resource(path, format="infer", lowercasing=True):
     """
 
     A helper function for loading various files formats, optionally
-    lowercasing them, and displaying the sizes of the resulting objects (
-    for monitoring huge resources).
+    lowercasing them, and displaying the sizes of the resulting objects
+    (for monitoring huge resources).
 
     Args:
         path (str): path to file with the resource
         format (str): the format of the file. By default it is inderred from
             the file extension, but can also be specified directly. The
             following formats are supported:
+
                 :type freqdict: for tab-separated [Word <tab> Number] file
                 :type csv_dict: for [Word1 <tab> Word2,Word3,Word4...] or [Word1 <tab> Word2]
                 :type vocab: for one-word-per-line vocab file
@@ -67,7 +68,8 @@ def load_resource(path, format = "infer", lowercasing = True):
                 :type yaml: a yaml dictionary
 
     Returns:
-        a set object for vocab files, a dictionary for everything else
+        (set, dict): a set object for vocab files, a dictionary for
+            everything else
     """
 
     if format == "infer":

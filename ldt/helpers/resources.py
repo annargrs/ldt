@@ -25,14 +25,12 @@ from ldt.helpers.loading import load_resource as load_resource
 def lookup_language(language, reverse=False):
     """
 
-    LDT uses mainly 2-letter language codes from
-    This function converts them to canonical names that are used by the
-    WiktionaryParser.
+    LDT uses mainly 2-letter language codes for language settings; they are
+    also used in Wiktionary abd BabelNet. This function converts canonical
+    language names to codes and vice versa.
 
     Args:
-        language (str): a `2-letter language code
-        <https://en.wiktionary.org/wiki/Wiktionary:List_of_languages#Two
-        -letter_codes>`_
+        language (str): a `2-letter language code <https://en.wiktionary.org/wiki/Wiktionary:List_of_languages#Two-letter_codes>`_
         reverse (bool): if True, returns the language code for the language
 
     Returns:

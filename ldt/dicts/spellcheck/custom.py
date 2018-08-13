@@ -31,6 +31,7 @@ Basic functionality:
       pre-defined languages;
 
 Todo:
+
     * alternatives: pyhunspell, https://pypi.org/project/org.keyphrene/
     * add names from wiki namespaces
     * not to check words with _
@@ -206,7 +207,7 @@ class Spellchecker(Dictionary):
 
         Returns:
             (bool): True if the word's characters are entirely within the
-            specified charsets
+                specified charsets
         """
         include = [x.lower() for x in include]
         exclude = [x.lower() for x in exclude]

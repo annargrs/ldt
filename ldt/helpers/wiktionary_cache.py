@@ -13,15 +13,9 @@
     LDT config file in the user directory.
 
     The naming convention is YYYY-M-D_language_dictionary.vocab. For example:
+
      - 2018-7-1_en_wikisaurus.vocab
      - 2018-7-1_en_wiktionary.vocab
-
-Example:
-    Examples can be given using either the ``Example`` or ``Examples``
-    sections. Sections support any reStructuredText formatting, including
-    literal blocks::
-
-        $ python example_google.py
 
 Todo:
     * refactor the tests
@@ -50,13 +44,11 @@ def find_vocab_file(language, path_to_cache, wikisaurus=False):
     language in the resources folder.
 
     Args:
-        language (str): a `2-letter language code
-        <https://en.wiktionary.org/wiki/Wiktionary:List_of_languages#Two
-        -letter_codes>`_
+        language (str): a `2-letter language code <https://en.wiktionary.org/wiki/Wiktionary:List_of_languages#Two-letter_codes>`_
         path_to_cache (str): the path to the cache subfolder of ldt resources
-        folder specified in config, where the wiktionary cache files are saved
-        wikisaurus (bool): if False, Wiktionary entry namespace is cached,
-        otherwise Wiktionary thesaurus entries are cached.
+            folder specified in config, where the wiktionary cache files are
+            saved wikisaurus (bool): if False, Wiktionary entry namespace is
+            cached, otherwise Wiktionary thesaurus entries are cached.
 
     Returns:
         (str): filename if one was present, or "none"
@@ -85,11 +77,9 @@ def get_timestamped_vocab_filenames(filename, language=config[
 
     Args:
         filename (str): an earlier cache file, or "none" is there wasn't one.
-        language (str): a `2-letter language code
-        <https://en.wiktionary.org/wiki/Wiktionary:List_of_languages#Two
-        -letter_codes>`_
-        wikisaurus (bool): if False, Wiktionary entry namespace is cached, otherwise
-        Wiktionary thesaurus entries are cached.
+        language (str): a `2-letter language code <https://en.wiktionary.org/wiki/Wiktionary:List_of_languages#Two-letter_codes>`_
+        wikisaurus (bool): if False, Wiktionary entry namespace is cached,
+            otherwise Wiktionary thesaurus entries are cached.
 
     Returns:
         (dict): a dictionary holding the old and new filenames
@@ -131,13 +121,11 @@ def update_wiktionary_cache(language=config["default_language"],
     ''' The main wiktionary cache updating function.
 
     Args:
-        language (str): a `2-letter language code
-        <https://en.wiktionary.org/wiki/Wiktionary:List_of_languages#Two
-        -letter_codes>`_
+        language (str): a `2-letter language code <https://en.wiktionary.org/wiki/Wiktionary:List_of_languages#Two-letter_codes>`_
         path_to_resources (str): the path to ldt resources folder specified in
-        config. The cache files are saved in "cache" subfolder of this folder.
+            config. The cache files are saved in "cache" subfolder of this folder.
         wikisaurus (bool): if False, Wiktionary entry namespace is cached,
-        otherwise Wiktionary thesaurus entries are cached.
+            otherwise Wiktionary thesaurus entries are cached.
 
     Returns:
         (bool): True if the cache was updated, False otherwise
@@ -207,19 +195,17 @@ def load_wiktionary_cache(language=config["default_language"],
     '''
 
     Args:
-        language (str): a `2-letter language code
-        <https://en.wiktionary.org/wiki/Wiktionary:List_of_languages#Two
-        -letter_codes>`_
+        language (str): a `2-letter language code <https://en.wiktionary.org/wiki/Wiktionary:List_of_languages#Two-letter_codes>`_
         lowercasing (bool): if not set, the global config variable is used.
-        True (default) lowercases all vocab.
+            True (default) lowercases all vocab.
         path_to_cache (str): the path to ldt resources folder specified in
-        config. The cache files are saved in "cache" subfolder of this folder.
+            config. The cache files are saved in "cache" subfolder.
         wikisaurus (bool): if False, Wiktionary entry namespace is cached,
-        otherwise Wiktionary thesaurus entries are cached.
+            otherwise Wiktionary thesaurus entries are cached.
 
     Returns:
         (set): vocab list for the corresponding language, lowercased or not
-        according to the global or local lowercasing option
+            according to the global or local lowercasing option
 
     Todo:
         update the error message
