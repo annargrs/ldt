@@ -111,14 +111,14 @@ html_theme = 'alabaster'
 
 html_theme_options = {
 "github_button": True,
-'github_repo': 'https://github.com/bitprophet/alabaster',
+'github_repo': 'https://github.com/ookimi/ldt',
 "description": "<br/> <br/>",
 "logo": "ldt_logo.png",
 "fixed_sidebar": True,
 "sidebar_includehidden": True,
 "show_powered_by": False,
 "sidebar_collapse": True,
-# "show_relbars": True,
+"show_relbars": True,
 "font_size": "0.93em",
 "code_font_size": "0.85em",
 "sidebar_width":  "25em",
@@ -146,8 +146,9 @@ html_static_path = ['_static']
 html_sidebars = {
     '**': ['about.html',
         'localtoc.html',
+        'sourcelink.html'
         # 'globaltoc.html',
-        # 'relations.html',  # needs 'show_related': True theme option to display
+        'relations.html',  # needs 'show_related': True theme option to display
         'navigation.html',
         'searchbox.html'
            ],
