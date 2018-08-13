@@ -55,7 +55,7 @@ class Tests(unittest.TestCase):
         worked = res1 == ["whop"] and res2 == ["flounder"]
         self.assertTrue(worked)
 
-    @ignore_warnings
+    # @ignore_warnings
     def test_past(self):
         test_dict = ldt.dicts.morphology.custom.en.MorphCustomDict()
         test_base_dict = ldt.dicts.base.wiktionary.BaseWiktionary(language="en",
