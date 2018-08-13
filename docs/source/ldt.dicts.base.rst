@@ -7,9 +7,15 @@ Subpackages
 .. toctree::
 
     ldt.dicts.base.wordnet
+    ldt.dicts.base.custom
 
 Submodules
 ----------
+
+.. automodule:: ldt.dicts.base
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 ldt\.dicts\.base\.babelnet module
 ---------------------------------
@@ -23,15 +29,6 @@ ldt\.dicts\.base\.wiktionary module
 -----------------------------------
 
 .. automodule:: ldt.dicts.base.wiktionary
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-Module contents
----------------
-
-.. automodule:: ldt.dicts.base
     :members:
     :undoc-members:
     :show-inheritance:

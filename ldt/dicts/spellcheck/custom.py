@@ -4,19 +4,12 @@
 This module creates the base ldt spellchecker class, currently based on
 `pyenchant <https://github.com/rfk/pyenchant>`_ library which in its turn relies
 on `enchant <https://github.com/AbiWord/enchant>`_. Pyenchant enables the
-use of various engines, including hunspell and aspell.
+use of various engines, including hunspell and aspell. Check the
+section :ref:`installation`.
 
 Dictionaries for US and UK English, German, and French are included in
 pyenchant distribution. If you need other languages, you will need to do the
-following:
-
-    * Windows: just copy OpenOffice dictionary files to pyenchant folder (
-    according to `this <https://faculty.math.illinois.edu/~gfrancis/illimath
-    /windows/aszgard_mini/movpy-2.0.0-py2.4.4/manuals/PyEnchant/PyEnchant
-    %20Tutorial.htm>`_, not tested by LDT developers.
-    * Mac: install enchant with brew (http://macappstore.org/enchant/)
-    * Linux: enchant should be available from your distribution repository.
-    E.g. on Ubuntu you should be able to just `sudo apt-get install enchant`.
+following.
 
 Note:
     Pyenchant developer announced that he's retiring from the project. It
@@ -253,7 +246,8 @@ class Spellchecker(Dictionary):
              'misspelling': 'grammE_r',
              'replaces': [('e', 'a')],
              'word': 'gramm_Ar'}
-            >>> ldt.dicts.spellcheck.get_opcode_alignment("generaly", "generally")
+            >>> ldt.dicts.spellcheck.get_opcode_alignment("generaly",
+            "generally")
             {'deletes': [],
              'inserts': ['l'],
              'misspelling': 'general_y',

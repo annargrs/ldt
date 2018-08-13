@@ -11,6 +11,5 @@
 
    Tutorial/index
    changelog
-   modules
+   py-modindex
    genindex
-

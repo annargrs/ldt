@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
 
     ldt.dicts.derivation.custom
+    ldt.dicts.derivation.wordnet
 
 Submodules
 ----------

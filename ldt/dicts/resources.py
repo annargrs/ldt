@@ -80,11 +80,12 @@ class ResourceDict(Dictionary):
         try:
             data = load_resource(self.path, format="infer",
                                  lowercasing=lowercasing)
+            self.data = data
         except FileNotFoundError:
             print("No resource was found, please check the file path "
                   ""+self.path)
 
-        self.data = data
+
 
 #todo lowercasing and splitting mwus for the whole resource
 

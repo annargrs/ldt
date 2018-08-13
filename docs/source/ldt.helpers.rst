@@ -2,7 +2,7 @@ ldt\.helpers package
 ====================
 
 Submodules
-----------
+++++++++++
 
 ldt\.helpers\.exceptions module
 -------------------------------
@@ -44,11 +44,3 @@ ldt\.helpers\.wiktionary\_cache module
     :undoc-members:
     :show-inheritance:
 
-
-Module contents
----------------
-
-.. automodule:: ldt.helpers
-    :members:
-    :undoc-members:
-    :show-inheritance:

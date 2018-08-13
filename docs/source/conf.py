@@ -146,9 +146,9 @@ html_static_path = ['_static']
 html_sidebars = {
     '**': ['about.html',
         'localtoc.html',
-        'sourcelink.html'
+        # 'sourcelink.html'
         # 'globaltoc.html',
-        'relations.html',  # needs 'show_related': True theme option to display
+        # 'relations.html',  # needs 'show_related': True theme option to display
         'navigation.html',
         'searchbox.html'
            ],

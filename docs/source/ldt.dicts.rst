@@ -2,7 +2,7 @@ ldt\.dicts package
 ==================
 
 Subpackages
------------
++++++++++++
 
 .. toctree::
 
@@ -13,7 +13,7 @@ Subpackages
     ldt.dicts.spellcheck
 
 Submodules
-----------
+++++++++++
 
 ldt\.dicts\.dictionary module
 -----------------------------
@@ -35,15 +35,6 @@ ldt\.dicts\.resources module
 ----------------------------
 
 .. automodule:: ldt.dicts.resources
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-Module contents
----------------
-
-.. automodule:: ldt.dicts
     :members:
     :undoc-members:
     :show-inheritance:
