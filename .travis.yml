@@ -23,9 +23,9 @@ install:
   - python -m nltk.downloader stopwords
   - python -m nltk.downloader wordnet
   - pip install -r requirements.txt
-#  - pip install -U coveralls
-#  - pip install -U coverage
-#  - pip install -U pylint
+  - pip install -U coveralls
+  - pip install -U coverage
+  - pip install -U pylint
 
 before_script: # configure a headless display to test plot generation
 - sudo apt-get install -y enchant #libenchant-dev
