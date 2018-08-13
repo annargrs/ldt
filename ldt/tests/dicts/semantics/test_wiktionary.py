@@ -2,6 +2,7 @@ import unittest
 
 import ldt
 import os
+import time
 
 from ldt.helpers.ignore import ignore_warnings as ignore_warnings
 
@@ -34,6 +35,7 @@ class Tests(unittest.TestCase):
     def test_word_in_wiktionary(self):
         test_dict = ldt.dicts.semantics.Wiktionary(cache=False)
         test_dict.language = "zulu"
+        time.sleep(0.5)
         self.assertTrue(test_dict.is_a_word("indlu"))
 
     @ignore_warnings
@@ -41,6 +43,7 @@ class Tests(unittest.TestCase):
         test_dict = ldt.dicts.semantics.Wiktionary(cache=False)
         test_dict.language = "zulu"
         # test_dict.load_cache()
+        time.sleep(0.5)
         res = test_dict.query("indlu")
         self.assertIn("definitions", res[0].keys())
 
@@ -48,6 +51,7 @@ class Tests(unittest.TestCase):
     def test_get_wiktionary_relations(self):
         test_dict = ldt.dicts.semantics.Wiktionary(cache=False)
         test_dict.language = "english"
+        time.sleep(0.5)
         res = test_dict.get_relations("white", relations="all")
         self.assertIn("black", res["antonyms"])
 
@@ -55,6 +59,7 @@ class Tests(unittest.TestCase):
     def test_get_wiktionary_relation(self):
         test_dict = ldt.dicts.semantics.Wiktionary(cache=False)
         test_dict.language = "english"
+        time.sleep(0.5)
         res = test_dict.get_relation("white", relation="antonyms")
         self.assertIn("black", res)
 

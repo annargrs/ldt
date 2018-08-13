@@ -1,6 +1,6 @@
 import unittest
 import os
-
+import time
 import ldt
 
 from ldt.helpers.ignore import ignore_warnings as ignore_warnings
@@ -35,12 +35,14 @@ class Tests(unittest.TestCase):
         # test_dict = ldt.dicts.semantics.wikisaurus.Wikisaurus(cache=False)
         # test_dict.language = "english"
         # test_dict.load_cache()
+        time.sleep(0.5)
         self.assertTrue(test_dict.is_a_word("benzodiazepine"))
 
     @ignore_warnings
     def test_retrieve_wikisaurus(self):
         # test_dict = ldt.dicts.semantics.wikisaurus.Wikisaurus(cache=False)
         # test_dict.language = "english"
+        time.sleep(0.5)
         res = test_dict.query("cat")
         self.assertIn("feline", res[0])
 
@@ -48,6 +50,7 @@ class Tests(unittest.TestCase):
     def test_parse_wikisaurus(self):
         # test_dict = ldt.dicts.semantics.wikisaurus.Wikisaurus(cache=False)
         # test_dict.language = "english"
+        time.sleep(0.5)
         res_data = test_dict.query("cat")
         res = test_dict._parse_wikisaurus_relations(res_data)
         self.assertIn("synonyms", res)
@@ -56,6 +59,7 @@ class Tests(unittest.TestCase):
     def test_cleanup_wikisaurus(self):
         # test_dict = ldt.dicts.semantics.wikisaurus.Wikisaurus(cache=False)
         # test_dict.language = "english"
+        time.sleep(0.5)
         res_data = test_dict.query("cat")
         res = test_dict._parse_wikisaurus_relations(res_data)
         cleaned_res = test_dict._cleanup_wikisaurus(res)
@@ -66,6 +70,7 @@ class Tests(unittest.TestCase):
     def test_wikisaurus_relations(self):
         # test_dict = ldt.dicts.semantics.wikisaurus.Wikisaurus(cache=False)
         # test_dict.language = "english"
+        time.sleep(0.5)
         res = test_dict.get_relations("cat", relations=("synonyms", "antonyms"))
         worked = "hyponyms" not in res and "tabby" in res["synonyms"]
         self.assertTrue(worked)

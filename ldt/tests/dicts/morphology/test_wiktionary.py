@@ -1,7 +1,7 @@
 import unittest
 
 import ldt
-
+import time
 from ldt.helpers.ignore import ignore_warnings as ignore_warnings
 
 test_dict = ldt.dicts.morphology.wiktionary.MorphWiktionary(cache=False,
@@ -19,11 +19,13 @@ class Tests(unittest.TestCase):
 
     @ignore_warnings
     def test_pos_dict(self):
+        time.sleep(0.5)
         res = test_dict.get_pos("cat")
         self.assertGreaterEqual(res["noun"], 8)
 
     @ignore_warnings
     def test_pos_list(self):
+        time.sleep(0.5)
         res = test_dict.get_pos("cat", formatting="list")
         worked = len(res) >= 2 and "noun" in res
         self.assertTrue(worked)

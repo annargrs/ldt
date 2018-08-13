@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-
+import time
 import ldt
 
 from ldt.helpers.ignore import ignore_warnings as ignore_warnings
@@ -22,6 +22,7 @@ class Tests(unittest.TestCase):
     def test_etymologies(self):
         test_dict = ldt.dicts.derivation.wiktionary.DerivationWiktionary(
             cache=False, language="english")
+        time.sleep(0.5)
         res = test_dict.get_etymologies("planetarium")
         self.assertIn("planet", res[0])
 
@@ -30,6 +31,7 @@ class Tests(unittest.TestCase):
         test_base_dict = ldt.dicts.base.wordnet.en.BaseWordNet()
         test_dict = ldt.dicts.derivation.wiktionary.DerivationWiktionary(
             cache=False, language="english")
+        time.sleep(0.5)
         res = test_dict.get_etymologies("brotherhood",
                                         exclude_old_sources=test_base_dict)
         worked = "brotherrede" not in res[0] and "brother" in res[0]
@@ -39,6 +41,7 @@ class Tests(unittest.TestCase):
     def test_related_words(self):
         test_dict = ldt.dicts.derivation.wiktionary.DerivationWiktionary(
             cache=False, language="english")
+        time.sleep(0.5)
         res = test_dict.get_related_words("wizard")
         self.assertIn("wizardess", res)
 

@@ -2,6 +2,7 @@
 
 import unittest
 import os
+import time
 
 import ldt
 from ldt.helpers.ignore import ignore_warnings as ignore_warnings
@@ -33,16 +34,19 @@ class Tests(unittest.TestCase):
 
     @ignore_warnings
     def test_metadictionary_is_a_word(self):
+        time.sleep(0.5)
         self.assertTrue(test_dict_fr.is_a_word("chatte"))
 
     @ignore_warnings
     def test_metadictionary_relations(self):
+        time.sleep(0.5)
         res = test_dict_en.get_relations("white", relations="main")
         worked = "unclean" in res["antonyms"] and "nonwhite" in res["antonyms"]
         self.assertTrue(worked)
 
     @ignore_warnings
     def test_metadictionary_relation(self):
+        time.sleep(0.5)
         res = test_dict_en.get_relation("white", relation="antonyms")
         worked = "unclean" in res and "nonwhite" in res
         self.assertTrue(worked)
