@@ -9,8 +9,8 @@ Subpackages
 
 """
 
-# from . import _version
-# from .load_config import config
+from . import _version
+from .load_config import config
 
 from ldt.helpers import resources
 from ldt.helpers import loading
