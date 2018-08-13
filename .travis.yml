@@ -16,6 +16,7 @@ addons:
     packages:
     - enchant
     - aspell
+    - aspell-en
     - aspell-de
     - aspell-fr
 #    - myspell-dictionary-de
