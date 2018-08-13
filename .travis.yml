@@ -15,6 +15,12 @@ addons:
     update: true
     packages:
     - enchant
+    - aspell
+    - aspell-de
+    - aspell-fr
+    - myspell-dictionary-de
+    - myspell-dictionary-fr
+
 #    - libenchant-dev
 
 install:
