@@ -1,2 +1,2 @@
-from .en import SpellingNazi
+from .en import SpellcheckerEn
 from .custom import Spellchecker

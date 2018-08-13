@@ -27,12 +27,19 @@ class Tests(unittest.TestCase):
     def test_dict_is_foreign(self):
         self.assertTrue(test_dict.is_a_word("chateau"))
 
+    def test_dict_with_charset(self):
+        self.assertFalse(test_dict._filter_by_charset("ça", include=["latin",
+                                                               "with"]))
+
+    def test_dict_latin(self):
+        self.assertFalse(test_dict._filter_by_charset("кот", include=["latin"]))
+
     def test_dict_suggest(self):
         self.assertIn("with", test_dict.suggest("iwth"))
 
     #only aspell is installed in travis, so the order does not actually change
     def test_dict_providers(self):
-        test_dict2 = ldt.dicts.spellcheck.Spellchecker(engine_order="myspell,aspell")
+        test_dict2 = ldt.dicts.spellcheck.Spellchecker(engine_order="aspell,myspell")
         self.assertEqual(test_dict.provider, test_dict2.provider)
 
     def test_opcodes(self):

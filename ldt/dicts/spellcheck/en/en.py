@@ -34,7 +34,7 @@ import operator
 from ldt.dicts.spellcheck.custom import Spellchecker as Spellchecker
 
 
-class SpellingNazi(Spellchecker):
+class SpellcheckerEn(Spellchecker):
     """The class providing the basic English WordNet interface.
 
     Since WordNets are language-specific, any further additions will have to
@@ -47,19 +47,75 @@ class SpellingNazi(Spellchecker):
 
     """
 
-    def __init__(self, **kw):  #pylint: disable=unused-argument
+    def __init__(self, foreign_languages=("german", "french"),
+                 engine_order="aspell,myspell"):
         """ Initializing the Misspellings class.
 
         Sets language to "en"
 
         """
 
-        super(SpellingNazi, self).__init__(language="en", **kw)
+        super(SpellcheckerEn, self).__init__(language="en",
+                                             foreign_languages=foreign_languages,
+                                             engine_order=engine_order)
 
+
+    def filter_by_charset(self, word):
+        """An English-specific wrapper for :meth:`_filter_by_charset` that
+        excludes words containing anything other than alphanumeric
+        characters or hyphen.
+
+        Exclusion of "with" enables avoiding Latin characters with diacritics.
+
+        Args:
+            word (str): the word to check.
+
+        Returns:
+            (bool): True if only allowed charsets are present
+        """
+        return self._filter_by_charset(word, include=["latin", "digit",
+                                       "hyphen-minus", "apostrophe"],
+                                       exclude=["with"])
+
+    def is_foreign(self, word, dictionary=None):
+        """Excluding foreign words with a combination of charset checking and
+        select foreign dictionaries.
+
+        Args:
+            word (str): the word to check
+            dictionary (LDT dictionary object): if specified, checking if a
+                word entry is present for English will also be conducted in this
+                language.
+
+        Note:
+
+            Wiktionary pagelists should *not* be used to detemine if a word
+            has an entry in English, because it is Wiktionary's explicit aim
+            that all Wiktionaries should contain entries for all words. For
+            example, the lists of lemmas in the English Wiktionary also
+            contains lemmas for other languages
+            (https://en.wiktionary.org/wiki/Category:Lemmas_by_language).
+
+        Returns:
+            (bool): False if the word either contains foreign characters or is
+            found in foreign dictionaries (excluding words present in the
+            English spellchecker dictionary)
+
+        """
+        if not self.filter_by_charset(word):
+            return True
+
+        if self.is_a_word(word):
+            return False
+        if dictionary:
+            if dictionary.is_a_word(word):
+                return False
+        elif self.in_foreign_dicts(word):
+            return True
 
     #pylint: disable=too-many-locals
     #pylint: disable=too-many-branches
-    def spellcheck(self, word, confidence=True, strict=True, min_length=4):
+    def spelling_nazi(self, word, confidence=True, strict=True, min_length=4):
         """This function attempts to correct common misspellings according
         to a predefined set of patterns.
 

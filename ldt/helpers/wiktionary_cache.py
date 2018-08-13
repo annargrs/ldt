@@ -26,6 +26,8 @@ Example:
 Todo:
     * refactor the tests
     * usage example in the module description
+    * switch to lemma lists instead of page title lists
+      (https://en.wiktionary.org/wiki/Category:English_lemmas)
 
 """
 

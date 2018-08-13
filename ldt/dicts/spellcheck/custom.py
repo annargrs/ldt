@@ -39,6 +39,7 @@ Todo:
 """
 
 import functools
+import unicodedata
 
 from difflib import SequenceMatcher
 
@@ -156,13 +157,13 @@ class Spellchecker(Dictionary):
 
 
     @functools.lru_cache(maxsize=None)
-    def is_foreign(self, word):
+    def in_foreign_dicts(self, word):
         """Returns True if the word is found in the spellchecker resoures
         for the specified foreign languages.
 
         Example:
             >>> test_dict = ldt.dicts.spellcheck.Spellchecker()
-            >>> test_dict.is_foreign("chocolat")
+            >>> test_dict.in_foreign_dicts("chocolat")
             False
 
         Args:
@@ -176,6 +177,52 @@ class Spellchecker(Dictionary):
             if spelldict.check(word):
                 return True
         return False
+
+    # pylint: disable=no-self-use
+    def _filter_by_charset(self, word, include=["latin", "digit"],
+                          exclude=["with"]):
+        """Simple filter by character type: returns False for words with
+        letters from any Unicode charset other than the the listed.
+
+        Example:
+            >>> test_dict = ldt.dicts.spellcheck.Spellchecker()
+            >>> test_dict.filter_by_charset("猫", "LATIN")
+            False
+
+        Args:
+            word (str): the word to check;
+            charsets (list): the character categories as returned by python
+            unicodedata (`full list of codes
+            <http://unicode.org/charts/charindex.html>`)).  Useful values include:
+
+                * [latin] for all Latin characters
+                * [latin, with] to exclude diacritics
+                * [cyrillic]
+                * [arabic]
+                * [korean]
+                * [cjk] (unified ideograms)
+                * [hyphen-minus, apostrophe, digit]
+                * etc.
+
+        Returns:
+            (bool): True if the word's characters are entirely within the
+            specified charsets
+        """
+        include = [x.lower() for x in include]
+        exclude = [x.lower() for x in exclude]
+        for character in word:
+
+            name = unicodedata.name(character).lower()
+            if " " in name:
+                name = set(name.split())
+            else:
+                name = set([name])
+
+            if not name.intersection(set(include)):
+                return False
+            elif name.intersection(set(exclude)):
+                return False
+        return True
 
     def suggest(self, word):
         """Suggesting alternative spellings for the word.

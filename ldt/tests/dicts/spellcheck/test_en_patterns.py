@@ -4,7 +4,8 @@ import unittest
 
 import ldt
 
-test_dict = ldt.dicts.spellcheck.en.SpellingNazi(engine_order="aspell,myspell")
+test_dict = ldt.dicts.spellcheck.en.SpellcheckerEn(engine_order="aspell,"
+                                                                "myspell")
 
 
 class Tests(unittest.TestCase):
@@ -17,6 +18,18 @@ class Tests(unittest.TestCase):
 
     def test_dict_initialization(self):
         self.assertIn("fr", test_dict.foreign_languages)
+
+    def test_dict_with_charset(self):
+        self.assertTrue(test_dict.filter_by_charset("the-cat-and-the-fiddle"))
+
+    def test_dict_foreign(self):
+        self.assertTrue(test_dict.is_foreign("猫"))
+
+    def test_dict_foreign(self):
+        self.assertTrue(test_dict.is_foreign("niño"))
+
+    def test_dict_foreign(self):
+        self.assertTrue(test_dict.is_foreign("chocolat"))
 
     def test_double_letters(self):
         res = test_dict.common_misspellings("gramar", "grammar")
@@ -43,29 +56,30 @@ class Tests(unittest.TestCase):
     #     self.assertIn('extra_common_letter', res)
 
     def test_min_length(self):
-        res = test_dict.spellcheck("pot", min_length=4)
+        res = test_dict.spelling_nazi("pot", min_length=4)
         self.assertFalse(res)
 
     def test_existing(self):
-        res = test_dict.spellcheck("abandon", strict=True)
+        res = test_dict.spelling_nazi("abandon", strict=True)
         self.assertFalse(res)
 
     def test_patterns(self):
-        res = test_dict.spellcheck("abillity", confidence=True, strict=True)
+        res = test_dict.spelling_nazi("abillity", confidence=True,
+                                        strict=True)
         self.assertEqual(res, "ability")
 
     def test_strict(self):
-        res = test_dict.spellcheck("abondon", strict=True)
+        res = test_dict.spelling_nazi("abondon", strict=True)
         self.assertFalse(res)
 
     def test_non_strict(self):
-        res = test_dict.spellcheck("abondon", strict=False, confidence=False)
+        res = test_dict.spelling_nazi("abondon", strict=False,
+                                       confidence=False)
         if "abandon" in res:
             worked = True
         else:
             worked = False
         self.assertTrue(worked)
-
 
 if __name__ == '__main__':
     unittest.main()
