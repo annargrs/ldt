@@ -40,7 +40,7 @@ setup(
     author='Anna Rogers',
     tests_require=['pytest'],
     install_requires=["ruamel.yaml", "pyenchant", "wiktionaryparser",
-                      "hurry.filesize"],
+                      "hurry.filesize", "timeout-decorator"],
     cmdclass={'test': PyTest},
     author_email='anna_rogers@uml.edu',
     description='Linguistic diagnostics for word embeddings',

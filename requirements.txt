@@ -2,3 +2,4 @@ ruamel.yaml
 pyenchant
 wiktionaryparser
 hurry.filesize
+timeout-decorator

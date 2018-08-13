@@ -23,21 +23,21 @@ install:
   - python -m nltk.downloader stopwords
   - python -m nltk.downloader wordnet
   - pip install -r requirements.txt
-  - pip install -U coveralls
-  - pip install -U coverage
-  - pip install -U pylint
+#  - pip install -U coveralls
+#  - pip install -U coverage
+#  - pip install -U pylint
 
 before_script: # configure a headless display to test plot generation
 - sudo apt-get install -y enchant #libenchant-dev
-- "export DISPLAY=:99.0"
-- "sh -e /etc/init.d/xvfb start"
-- sleep 3 # give xvfb some time to start
+#- "export DISPLAY=:99.0"
+#- "sh -e /etc/init.d/xvfb start"
+#- sleep 3 # give xvfb some time to start
 
 script:
 #- python -m coverage run --source . -m unittest discover --verbose
 - "coverage run --source=ldt setup.py test"
 
 after_success:
-  - python -m pylint --load-plugins=pylint.extensions.mccabe --docstring-min-length 5 --no-docstring-rgx "^(test)?_|.*Tests$" --unsafe-load-any-extension y --output-format colorized  --reports y $(find . -name "*.py")
-  - python -m coverage report --show-missing
-  - coveralls
+#  - python -m pylint --load-plugins=pylint.extensions.mccabe --docstring-min-length 5 --no-docstring-rgx "^(test)?_|.*Tests$" --unsafe-load-any-extension y --output-format colorized  --reports y $(find . -name "*.py")
+#  - python -m coverage report --show-missing
+#  - coveralls
