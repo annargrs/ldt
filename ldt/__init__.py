@@ -9,7 +9,7 @@ Subpackages
 
 """
 
-from . import _version
+from ._version import __version__
 from .load_config import config
 
 from ldt.helpers import resources
