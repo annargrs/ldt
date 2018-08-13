@@ -37,31 +37,15 @@ class Tests(unittest.TestCase):
         worked = "brotherrede" not in res[0] and "brother" in res[0]
         self.assertTrue(worked)
 
-    @ignore_warnings
-    def test_related_words(self):
-        test_dict = ldt.dicts.derivation.wiktionary.DerivationWiktionary(
-            cache=False, language="english")
-        time.sleep(0.5)
-        res = test_dict.get_related_words("kind")
-        self.assertIn("kindliness", res)
+    # @ignore_warnings
+    # def test_related_words(self):
+    #     test_dict = ldt.dicts.derivation.wiktionary.DerivationWiktionary(
+    #         cache=False, language="english")
+    #     time.sleep(0.5)
+    #     res = test_dict.get_related_words("kind")
+    #     self.assertIn("kindliness", res)
         # res = test_dict.get_related_words("wizard")
         # self.assertIn("wizardess", res)
-
-
-    #     self.assertGreaterEqual(res["noun"], 8)
-    #
-    # def test_pos_list(self):
-    #     test_dict = ldt.dicts.morphology.wiktionary.MorphWiktionary(
-    #         cache=False, language="english")
-    #     res = test_dict.get_pos("cat", formatting="list")
-    #     worked = len(res) >= 2 and "noun" in res
-    #     self.assertTrue(worked)
-
-    # def test_lemmatize(self):
-    #     test_dict = ldt.dicts.morphology.wiktionary.MorphWiktionary()
-    #     res = test_dict.lemmatize("cats")
-    #     worked = len(res) == 1 and "cat" in res
-    #     self.assertTrue(worked)
 
 if __name__ == '__main__':
     unittest.main()
