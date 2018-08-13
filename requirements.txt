@@ -3,3 +3,4 @@ pyenchant
 wiktionaryparser
 hurry.filesize
 timeout-decorator
+inflect
