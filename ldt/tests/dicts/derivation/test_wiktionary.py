@@ -42,8 +42,10 @@ class Tests(unittest.TestCase):
         test_dict = ldt.dicts.derivation.wiktionary.DerivationWiktionary(
             cache=False, language="english")
         time.sleep(0.5)
-        res = test_dict.get_related_words("wizard")
-        self.assertIn("wizardess", res)
+        res = test_dict.get_related_words("kind")
+        self.assertIn("kindliness", res)
+        # res = test_dict.get_related_words("wizard")
+        # self.assertIn("wizardess", res)
 
 
     #     self.assertGreaterEqual(res["noun"], 8)

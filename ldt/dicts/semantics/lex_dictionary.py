@@ -318,7 +318,8 @@ class DictionaryWithDefinitions(LexicographicDictionary, metaclass=ABCMeta):
 
         # except LookupError("No NLTK tokenizer for "+nltk_language):
         # problem: TypeError: catching classes that do not inherit from BaseException is not allowed
-        words = words.split()
+        if isinstance(words, str):
+            words = words.split()
         words = list(set(words))
 
         if stopwords:
