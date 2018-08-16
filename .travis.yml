@@ -30,6 +30,7 @@ install:
   - python -m nltk.downloader stopwords
   - python -m nltk.downloader wordnet
   - python -m nltk.downloader punkt
+  - pip install -U pyenchant
   - pip install -r requirements.txt
   - pip install -U coveralls
   - pip install -U coverage
