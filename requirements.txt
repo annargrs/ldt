@@ -4,3 +4,4 @@ wiktionaryparser
 hurry.filesize
 timeout-decorator
 inflect
+nltk
