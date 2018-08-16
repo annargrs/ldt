@@ -30,7 +30,20 @@ class Tests(unittest.TestCase):
 
     @ignore_warnings
     def test_metadictionary_wn(self):
-        self.assertEqual(test_dict_en.wn._language, "en")
+        self.assertEqual(test_dict_en.wordnet._language, "en")
+
+    @ignore_warnings
+    def test_metadictionary_order(self):
+        self.assertEqual(test_dict_en._order, ["wordnet", "wiktionary", "wikisaurus"])
+
+    @ignore_warnings
+    def test_metadictionary_minimal(self):
+        self.assertEqual(test_dict_en.is_a_word("cat", minimal=True), ["wordnet"])
+
+    @ignore_warnings
+    def test_metadictionary_max(self):
+        res = test_dict_en.is_a_word("cat", minimal=False)
+        self.assertTrue(len(res) > 1)
 
     @ignore_warnings
     def test_metadictionary_is_a_word(self):

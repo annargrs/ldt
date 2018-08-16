@@ -12,11 +12,13 @@ Todo:
 
 """
 
+from ldt.helpers.exceptions import AuthorizationError
+
 from ldt.dicts.dictionary import Dictionary as Dictionary
 from ldt.dicts.semantics.wikisaurus import Wikisaurus
 from ldt.dicts.semantics.wiktionary import Wiktionary
 from ldt.dicts.semantics.wordnet.en import WordNet
-
+from ldt.dicts.semantics.babelnet import BabelNet
 
 # from ldt.config import lowercasing as config_lowercasing
 # from ldt.config import language as config_language
@@ -25,62 +27,138 @@ from ldt.dicts.semantics.wordnet.en import WordNet
 from ldt.load_config import config as config
 
 class MetaDictionary(Dictionary):
+    """Class implementing a collection of dictionaries which are queried in
+    the specified oder (either the entire collection or until the first
+    match is found).
 
-    def __init__(self, language=config["default_language"],
+    Examples:
+        >>> meta = ldt.dicts.metadictionary.MetaDictionary(languge="English")
+        # each constituent dictionary is accessible as an attribute on the
+        # meta-dictionary, with all their functionality:
+        >>> meta.wiktionary.is_a_word("cat")
+        True
+        # or via the _dicts attribute, which contains a dictionary with
+        # dictionary types as keys
+        >>> meta.wiktionary._dicts["wiktionary"].is_a_word("cat")
+        True
+        # the list of constituent dictionaries that should be initialized,
+        # and the order in which they should be queried are set with order
+        # parameter:
+        >>> meta = ldt.dicts.metadictionary.MetaDictionary(order=['wordnet',
+        'wiktionary', 'wikisaurus'], languge="English")
+        >>> meta._order
+        ['wordnet', 'wiktionary', 'wikisaurus']
+        # this is the order in which the dictionaries should be queried for
+        the # minimal-result setting
+        >>> meta._is_a_word("cat", minimal=True)
+        ["wordnet]
+        >>> meta._is_a_word("cat", minimal=False)
+        ['wordnet', 'wiktionary', 'wikisaurus']
+
+    """
+    def __init__(self, order=("wordnet", "wiktionary", "wikisaurus",
+                              "babelnet"),
+                 language=config["default_language"],
                  lowercasing=config["lowercasing"],
                  split_mwu=config["split_mwu"],
-                 cache=config["wiktionary_cache"]):
-        self.language = language
+                 cache=config["wiktionary_cache"],
+                 babelnet_key=config["babelnet_key"]):
 
-        self.wiktionary = Wiktionary(language=language,
-                                     lowercasing=lowercasing,
-                                     split_mwu=split_mwu,
-                                     cache=cache)
-        self.wikisaurus = Wikisaurus(language=language,
-                                     lowercasing=lowercasing,
-                                     split_mwu=split_mwu,
-                                     cache=cache)
-        if language.lower() in ["en", "english"]:
-            self.wn = WordNet(lowercasing, split_mwu)
-            self._dicts = (self.wn, self.wikisaurus, self.wiktionary)
-        else:
-            self._dicts = (self.wikisaurus, self.wiktionary)
+        self.language = language
+        self._dicts = {}
+        self._order = []
+
+        for dictionary in order:
+
+            if dictionary == "wiktionary":
+                self.wiktionary = Wiktionary(language=language,
+                                             lowercasing=lowercasing,
+                                             split_mwu=split_mwu,
+                                             cache=cache)
+                self._dicts[dictionary] = self.wiktionary
+                self._order.append(dictionary)
+            if dictionary == "wikisaurus":
+                self.wikisaurus = Wikisaurus(language=language,
+                                             lowercasing=lowercasing,
+                                             split_mwu=split_mwu,
+                                             cache=cache)
+                self._dicts[dictionary] = self.wikisaurus
+                self._order.append(dictionary)
+            if dictionary == "babelnet":
+                try:
+                    self.babelnet = BabelNet(language=language,
+                                             lowercasing=lowercasing,
+                                             split_mwu=split_mwu,
+                                             babelnet_key=babelnet_key)
+                    self._dicts[dictionary] = self.babelnet
+                    self._order.append(dictionary)
+                except AuthorizationError:
+                    pass
+            if dictionary == "wordnet" and language.lower() in ["en", "english"]:
+                self.wordnet = WordNet(lowercasing, split_mwu)
+                self._dicts[dictionary] = self.wordnet
+                self._order.append(dictionary)
+
         self.supported_relations = ("synonyms", "antonyms", "hyponyms",
                                     "hypernyms", "meronyms", "holonyms",
                                     "troponyms", "coordinate terms", "other")
 
-    def is_a_word(self, word):
-        """ Determining if a word has an entry in at least one resource.
+    def is_a_word(self, word, minimal=True):
+        """ Returning the name of the resource containing an entry for the
+        queried word (the first in the pre-defined order).
+
+        Examples:
+            >>> meta = ldt.dicts.metadictionary.MetaDictionary(cache=False)
+            >>> meta.is_a_word("cat")
+            ['wordnet']
+            >>> meta.is_a_word("cat", minimal=False)
+            ['wordnet', 'wiktionary', 'wikisaurus', "babelnet"]
 
         Args:
-            word (str): the word to be looked up
+            word (str): the word to be looked up.
+            minimal (bool): if True, only the first matching dictionary is
+            returned
 
         Returns:
-            (bool): whether the target word has an entry in the resource
+            (list): which resource(s) contains an entry for the queried word,
+            if any
 
         """
-        for dictionary in self._dicts:
-            if dictionary.is_a_word(word):
-                return True
+        res = []
+        for dictionary in self._order:
+            if self._dicts[dictionary].is_a_word(word):
+                res.append(dictionary)
+                if minimal:
+                    return res
+        if res:
+            return res
+        return None
 
-    def get_relations(self, word, relations="main"):
+    def get_relations(self, word, minimal=False, relations="main"):
         """Combining relations data from all available sources.
 
         Args:
             word (str): the word to be looked up
+            minimal (bool): if True, only the first matching resource will be
+                queried
             relations (tuple, string): the relations to look up
 
         Returns:
             (dict): dictionary with relations as keys and lists of words as
-            values
+                values
+
+        Todo:
+
+            * component dicts should just ignore relations that they don't have
+            * include babelnet relations in supported_relations
 
         """
         res = {}
 
-        for dictionary in self._dicts:
-            if dictionary.is_a_word(word):
-                relation_dict = dictionary.get_relations(word, relations,
-                                                         reduce=True)
+        dicts = self.is_a_word(word, minimal)
+        for i in dicts:
+                relation_dict = self._dicts[i].get_relations(word, relations,
+                                                             reduce=True)
                 # print(relation_dict)
                 for relation in relation_dict:
                     if not relation in res:
@@ -92,7 +170,7 @@ class MetaDictionary(Dictionary):
             res[relation] = sorted(res[relation])
         return res
 
-    def get_relation(self, word, relation):
+    def get_relation(self, word, relation, minimal=False):
         """Wrapper for :meth:`get_relations` for one-relation use.
 
         Some resources like WordNet have detailed interfaces for different
@@ -103,6 +181,8 @@ class MetaDictionary(Dictionary):
         Args:
             word (str): the word to be looked up
             relation (str): the relation to look up
+            minimal (bool): if True, only the first matching resource will be
+                queried
 
         Returns:
             (list): the list of words related to the target word with the
@@ -110,10 +190,10 @@ class MetaDictionary(Dictionary):
         """
 
         res = []
-        for dictionary in self._dicts:
-            if dictionary.is_a_word(word):
-                if relation in dictionary.supported_relations:
-                    res += dictionary.get_relation(word, relation)
+        dicts = self.is_a_word(word, minimal)
+        for i in dicts:
+                if relation in self._dicts[i].supported_relations:
+                    res += self._dicts[i].get_relation(word, relation)
         res = list(set(res))
         res = sorted(res)
         return res

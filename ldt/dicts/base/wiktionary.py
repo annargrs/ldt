@@ -12,6 +12,7 @@
     Todo:
         * silent cache loading,
         * silent cache update every 2 weeks
+        * sleep option
 """
 
 import functools

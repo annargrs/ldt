@@ -14,8 +14,6 @@ import shutil
 # import nltk
 import ruamel.yaml as yaml
 
-from ldt._version import __version__
-
 from ldt.helpers.exceptions import ResourceError as ResourceError
 
 warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
@@ -27,13 +25,8 @@ warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
 
 TESTFILE = os.path.dirname(os.path.realpath(__file__))
 TESTFILE = os.path.join(TESTFILE, "tests/sample_files/.ldt-config.yaml")
-# TESTFILE = os.path.abspath(".test/sample_files/.ldt-config.yaml")
 
-# if not os.path.exists(TESTFILE):
-#     egg = "/ldt-"+__version__+"-py3.5/"
-#     TESTFILE = TESTFILE.replace("/ldt/", egg)
-
-if "unittest" in sys.modules:
+if "unittest" in sys.modules or "sphinx" in sys.modules:
     CONFIGPATH = TESTFILE
 else:
     CONFIGPATH = os.path.expanduser('~/.ldt-config.yaml')
@@ -47,14 +40,12 @@ def load_config(path=CONFIGPATH):
     directory"""
 
     if not os.path.isfile(path):
-        # raise ResourceError("User configuration file not found at path "+path)
         raise ResourceError("Configuration yaml file was not found at "+path)
 
     with open(path) as stream:
         try:
             options = yaml.safe_load(stream)
         except yaml.YAMLError:
-            # print("Something is wrong with the configuration yaml file.")
             raise ResourceError("Something is wrong with the configuration "
                                 "yaml file.")
 
