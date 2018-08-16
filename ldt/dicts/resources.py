@@ -28,7 +28,7 @@ class ResourceDict(Dictionary):
     """A class for simple resources like vocabulary lists, which only
     require simple lookup."""
 
-    def __init__(self, path=config, resource="names",
+    def __init__(self, path=None, resource="names",
                  language=config["default_language"],
                  lowercasing=config["lowercasing"],
                  split_mwu=config["split_mwu"]):
@@ -40,7 +40,7 @@ class ResourceDict(Dictionary):
                 spellings of multi-word expressions their dashed and spaced
                 versions should also be produced (e.g. 'good night',
                 'good_night', "good-night")
-            path (str, dict): if str, interpreted as the full direct path to
+            path (str): if str, interpreted as the full direct path to
                 the resource to be used (one-column vocab text file expected).
                 Otherwise LDT will look for the file in the
                 language_resources subfolder of the ldt_resources folder,
@@ -59,7 +59,7 @@ class ResourceDict(Dictionary):
         if isinstance(path, str):
             self.path=path
 
-        if isinstance(path, dict):
+        if not path:
 
             if resource in ["names", "numbers", "associations"]:
                 resource_type = "language_resources"
@@ -99,7 +99,7 @@ class NameDictionary(ResourceDict):
 
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"], path=config, resource="names"):
+                 split_mwu=config["split_mwu"], path=None, resource="names"):
         """ Initializing the names lookup class.
 
         Args:
@@ -124,7 +124,7 @@ class NumberDictionary(ResourceDict):
 
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"], path=config,
+                 split_mwu=config["split_mwu"], path=None,
                  resource="numbers"):
         """ Initializing the numbers lookup class.
 
@@ -142,7 +142,7 @@ class NumberDictionary(ResourceDict):
         """
         super(NumberDictionary, self).__init__(language=language,
                                              lowercasing=lowercasing,
-                                             split_mwu=split_mwu, path=path,
+                                             split_mwu=split_mwu, path=None,
                                              resource=resource)
 
     def is_a_word(self, word):
@@ -168,7 +168,7 @@ class AssociationDictionary(ResourceDict):
 
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"], path=config,
+                 split_mwu=config["split_mwu"], path=None,
                  resource="associations"):
         """ Initializing the associations lookup class.
 
