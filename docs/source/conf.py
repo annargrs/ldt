@@ -20,7 +20,7 @@
 import os
 import sys
 import shutil
-sys.path.insert(0, os.path.abspath('..'))
+# sys.path.insert(0, os.path.abspath('.'))
 from ldt import __version__
 
 # root = os.path.abspath(".")
@@ -28,6 +28,7 @@ root = os.path.dirname(os.path.realpath(__file__))
 # root = root.rstrip("/")
 tutorial_path = os.path.join(root, "Tutorial/resources/.ldt-config.yaml")
 root = root.rstrip("/docs/source")
+sys.path.insert(0, root)
 sample_file = os.path.join(root, "ldt/tests/sample_files/.ldt-config.yaml")
 shutil.copyfile(sample_file, tutorial_path)
 
