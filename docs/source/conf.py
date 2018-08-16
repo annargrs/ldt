@@ -31,6 +31,8 @@ root = root.rstrip("/docs/source")
 sample_file = os.path.join(root, "ldt/tests/sample_files/.ldt-config.yaml")
 shutil.copyfile(sample_file, tutorial_path)
 
+autodoc_mock_imports = ["nltk", "enchant", "pyenchant"]
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.

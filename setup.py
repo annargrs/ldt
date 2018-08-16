@@ -39,7 +39,7 @@ setup(
     license='Apache Software License',
     author='Anna Rogers',
     tests_require=['pytest'],
-    install_requires=["ruamel.yaml", "pyenchant", "wiktionaryparser",
+    install_requires=["ruamel.yaml", "wiktionaryparser",
                       "hurry.filesize", "timeout-decorator", "inflect"],
     cmdclass={'test': PyTest},
     author_email='anna_rogers@uml.edu',
