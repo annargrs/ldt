@@ -20,7 +20,7 @@
 import os
 import sys
 import shutil
-sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('..'))
 from ldt import __version__
 
 # root = os.path.abspath(".")
@@ -31,7 +31,7 @@ root = root.rstrip("/docs/source")
 sample_file = os.path.join(root, "ldt/tests/sample_files/.ldt-config.yaml")
 shutil.copyfile(sample_file, tutorial_path)
 
-autodoc_mock_imports = ["nltk", "enchant", "pyenchant", "ldt"]
+autodoc_mock_imports = ["nltk", "enchant", "pyenchant"]
 
 # -- General configuration ------------------------------------------------
 
