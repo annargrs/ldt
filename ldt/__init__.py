@@ -33,6 +33,7 @@ from ldt.dicts.morphology.wordnet import en
 from ldt.dicts.morphology import babelnet
 from ldt.dicts.morphology import wiktionary
 from ldt.dicts.morphology import morph_dictionary
+from ldt.dicts.morphology import meta
 
 from ldt.dicts.spellcheck.en import en
 from ldt.dicts.spellcheck import custom

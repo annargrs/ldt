@@ -86,6 +86,11 @@ class Dictionary(metaclass=abc.ABCMeta):
     def _set_language(self, language):
         self._language = language
 
+    def _lowercase(self, word):
+        if self.lowercasing:
+            return word.lower()
+        return word
+
     @abc.abstractmethod
     def is_a_word(self, word):
         """Stub for the compulsory method for all subclasses that

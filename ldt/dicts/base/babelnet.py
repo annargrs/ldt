@@ -67,9 +67,9 @@ class BaseBabelNet(Dictionary):
         if len(self.language) > 2:
             self.language = lookup_language(self.language, reverse=True)
         self._language = self.language.upper()
-        if config["babelnet_key"]:
-            if config["babelnet_key"] != "None":
-                self.babelnet_key = config["babelnet_key"]
+        if babelnet_key:
+            if babelnet_key != "None":
+                self.babelnet_key = babelnet_key
             else:
                 raise AuthorizationError("Please provide a BabelNet key. If you "
                                          "don't have one, register at "
@@ -104,6 +104,7 @@ class BaseBabelNet(Dictionary):
             return True
         return False
 
+    @functools.lru_cache(maxsize=None)
     def query(self, url):
         """Helper method for querying BabelNet
 

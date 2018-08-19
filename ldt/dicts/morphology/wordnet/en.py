@@ -26,7 +26,8 @@ class MorphWordNet(MorphDictionary, BaseWordNet):
     """This class implements an interface for retrievning POS
     information from NLTK WordNet and lemmatization."""
 
-    def __init__(self, language=config["default_language"]):
+    def __init__(self, language=config["default_language"],
+                 lowercasing=config["lowercasing"]):
         """ Initializing the base class.
 
         Args:
@@ -35,7 +36,8 @@ class MorphWordNet(MorphDictionary, BaseWordNet):
 
         """
 
-        super(MorphWordNet, self).__init__(language=language)
+        super(MorphWordNet, self).__init__(language=language,
+                                           lowercasing=lowercasing)
 
     def get_pos(self, word, formatting="dict"):
         """Stub for the method of all subclasses of MorphDictionary that
@@ -61,6 +63,7 @@ class MorphWordNet(MorphDictionary, BaseWordNet):
         Todo:
             * pos format
         """
+        word = self._lowercase(word)
         poses = []
         res = {}
         tags = [".v.", ".n.", ".a.", ".r.", ".s."]
@@ -78,7 +81,7 @@ class MorphWordNet(MorphDictionary, BaseWordNet):
             "s": "adjective"
         }
         new_res = {new_tags[k]: res[k] for k in res}
-        if format == "list":
+        if formatting == "list":
             new_res = list(new_res.keys())
         return new_res
 
@@ -98,7 +101,7 @@ class MorphWordNet(MorphDictionary, BaseWordNet):
 
         Todo:
         """
-
+        word = self._lowercase(word)
         res = []
         verb = WordNetLemmatizer().lemmatize(word, 'v')
         adjective = WordNetLemmatizer().lemmatize(word, 'a')

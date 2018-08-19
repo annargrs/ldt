@@ -28,9 +28,7 @@ class MorphDictionary(Dictionary, metaclass=ABCMeta):
 
     """
     # pylint: disable=unused-argument
-    def __init__(self, language=config["default_language"],
-                 lowercasing=config["lowercasing"], split_mwu=config[
-                "split_mwu"], cache=config["wiktionary_cache"]):
+    def __init__(self, **kw):
         """ Initializing the base class.
 
         Args:
@@ -42,9 +40,7 @@ class MorphDictionary(Dictionary, metaclass=ABCMeta):
 
         """
 
-        super(MorphDictionary, self).__init__(language=language,
-                                              lowercasing=lowercasing,
-                                              split_mwu=split_mwu, cache=cache)
+        super(MorphDictionary, self).__init__(**kw)
 
     @abstractmethod
     def get_pos(self, word, formatting):

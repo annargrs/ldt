@@ -16,6 +16,7 @@ class MorphBabelNet(MorphDictionary, BaseBabelNet):
     BabelNet. At the moment, only POS tags can be obtained."""
 
     def __init__(self, language=config["default_language"],
+                 lowercasing=config["lowercasing"],
                  babelnet_key=config["babelnet_key"]):
         """ Initializing the base class.
 
@@ -26,7 +27,8 @@ class MorphBabelNet(MorphDictionary, BaseBabelNet):
         """
 
         super(MorphBabelNet, self).__init__(language=language,
-                                            babelnet_key=babelnet_key)
+                                            babelnet_key=babelnet_key,
+                                            lowercasing=lowercasing)
 
     def get_pos(self, word, formatting="dict"):
         """Retrieving parts of speech for a given word.
@@ -46,7 +48,7 @@ class MorphBabelNet(MorphDictionary, BaseBabelNet):
             * pos format
         """
 
-        word = self.get_ids(word, full=True)
+        word = self.get_ids(self._lowercase(word), full=True)
 
         if not word:
             return {}
@@ -64,7 +66,8 @@ class MorphBabelNet(MorphDictionary, BaseBabelNet):
         return res
 
     def lemmatize(self, word):
-        """BabelNet currently does not support lookup of non-lemmatized forms.
+        """BabelNet currently does not support lookup in non-lemmatized
+        forms. If a word is found, LDT assumes that it is a lemma.
 
         Args:
             word (str): the word to be looked up
@@ -74,5 +77,5 @@ class MorphBabelNet(MorphDictionary, BaseBabelNet):
 
         Todo:
         """
-
-        raise NotImplementedError()
+        if self.is_a_word(word):
+            return [word]

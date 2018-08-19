@@ -10,6 +10,11 @@ class Tests(unittest.TestCase):
 
     """
 
+    def test_dict_initialization(self):
+        with self.assertRaises(ldt.helpers.exceptions.AuthorizationError):
+            test_dict = ldt.dicts.morphology.babelnet.MorphBabelNet(
+                language="english", babelnet_key="None")
+
     # def test_dict_initialization(self):
     #     test_dict = ldt.dicts.morphology.babelnet.MorphBabelNet(
     #         language="english")

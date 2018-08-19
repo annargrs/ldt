@@ -48,7 +48,7 @@ class MorphWiktionary(MorphDictionary, BaseWiktionary):
             * pos format
         """
 
-        word = self.query(word)
+        word = self.query(self._lowercase(word))
 
         if not word:
             return {}
@@ -68,7 +68,7 @@ class MorphWiktionary(MorphDictionary, BaseWiktionary):
 
     def lemmatize(self, word):
         """Wiktionary currently does not support lookup in non-lemmatized
-        forms.
+        forms. If a word is found, LDT assumes that it is a lemma.
 
         Args:
             word (str): the word to be looked up
@@ -78,5 +78,5 @@ class MorphWiktionary(MorphDictionary, BaseWiktionary):
 
         Todo:
         """
-
-        raise NotImplementedError()
+        if self.is_a_word(word):
+            return [word]

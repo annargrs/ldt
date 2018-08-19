@@ -197,25 +197,3 @@ class MetaDictionary(Dictionary):
         res = list(set(res))
         res = sorted(res)
         return res
-
-
-# @functools.lru_cache(maxsize=None)
-# def get_semantic_relations(word):
-#     spellings = list(word.spellings.keys())
-#     stems = list(word.stems.keys())
-#     sem = {}
-#     stem_sem = {}
-#     for s in spellings:
-#         rels = collect_all_semantic_relations(s)
-#         sem.update(rels)
-#     for stem in stems:
-#         rels = collect_all_semantic_relations(stem)
-#         stem_sem.update(rels)
-#     #lowercase and set all words in relations
-#     for rel in stem_sem:
-#         stem_sem[rel] = set(w.lower() for w in stem_sem[rel])
-#     for rel in sem:
-#         sem[rel] = set(w.lower() for w in sem[rel])
-#     word.semantics = sem
-#     word.stem_semantics = stem_sem
-#     return word
