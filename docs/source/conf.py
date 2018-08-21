@@ -23,11 +23,15 @@ import shutil
 # sys.path.insert(0, os.path.abspath('.'))
 # sys.path.insert(0, os.path.abspath('..'))
 # sys.path.insert(0, os.path.abspath('...'))
+
+root = os.path.dirname(os.path.realpath(__file__))
+import ldt
+
 from ldt import __version__
 sys.path.append(os.path.join(os.path.dirname(__name__), '..'))
 # root = os.path.abspath(".")
-root = os.path.dirname(os.path.realpath(__file__))
-# root = root.rstrip("/")
+
+
 tutorial_path = os.path.join(root, "Tutorial/resources/.ldt-config.yaml")
 root = root.rstrip("/docs/source")
 sys.path.insert(0, root)
