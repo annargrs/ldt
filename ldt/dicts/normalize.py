@@ -160,9 +160,9 @@ class Normalization(MorphMetaDict):
         if self.namedict.is_a_word(word):
             res["word_categories"] = ["Names"]
             res["lemmas"] = [word]
-        # else:
-        #     if self.spelldict.is_foreign(word):
-        #         res["word_categories"] = ["Foreign"]
+        else:
+            if self.spelldict.is_foreign(word):
+                res["word_categories"] = ["Foreign"]
         return res
 
     def _fix(self, word):

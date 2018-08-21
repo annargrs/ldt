@@ -68,15 +68,15 @@ class Tests(unittest.TestCase):
         res = test_dict.normalize("cats")
         self.assertIn("cat", res["lemmas"])
 
-    @ignore_warnings
-    def test_names(self):
-        res = test_dict.normalize("alice")
-        self.assertIn("Names", res["word_categories"])
-
     # @ignore_warnings
-    # def test_foreign(self):
-    #     res = test_dict.normalize("niño")
-    #     self.assertIn("Foreign", res["word_categories"])
+    # def test_names(self):
+    #     res = test_dict.normalize("alice")
+    #     self.assertIn("Names", res["word_categories"])
+
+    @ignore_warnings
+    def test_foreign(self):
+        res = test_dict.normalize("niño")
+        self.assertIn("Foreign", res["word_categories"])
     #
     # @ignore_warnings
     # def test_denoise(self):
