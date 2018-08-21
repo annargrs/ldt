@@ -15,6 +15,8 @@ Examples:
     {"lemmas": ["cat"], "word_categories": ["hashtag"]}
 
 Todo:
+    * check the checking of foreign words against wiktionary output
+    * binding spellcheckers and wordnets by languages
     * creation of default config file upon installation
     * the right error path in NLTK tokenizer
     * add .citation property, and print it out on initialization
@@ -22,107 +24,180 @@ Todo:
         citation for this resource.
 """
 
-# trying to clean up
+import functools
+
+from ldt.dicts.dictionary import Dictionary as Dictionary
+from ldt.dicts.morphology.meta import MorphMetaDict as MorphMetaDict
+from ldt.dicts.resources import NumberDictionary as NumberDictionary
+from ldt.dicts.resources import NameDictionary as NameDictionary
+from ldt.dicts.resources import WebDictionary as WebDictionary
+from ldt.dicts.resources import FileDictionary as FileDictionary
+from ldt.dicts.spellcheck.en.en import SpellcheckerEn as Spellchecker
+
+from ldt.load_config import config as config
 
 
 
+def contains_a_letter(word):
+    """Helper for :meth:`analyze`"""
+    for char in word:
+        if char.isalpha():
+            return True
+    return False
+
+#%%
+def contains_non_letters(word):
+    """Helper for :meth:`analyze`"""
+    for char in word:
+        if not char.isalpha():
+            if not char in ["'", "-"]:
+                return True
+    return False
+
+#%%
+def contains_splittable_chars(word):
+    """Helper for :meth:`analyze`"""
+    for char in word:
+        if char in ["'", "-"]:
+            return True
+    return False
 
 @functools.lru_cache(maxsize=None)
-def analyze(word):
+def denoise(word):
     '''
-    :param word: an ldt.word object
-    :return: object with modified spellings, is_misspelled and is_lemmatized attributes
+    Remove trash symbols, if any
     '''
-    wordform = str(word.original_spelling)
-    spellings = []
-    if not contains_a_letter(wordform):
-        word.is_noise.append(True)
+    trash = []
+    for char in list(word):
+        if not char.isalnum():
+            trash.append(char)
+    for char in trash:
+        word = word.strip(char)
+    if not contains_non_letters(word):
         return word
-    #if contains trash, clean up
-    if contains_fishy_punctuation(wordform):
-        # TODO dots in filenames and extensions
-        candidate = turn_to_word(wordform)
-        candidates = turn_to_words(wordform)
-        if candidate == None:
-            word.has_extension = True
-        else:
-            word.has_extension = False
-            if len(candidate) > 0:
-                word.is_misspelled = True
-#            print(1, candidate)
-                spellings+=candidate
-        if candidates != None:
-#            print(2, candidates)
-            if word.has_extension:
-                candidates = candidates[:-1]
-                word.is_misspelled = False
-            for variant in candidates:
-                if variant != None:
-                    if len(variant) > 0:
-                        if not variant in stopWords:
-                            check = check_cleaned_up_variant(variant, word, l="derivation")
-                            if check != None:
-                                word = check
-                            if not word.has_extension:
-                                word.is_misspelled = True
     else:
-        #TODO append british / american spellings
-        spellings.append(wordform)
-    #now proceed with a spellings list without punctuation trash
-    for variant in spellings:
-        if variant != None:
-            if len(variant) > 0:
-                #print("\nprocessing the variant: ", variant)
-
-                check = check_cleaned_up_variant(variant, word, l = "spellings")
-                if check != None:
-                    word = check
-
-
-                #try splitting a compound or misspelling:
-
-                split = split_a_compound(variant)
-                if split != False:
-                    #print("splitted: ", split)
-                    word.is_misspelled=True
-                    for w in split:
-                #         print(w)
-                        check = check_cleaned_up_variant(w, word, l = "derivation")
-                        if check != None:
-                            word = check
-                            #print("here", word.spellings)
-                    try_hyphenating = "-".join(split)
-                    check = check_cleaned_up_variant(try_hyphenating, word, l="spelling")
-                    if check != None:
-                        word = check
-                        word.is_misspelled = True
-                    try_underscore = "_".join(split)
-                    check = check_cleaned_up_variant(try_underscore, word, l="spelling")
-                    if check != None:
-                        word = check
-                        word.is_misspelled = True
-            #
-            # if all failed, try to spellcheck and check for foreign words
-                if len(word.spellings) == 0 and len(word.stems) == 0:
-                    for variant in spellings:
-                        if len(spellings) == 1:
-                            if not is_english(variant):
-                                word.is_foreign = True
-                            if ldt.dicts.cleanup.spellchecker.check_if_foreign(variant):
-                                word.is_foreign = True
-                            #else:
-                                #word.is_foreign = False
-                    #only do "safe" spellchecking when there's less chance to get it wrong:
-                        if not word.is_foreign:
-                            if abs(len(variant) - len(word.original_spelling)) < 2:
-                                variant = ldt.dicts.cleanup.spellchecker.spellcheck(variant , confidence = True)
-                                if variant:
-                                    check = check_cleaned_up_variant(variant, word, l="spellings")
-                                    if check != None:
-                                        word = check
-                                        word.is_misspelled = True
-    #for now just make tags unique
-    word.is_a_lemma = list(set(word.is_a_lemma))
-    word.affixes = list(set(word.affixes))
-#    print("\n\n")
+        #if something in the middle of the word, like gr#eef
+        for char in trash:
+            if char not in ["-", "'"]:
+                word = word.replace(char, "")
     return word
+
+# def hyphenation(word)
+#     if "-" in word:
+#         if not "-free" in word and not "-in" in word and not "-like" in word and not "-stricken" in word and not "-to-be" in word:
+#             if check_in_dictionaries(word.replace("-","")):
+#                 candidates.append(word.replace("-",""))
+#             elif check_in_dictionaries(word.replace("-","_")):
+#                 candidates.append(word.replace("-","_"))
+#     if "_" in word:
+#         if check_in_dictionaries(word.replace("_", "-")):
+#             candidates.append(word.replace("_", "-"))
+#     return candidates
+
+
+class Normalization(MorphMetaDict):
+
+    def __init__(self, language=config["default_language"],
+                 lowercasing=config["lowercasing"], order=("wordnet",
+                                                           "wiktionary",
+                                                           "custom")):
+        """ Initializing the base class.
+
+        Args:
+            language (str): the query language
+            lowercasing (bool): whether all input should be lowercased
+
+        """
+
+        super(Normalization, self).__init__(language=language,
+                                            lowercasing=lowercasing,
+                                            order=order)
+        # self.basedict = MorphMetaDict(order="wordnet", "babelnet")
+        self.namedict = NameDictionary(language=language, lowercasing=lowercasing)
+        self.numberdict = NumberDictionary(language=language, lowercasing=lowercasing)
+        self.webdict = WebDictionary(lowercasing=lowercasing)
+        self.filedict = FileDictionary(lowercasing=lowercasing)
+        self.spelldict = Spellchecker()
+
+    def _noise(self, word):
+        res = {}
+        if word.isnumeric():
+            res["word_categories"] = ["Numbers"]
+        else:
+            res["word_categories"] = ["Noise"]
+        return res
+
+    def _resources(self, word):
+
+        res = {}
+
+        if self.numberdict.is_a_word(word):
+            res["word_categories"] = ["Numbers"]
+        if self.webdict.is_a_word(word):
+            res["word_categories"] = ["URLs"]
+        elif self.filedict.is_a_word(word):
+            res["word_categories"] = ["Filenames"]
+        if word.startswith("#"):
+            attempt = self.is_a_word(word.strip("#"))
+            if attempt:
+                res["word_categories"] = ["Hashtags"]
+                res["found_in"] = attempt
+                res["lemmas"] = self.lemmatize(word.strip("#"))
+        return res
+
+    def _word(self, word):
+
+        res = {}
+
+        num = self.numberdict.is_a_word(word)
+        if num:
+            res["word_categories"] = ["Numbers"]
+
+        attempt = self.is_a_word(word)
+        if attempt:
+            res["found_in"] = attempt
+            res["lemmas"] = self.lemmatize(word)
+        if self.namedict.is_a_word(word):
+            res["word_categories"] = ["Names"]
+            res["lemmas"] = [word]
+        # else:
+        #     if self.spelldict.is_foreign(word):
+        #         res["word_categories"] = ["Foreign"]
+        return res
+
+    def _fix(self, word):
+        res = {}
+        attempt = denoise(word)
+        lemmas = self.lemmatize(attempt)
+        if lemmas:
+            res["lemmas"] = lemmas
+        return res
+
+    def normalize(self, word):
+
+        word = str(word)
+
+        res = {}
+        while not res:
+
+            if not contains_a_letter(word):
+            # the word contains nothing to analyze
+                res = self._noise(word)
+
+            elif contains_non_letters(word):
+            # URLs, filenames, numbers etc
+                res = self._resources(word)
+
+        # the word is correctly spelled and is in dict, is a name or a
+        # foreign word
+            else:
+                res = self._word(word)
+
+        # # the word has to be modified
+        #     res = self._fix(word)
+        return res
+
+
+if __name__ == "__main__":
+    d = Normalization()
+    print(d.normalize("apt500"))

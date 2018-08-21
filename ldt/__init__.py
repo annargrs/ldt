@@ -22,6 +22,7 @@ from ldt.helpers import formatting
 from ldt.dicts import dictionary
 from ldt.dicts import metadictionary
 from ldt.dicts import resources
+from ldt.dicts import normalize
 
 from ldt.dicts.base.custom import en
 from ldt.dicts.base.wordnet import en

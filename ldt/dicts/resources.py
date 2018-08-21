@@ -12,6 +12,7 @@ Todo:
 """
 
 import os
+import functools
 
 from abc import ABCMeta, abstractmethod
 
@@ -88,11 +89,12 @@ class ResourceDict(Dictionary):
 
 
 #todo lowercasing and splitting mwus for the whole resource
-
+    @functools.lru_cache(maxsize=None)
     def is_a_word(self, word):
         if word in self.data:
             return True
         return False
+
 
 class NameDictionary(ResourceDict):
     """A class for language-specific name resources."""
@@ -145,6 +147,7 @@ class NumberDictionary(ResourceDict):
                                              split_mwu=split_mwu, path=None,
                                              resource=resource)
 
+    @functools.lru_cache(maxsize=None)
     def is_a_word(self, word):
         """Returns True if the word is an ordinal or cardinal numeral,
         or if if contains an Arabic number.
@@ -155,12 +158,18 @@ class NumberDictionary(ResourceDict):
         Returns:
             (bool): True if the word is or contains a number.
         """
-        if word.lower() in self.data:
+        word = word.lower()
+        if word in self.data:
             return True
         else:
-            for i in word.lower():
-                if i.isnumeric():
-                    return True
+            # for char in word:
+            #     if char.isnumeric():
+            #         return True
+            word = list(word)
+            numbers = len([x for x in word if x.isnumeric()])
+            # # letters = len([x for x in word if x.isalpha()])
+            if numbers >= 2 or numbers/len(word) > 0.4:
+                return True
         return False
 
 class AssociationDictionary(ResourceDict):

@@ -60,6 +60,9 @@ class MorphMetaDict(Dictionary):
                  cache=config["wiktionary_cache"],
                  babelnet_key=config["babelnet_key"]):
 
+        super(MorphMetaDict, self).__init__(language=language,
+                                            lowercasing=lowercasing)
+
         self.language = language
         self._dicts = {}
         self._order = []

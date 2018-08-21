@@ -36,8 +36,9 @@ class Tests(unittest.TestCase):
     def test_numbers(self):
         self.assertTrue(number_dict.is_a_word("2"))
 
+    #todo: split such cases?
     def test_numbers(self):
-        self.assertTrue(number_dict.is_a_word("test2"))
+        self.assertFalse(number_dict.is_a_word("test2"))
 
     def test_associations(self):
         test_dict = ldt.dicts.resources.AssociationDictionary(

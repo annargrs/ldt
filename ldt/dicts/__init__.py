@@ -1,4 +1,5 @@
 from .dictionary import Dictionary
+from .normalize import Normalization
 from .metadictionary import MetaDictionary
 from .resources import NameDictionary, NumberDictionary, \
     AssociationDictionary, WebDictionary, FileDictionary
