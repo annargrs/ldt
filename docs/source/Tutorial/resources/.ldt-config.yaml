@@ -16,7 +16,7 @@ split_mwu: False
 babelnet_key: None
 
 # if True, a recent list of wiktionary entries will be downloaded to avoid queries for non-existing entries
-wiktionary_cache: True
+wiktionary_cache: False
 
 # Extra language-specific resources
 
