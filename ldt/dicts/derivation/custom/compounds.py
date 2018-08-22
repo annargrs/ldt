@@ -262,7 +262,7 @@ class Compounds(BaseCustomDict):
         return res
 
 
-def filter_by_min_length(splits, min_length, threshold=0.5):
+def filter_by_min_length(splits, min_length, threshold=0.1):
     """Filtering out those compound analyses that contain over a
     threshold (50% by default) of words over specified length
 

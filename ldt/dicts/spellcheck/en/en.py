@@ -73,9 +73,16 @@ class SpellcheckerEn(Spellchecker):
         Returns:
             (bool): True if only allowed charsets are present
         """
-        return self._filter_by_charset(word, include=["latin", "digit",
-                                       "hyphen-minus", "apostrophe"],
-                                       exclude=["with"])
+        try:
+            word.encode('ascii')
+            return True
+        except UnicodeEncodeError:
+            return False
+
+        # else:
+        #     return self._filter_by_charset(word, include=["latin", "digit",
+        #                                    "hyphen-minus", "apostrophe"],
+        #                                    exclude=["with"])
 
     def is_foreign(self, word, dictionary=None):
         """Excluding foreign words with a combination of charset checking and

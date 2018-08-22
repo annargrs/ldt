@@ -6,8 +6,8 @@ import ldt
 from ldt.helpers.ignore import ignore_warnings as ignore_warnings
 
 test_dict = ldt.dicts.normalize.Normalization(language="English",
-                                              lowercasing=False,
-                                              order=("wordnet", "custom"))
+                                              order=("wordnet", "custom"),
+                                              lowercasing=True)
 
 class Tests(unittest.TestCase):
     """
@@ -56,7 +56,7 @@ class Tests(unittest.TestCase):
 
     def test_numbers(self):
         res = test_dict.normalize("twenty")
-        self.assertEqual(res["word_categories"], ["Numbers"])
+        self.assertIn("Numbers", res["word_categories"])
 
     @ignore_warnings
     def test_basic(self):
@@ -68,24 +68,55 @@ class Tests(unittest.TestCase):
         res = test_dict.normalize("cats")
         self.assertIn("cat", res["lemmas"])
 
-    # @ignore_warnings
-    # def test_names(self):
-    #     res = test_dict.normalize("alice")
-    #     self.assertIn("Names", res["word_categories"])
+    @ignore_warnings
+    def test_names(self):
+        res = test_dict.normalize("alice")
+        self.assertIn("Names", res["word_categories"])
 
     @ignore_warnings
     def test_foreign(self):
-        res = test_dict.normalize("niño")
+        res = test_dict.normalize("gouvernement")
         self.assertIn("Foreign", res["word_categories"])
+
+    def test_denoise(self):
+        res = ldt.dicts.normalize.denoise("#$%cats(*")
+        self.assertEqual(res, "cats")
+
+    def test_denoise_norm(self):
+        res = test_dict.normalize("#$%cats(*")
+        self.assertIn("cat", res["lemmas"])
+
+    def test_misspell(self):
+        res = test_dict.spelldict.spelling_nazi("mispelling")
+        self.assertEqual(res, "misspelling")
+
+    def test_misspell_norm(self):
+        res = test_dict.normalize("gramar")
+        self.assertIn("grammar", res["lemmas"])
+    # fix spelling
     #
-    # @ignore_warnings
-    # def test_denoise(self):
-    #     res = test_dict.normalize("#$%cats(*")
-    #     print(res)  #{'found_in': ['wordnet'], 'lemmas': ['cat']}
-    #     self.assertIn("cat", res["lemmas"])
+    # # fix hyphenation
+    @ignore_warnings
+    def test_hyphenation(self):
+        res = test_dict.normalize("hy-phen")
+        self.assertIn("hyphen", res["lemmas"])
 
+    @ignore_warnings
+    def test_dash_join(self):
+        res = test_dict._dash("hy-phen")
+        self.assertIn("hyphen", res["lemmas"])
+    #
+    @ignore_warnings
+    def test_split(self):
+        res = test_dict.normalize("cat.purrs")
+        worked = "purr" in res["lemmas"] and "cat" in res["lemmas"]
+        self.assertTrue(worked)
 
-
+    @ignore_warnings
+    def test_split_unspaced(self):
+        res = test_dict.normalize("knownissue")
+        worked = "known" in res["lemmas"] and "issue" in res["lemmas"]
+        self.assertTrue(worked)
 
 if __name__ == '__main__':
     unittest.main()

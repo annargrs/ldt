@@ -103,17 +103,23 @@ class MorphWordNet(MorphDictionary, BaseWordNet):
         """
         word = self._lowercase(word)
         res = []
-        verb = WordNetLemmatizer().lemmatize(word, 'v')
-        adjective = WordNetLemmatizer().lemmatize(word, 'a')
-        noun = WordNetLemmatizer().lemmatize(word, 'n')
-        if verb != word:
-            res.append(verb)
-        elif adjective != word:
-            res.append(adjective)
-        elif noun != word:
-            res.append(noun)
-        for synset in wn.synsets(word):
-            if synset.name().split(".")[0] == word:
-                res.append(word)
-                break
-        return res
+        if word[-1] in ["e", "t", "n", "d", "w", "g", "k", "l", "s", "y",
+                        "m", "n"]:
+            verb = WordNetLemmatizer().lemmatize(word, 'v')
+            if verb != word:
+                res.append(verb)
+        if word.endswith("er") or word.endswith("est"):
+            adjective = WordNetLemmatizer().lemmatize(word, 'a')
+            if adjective != word:
+                res.append(adjective)
+        if word.endswith("s"):
+            noun = WordNetLemmatizer().lemmatize(word, 'n')
+            if noun != word:
+                res.append(noun)
+        elif self.is_a_word(word):
+            res.append(word)
+        # for synset in wn.synsets(word):
+        #     if synset.name().split(".")[0] == word:
+        #         res.append(word)
+        #         break
+        return list(set(res))

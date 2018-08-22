@@ -1,18 +1,39 @@
 # -*- coding: utf-8 -*-
 """ This module brings together multiple resources for either:
 
- * confirming that a word is found in resources;
+ * confirming that a word is found in what resources;
  * confirming that the word is of a category that excludes its being in
    resources (e.g. it is a proper noun, a foreign word or a number);
  * attempting to lemmatize by productive rules;
- * attempting to normalize the spelling.
+ * attempting to normalize the hyphenation and tokenization errors;
+ * attempting to
 
 Examples:
-    >>> test_dict.normalize("#cat")
-    {is_standard: False, "lemmas": ["cat"], "word_categories": ["hashtag"],
-    "found_in": ["WordNet"]}
-    >>> test_dict.normalize("cat")
-    {"lemmas": ["cat"], "word_categories": ["hashtag"]}
+    >>> test_dict = ldt.dicts.normalize.Normalization(language="English",
+                                              order=("wordnet", "custom"),
+                                              lowercasing=True)
+    >>> test_dict.normalize("grammar")
+    {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': ['Lexicon']}
+    >>> test_dict.normalize("grammars")
+    {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': ['Lexicon']}
+    >>> test_dict.normalize("grammarxyz")
+    None
+    >>> test_dict.normalize("grammaire")
+     {'word_categories': ['Foreign']}
+    >>> test_dict.normalize("gramar")
+    {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': ['Misspellings']}
+    >>> test_dict.normalize("%grammar")
+    {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': ['Misspellings']}
+    >>> test_dict.normalize("grammar.com")
+    {'word_categories': ['URLs']}
+    >>> test_dict.normalize("grammar.jpg")
+    {'word_categories': ['Filenames']}
+    >>> test_dict.normalize("gram-mar")
+    {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': ['Misspellings']}
+    >>> test_dict.normalize("grammar.lexicon")
+    {'found_in': ['wordnet'], 'lemmas': ['grammar', "lexicon], 'word_categories': ['Misspellings']}
+    >>> test_dict.normalize("grammarlexicon")
+    {'found_in': ['wordnet'], 'lemmas': ['grammar', "lexicon], 'word_categories': ['Misspellings']}
 
 Todo:
     * check the checking of foreign words against wiktionary output
@@ -26,13 +47,14 @@ Todo:
 
 import functools
 
-from ldt.dicts.dictionary import Dictionary as Dictionary
 from ldt.dicts.morphology.meta import MorphMetaDict as MorphMetaDict
 from ldt.dicts.resources import NumberDictionary as NumberDictionary
 from ldt.dicts.resources import NameDictionary as NameDictionary
 from ldt.dicts.resources import WebDictionary as WebDictionary
 from ldt.dicts.resources import FileDictionary as FileDictionary
 from ldt.dicts.spellcheck.en.en import SpellcheckerEn as Spellchecker
+from ldt.dicts.derivation.custom.compounds import Compounds as Compounds
+from ldt.dicts.morphology.wordnet.en import MorphWordNet as MorphWordNet
 
 from ldt.load_config import config as config
 
@@ -45,7 +67,6 @@ def contains_a_letter(word):
             return True
     return False
 
-#%%
 def contains_non_letters(word):
     """Helper for :meth:`analyze`"""
     for char in word:
@@ -54,19 +75,9 @@ def contains_non_letters(word):
                 return True
     return False
 
-#%%
-def contains_splittable_chars(word):
-    """Helper for :meth:`analyze`"""
-    for char in word:
-        if char in ["'", "-"]:
-            return True
-    return False
-
 @functools.lru_cache(maxsize=None)
 def denoise(word):
-    '''
-    Remove trash symbols, if any
-    '''
+    """Remove non-alpha symbols, if any."""
     trash = []
     for char in list(word):
         if not char.isalnum():
@@ -82,44 +93,68 @@ def denoise(word):
                 word = word.replace(char, "")
     return word
 
-# def hyphenation(word)
-#     if "-" in word:
-#         if not "-free" in word and not "-in" in word and not "-like" in word and not "-stricken" in word and not "-to-be" in word:
-#             if check_in_dictionaries(word.replace("-","")):
-#                 candidates.append(word.replace("-",""))
-#             elif check_in_dictionaries(word.replace("-","_")):
-#                 candidates.append(word.replace("-","_"))
-#     if "_" in word:
-#         if check_in_dictionaries(word.replace("_", "-")):
-#             candidates.append(word.replace("_", "-"))
-#     return candidates
 
+def turn_to_words(word):
+    """Split on non-alphanumeric characters, if any."""
+    res = []
+    subword = ""
+    for char in list(word):
+        if char.isalnum():
+            subword = subword + char
+        else:
+            if subword:
+                res.append(subword)
+            subword = ""
+    res.append(subword)
+    return res
 
 class Normalization(MorphMetaDict):
+    """The normalizer class brings together many ldt resources for
+    fixing frequent tokenization and spelling problems in the word
+    embeddings vocabulary."""
 
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"], order=("wordnet",
                                                            "wiktionary",
                                                            "custom")):
-        """ Initializing the base class.
+        """ Initializing the normalizer class.
 
         Args:
             language (str): the query language
             lowercasing (bool): whether all input should be lowercased
+            order (tuple of str): the resources that should be used to check the
+              existence of an entry, in that order
 
         """
 
         super(Normalization, self).__init__(language=language,
                                             lowercasing=lowercasing,
                                             order=order)
-        # self.basedict = MorphMetaDict(order="wordnet", "babelnet")
+        #: ldt names dictionary object
         self.namedict = NameDictionary(language=language, lowercasing=lowercasing)
+        #: ldt number object
         self.numberdict = NumberDictionary(language=language, lowercasing=lowercasing)
+        #: ldt web dictionary object
         self.webdict = WebDictionary(lowercasing=lowercasing)
+        #: ldt filename dictionary object
         self.filedict = FileDictionary(lowercasing=lowercasing)
+        #: ldt spelldictionary dictionary object
         self.spelldict = Spellchecker()
 
+        morph_dict = MorphWordNet()
+        #: ldt compound splitter object
+        self.splitter = Compounds(dictionary=self.wordnet,
+                                  morph_dictionary=morph_dict)
+
     def _noise(self, word):
+        """Handling the cases where the input doesn't contain any letters.
+
+        Args:
+            word (str): the word to check.
+
+        Returns:
+            (dict): word category labels and found lemmas, if any.
+        """
         res = {}
         if word.isnumeric():
             res["word_categories"] = ["Numbers"]
@@ -128,76 +163,222 @@ class Normalization(MorphMetaDict):
         return res
 
     def _resources(self, word):
+        """Handling the cases where the input is contains something
+        non-alphanumeric and belongs to some unanalyzable category like
+        filenames, or punctuation it can be split on.
 
+        Args:
+            word (str): the word to check.
+
+        Returns:
+            (dict): word category labels and found lemmas, if any.
+        """
         res = {}
 
         if self.numberdict.is_a_word(word):
             res["word_categories"] = ["Numbers"]
-        if self.webdict.is_a_word(word):
+        elif self.webdict.is_a_word(word):
             res["word_categories"] = ["URLs"]
         elif self.filedict.is_a_word(word):
             res["word_categories"] = ["Filenames"]
-        if word.startswith("#"):
+        elif word.startswith("#"):
             attempt = self.is_a_word(word.strip("#"))
             if attempt:
                 res["word_categories"] = ["Hashtags"]
                 res["found_in"] = attempt
                 res["lemmas"] = self.lemmatize(word.strip("#"))
-        return res
+        else:
+            res = self._subwords(word)
+        if res:
+            return res
+
+
+
+    def _subwords(self, word):
+        """Handling the cases where the input doesn't contain any letters.
+
+        Args:
+            word (str): the word to check.
+
+        Note:
+            The normalizer class should include at least wiktionary in the
+            dictionary order option to be able to handle articles,
+            prepositions etc. that are erroneously appended to a word (e.g.
+            "cats.and"), as they are not included in WordNet.
+
+        Returns:
+            (dict): word category labels and found lemmas, if any.
+        """
+        # need at least wiktionary to handle "cat.and"
+        subwords = turn_to_words(word)
+        if len(subwords) > 1:
+            res = {}
+            res["lemmas"] = []
+            res["found_in"] = []
+            res["word_categories"] = ["Misspellings"]
+            for subword in subwords:
+                lemmas = self.lemmatize(subword)
+                if not lemmas:
+                    return None
+                else:
+                    res["lemmas"] += lemmas
+                    res["found_in"] += self.is_a_word(subword, minimal=True)
+
+            # if len(res["found_in"]) == len(subwords):
+            res["lemmas"] = list(set(res["lemmas"]))
+            res["found_in"] = list(set(res["found_in"]))
+            return res
 
     def _word(self, word):
+        """Handling the cases where the input doesn't contain any
+        non-letter characters: straightforward lemmatization, name detection,
+        correction of frequent misspellings.
 
-        res = {}
+        Args:
+            word (str): the word to check.
+
+        Returns:
+            (dict): word category labels and found lemmas, if any.
+        """
+        res = {"word_categories": []}
 
         num = self.numberdict.is_a_word(word)
         if num:
-            res["word_categories"] = ["Numbers"]
+            res["word_categories"].append("Numbers")
+            res["lemmas"] = [word]
 
         attempt = self.is_a_word(word)
         if attempt:
             res["found_in"] = attempt
             res["lemmas"] = self.lemmatize(word)
+            res["word_categories"].append("Lexicon")
         if self.namedict.is_a_word(word):
-            res["word_categories"] = ["Names"]
+            res["word_categories"].append("Names")
             res["lemmas"] = [word]
-        else:
+        if not res["word_categories"]:
             if self.spelldict.is_foreign(word):
-                res["word_categories"] = ["Foreign"]
+                res["word_categories"].append("Foreign")
+
+        if not res["word_categories"]:
+            misspelled = self.spelldict.spelling_nazi(word)
+            if misspelled:
+                lemmas = self.lemmatize(misspelled)
+                if lemmas:
+                    res["found_in"] = self.is_a_word(lemmas[0])
+                    res["lemmas"] = lemmas
+                    res["word_categories"] = ["Misspellings"]
+
         return res
 
     def _fix(self, word):
+        """Cleaning up the cases where noise symbols can be removed (*"%cat*).
+
+        Args:
+            word (str): the word to check.
+
+        Returns:
+            (dict): word category labels and found lemmas, if any.
+        """
         res = {}
+        #denoising
         attempt = denoise(word)
-        lemmas = self.lemmatize(attempt)
-        if lemmas:
-            res["lemmas"] = lemmas
+        if attempt != word:
+            lemmas = self.lemmatize(attempt)
+            if lemmas:
+                res["lemmas"] = lemmas
+                res["found_in"] = self.is_a_word(lemmas[0])
+                res["word_categories"] = ["Misspellings"]
+            if res:
+                return res
+
+
+    def _dash(self, word):
+        """Cleaning up the cases where the word is erroneously hyphenated.
+
+        Args:
+            word (str): the word to check.
+
+        Returns:
+            (dict): word category labels and found lemmas, if any.
+        """
+        res = {}
+        dashes = ["―", "—", "–", "-", "‒"]
+        for dash in dashes:
+            if dash in word:
+                attempt = word.replace(dash, "")
+                dicts = self.is_a_word(attempt)
+                if dicts:
+                    res["found_in"] = dicts
+                    res["lemmas"] = [attempt]
+                    res["word_categories"] = ["Misspellings"]
+                    return res
+
+    def _unspaced(self, word):
+        """Cleaning up the cases where the word is erroneously joined.
+
+        Args:
+            word (str): the word to check.
+
+        Todo:
+           * the min split length parameter to be settable in the normalizer
+           dictionary
+
+        Returns:
+            (dict): word category labels and found lemmas, if any.
+        """
+        res = {"word_categories": ["Misspellings"], "lemmas":[]}
+        splits = self.splitter.split_compound(word, filtering="min_split_4")
+        if splits:
+            for split in splits:
+                for subword in split:
+                    dicts = self.is_a_word(subword)
+                    if dicts:
+                        res["found_in"] = dicts
+                        res["lemmas"].append(subword)
         return res
 
     def normalize(self, word):
+        """The main normalizer function bringing together all functonality.
 
+        Args:
+            word (str): the word to check.
+
+        Returns:
+            (dict): word category labels and found lemmas, if any.
+        """
         word = str(word)
 
-        res = {}
-        while not res:
+        if not contains_a_letter(word):
+        # the word contains nothing to analyze
+            res = self._noise(word)
+            if res:
+                return res
 
-            if not contains_a_letter(word):
-            # the word contains nothing to analyze
-                res = self._noise(word)
+        res = self._dash(word)
+        if res:
+            return res
 
-            elif contains_non_letters(word):
+
+        if contains_non_letters(word):
             # URLs, filenames, numbers etc
-                res = self._resources(word)
+            res = self._resources(word)
+            if res:
+                return res
 
         # the word is correctly spelled and is in dict, is a name or a
         # foreign word
+        else:
+
+            res = self._word(word)
+            if res["word_categories"]:
+                return res
             else:
-                res = self._word(word)
+                res = self._unspaced(word)
+                if res["lemmas"]:
+                    return res
 
         # # the word has to be modified
-        #     res = self._fix(word)
-        return res
-
-
-if __name__ == "__main__":
-    d = Normalization()
-    print(d.normalize("apt500"))
+        if not res:
+            res = self._fix(word)
+            if res["lemmas"]:
+                return res
