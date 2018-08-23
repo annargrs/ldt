@@ -5,3 +5,5 @@ hurry.filesize
 timeout-decorator
 inflect
 nltk
+vsmlib
+pandas

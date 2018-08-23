@@ -21,11 +21,9 @@ LDT is a shiny new Python library for doing two things:
 * using the above to **explore and profile word embeddings**, i.e. the cool
   distributional representations of words as vectors.
 
-  If you have never heard about word embeddings -- you're missing out, here's `an introduction
-  <https://www.shanelynn.ie/get-busy-with-word-embeddings-introduction/>`_.
-  If you have, head  over to the `project website <ldtoolkit.space>`_ for
-  some new research results. And if you don't care about word embeddings, you
-  can still just use LDT as a supplement to NLTK, SpaCy, and other great NLP tools.
+If you have never heard about word embeddings -- you're missing out, here's `an introduction <https://www.shanelynn.ie/get-busy-with-word-embeddings-introduction/>`_.  If you have, head  over to the `project website <ldtoolkit.space>`_ for some new research results. And if you don't care about word embeddings, you can still just use LDT as a supplement to NLTK, SpaCy, and other great NLP tools.
+
+**Note:** LDT is undergoing refactoring, and not all the LD scores published** `in the paper <http://aclweb.org/anthology/C18-1228>`_ are in the public build yet. Check back for the rest of the code and detailed tutorial in the end of August.
 
 .. inclusion-marker-end-do-not-remove
 
@@ -33,13 +31,13 @@ LDT is a shiny new Python library for doing two things:
 Current functionality
 ----------------------
 
-* A unified interface for querying a vast array of resources for natural
+LDT provides a unified interface for querying a vast array of resources for natural
   language processing, including Wiktionary, BabelNet, WordNet, and a lot of
   new custom routines:
 
      * misspellings (*cat : kat*);
      * inflected forms (*cat : cats*);
-     * derivational relations (*cat : catness*);
+     * derivational relations (*cat : cattish*);
      * lexicographic semantic relations:
        - synonymy (*cat : pussycat*);
        - antonymy (*black : white*);
@@ -47,17 +45,9 @@ Current functionality
        - hyponymy (*feline : cat*);
        - co-hyponymy (*cat : dog*);
        - meronymy (*cat : tail*)
-     * psychological association norms (cat : mouse)
-     * corpus-based statistics (e.g. for *cat : mouse* pair the frequency of
-       *mouse* in the corpus in general and in the context of *cat* in
-       particular);
 
-* Using the above for large-scale analysis of potential relations between pairs
-  of words
-
-* Full setup for experimenting with your favorite word embeddings: loading
-  them, drawing balanced vocab samples, and profiling them for the kinds of
-  information that they encode.
+All of the above can be used for large-scale analysis of potential relations between pairs
+  of words. See ldt.experiments.demo file for a toy example of such an analysis.
 
 That last step can help you predict how your model will do on a particular
 task, and also give some ideas about how it can be improved. Check out the
@@ -68,12 +58,11 @@ task, and also give some ideas about how it can be improved. Check out the
 Quick links
 -----------
 
- * `Installation <https://ldt.readthedocs.io/en/latest/Tutorial/installation.html>`_.
- * Tutorial: using LDT for querying dictionaries and analyzing morphology.
- * Tutorial: using LDT for experiments with word embeddings.
- * API reference.
- * Published research results.
- * Word embeddings leaderboard.
+ * `Project website <ldtoolkit.space>`_
+ * `API reference <https://ldt.readthedocs.io/genindex.html>`_.
+ * `Published research results <http://aclweb.org/anthology/C18-1228>`_.
+ * `Word embeddings leaderboard <http://ldtoolkit.space/leaderboard/>`_.
+ * `Correlation of LD scores with downstream task performance <http://ldtoolkit.space/analysis/correlation/>`_.
 
 -------
 Support

@@ -4,11 +4,7 @@
 Installing Linguistic Diagnostics Toolkit
 =========================================
 
-You need Python 3.5 or above.
-
-.. code-block:: python
-
-   pip install ldt
+You need Python 3.5 or above. LDT will soon be available in PyPi; for now just clone or download the GitHub repo.
 
 Package requirements:
 
