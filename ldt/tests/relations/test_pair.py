@@ -1,0 +1,93 @@
+# -*- coding: utf-8 -*-
+"""Testing the analysis of relations in word pairs"""
+
+import unittest
+import ldt
+
+from ldt.helpers.ignore import ignore_warnings as ignore_warnings
+
+
+
+normalizer = ldt.dicts.normalize.Normalization(language="English",order=(
+    "wordnet", "custom"), lowercasing=True)
+DerivationAnalyzer = ldt.dicts.derivation.meta.DerivationAnalyzer()
+LexDict = ldt.dicts.metadictionary.MetaDictionary()
+
+test_dict = ldt.relations.pair.RelationsInPair(normalizer=normalizer,
+                                               derivation_dict =
+                                               DerivationAnalyzer,
+                                               lex_dict=LexDict)
+
+class Tests(unittest.TestCase):
+    """
+    The tests in this block inspect the loading of all the information from
+    ldt.dicts for a given word.
+    """
+
+    @ignore_warnings
+    def test_numbers(self):
+        """Test hashtag detection."""
+        res = test_dict.analyze("one", "two")
+        self.assertIn("Numbers", res)
+
+    @ignore_warnings
+    def test_urls(self):
+        """Test hashtag detection."""
+        res = test_dict.analyze("google.com", "yahoo.com")
+        self.assertIn("URLs", res)
+
+    @ignore_warnings
+    def test_hashtags(self):
+        """Test hashtag detection."""
+        res = test_dict.analyze("#dog", "#cat")
+        worked = "Hashtags" in res and "SharedPOS" in res
+        self.assertTrue(worked)
+
+    @ignore_warnings
+    def test_deriv(self):
+        """Test hashtag detection."""
+        res = test_dict.analyze("kindness", "happiness")
+        worked = "SharedPOS" in res and "SharedDerivation" in res and \
+                 "SharedMorphForm" in res
+        self.assertTrue(worked)
+
+    @ignore_warnings
+    def test_antonyms(self):
+        """Test hashtag detection."""
+        res = test_dict.analyze("beautiful", "ugly")
+        worked = "SharedPOS" in res and "Antonyms" in res
+        self.assertTrue(worked)
+
+    # @ignore_warnings
+    # def test_pos(self):
+    #     """Test hashtag detection."""
+    #     res = test_dict.analyze("dog", "cat")
+    #     self.assertIn("SharedPOS", res)
+
+
+    # def test_lemma(self):
+    #     """Test lemma detection."""
+    #     self.assertTrue(cat.info["IsLemma"])
+    #
+    # def test_name(self):
+    #     """Test lemma detection."""
+    #     self.assertFalse(cat.info["ProperNouns"])
+    #
+    # def test_number(self):
+    #     """Test number detection."""
+    #     self.assertFalse(cat.info["Numbers"])
+    #
+    # def test_pos(self):
+    #     """Test pos detection."""
+    #     self.assertIn("noun", cat.info["POS"])
+    #
+    # def test_affixes(self):
+    #     """Test pos detection."""
+    #     self.assertIn("-ness", kindness.info["Suffixes"])
+    #
+    # def test_sem(self):
+    #     """Test pos detection."""
+    #     self.assertIn("feline", cat.info["Hypernyms"])
+
+if __name__ == '__main__':
+    unittest.main()

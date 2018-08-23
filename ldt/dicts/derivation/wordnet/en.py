@@ -54,5 +54,6 @@ class DerivationWordNet(BaseWordNet):
                     if word in string[-1]:
                         for w in lemma.derivationally_related_forms():
                             res.append(w.name())
-        res = list(set(res))
+        if res:
+            return list(set(res))
         return res

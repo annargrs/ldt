@@ -21,27 +21,27 @@ class Tests(unittest.TestCase):
 
     def test_lemma(self):
         """Test lemma detection."""
-        self.assertTrue(cat.is_a_lemma)
+        self.assertTrue(cat.info["IsLemma"])
 
     def test_name(self):
         """Test lemma detection."""
-        self.assertFalse(cat.is_a_proper_noun)
+        self.assertFalse(cat.info["ProperNouns"])
 
     def test_number(self):
         """Test number detection."""
-        self.assertFalse(cat.is_a_number)
+        self.assertFalse(cat.info["Numbers"])
 
     def test_pos(self):
         """Test pos detection."""
-        self.assertIn("noun", cat.pos)
+        self.assertIn("noun", cat.info["POS"])
 
     def test_affixes(self):
         """Test pos detection."""
-        self.assertIn("-ness", kindness.suffixes)
+        self.assertIn("-ness", kindness.info["Suffixes"])
 
     def test_sem(self):
         """Test pos detection."""
-        self.assertIn("feline", cat.semantics["hypernyms"])
+        self.assertIn("feline", cat.info["Hypernyms"])
 
 if __name__ == '__main__':
     unittest.main()

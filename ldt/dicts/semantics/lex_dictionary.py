@@ -145,8 +145,9 @@ class LexicographicDictionary(Dictionary, metaclass=ABCMeta):
 
         relation = self.check_relation(relation)
         res = self.get_relations(word, (relation))
-        if relation in res:
-            return res[relation]
+        if res:
+            if relation in res:
+                return res[relation]
         else:
             return []
 

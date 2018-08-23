@@ -89,7 +89,8 @@ class Wiktionary(BaseWiktionary, LexicographicDictionary):
 
 
     @functools.lru_cache(maxsize=None)
-    def get_relations(self, word, relations, reduce=False): #pylint: disable=arguments-differ
+    def get_relations(self, word, relations=None,
+                      reduce=False): #pylint: disable=arguments-differ
 
         """Parsing lexicographic relations in Wiktionary.
 
@@ -107,13 +108,15 @@ class Wiktionary(BaseWiktionary, LexicographicDictionary):
 
         Todo:
 
-            * The text and examples fields sometimes have unccounted synonyms as
-              "Synonym: " or "Synonyms: "
+            * The text and examples fields sometimes have unaccounted
+            synonyms as "Synonym: " or "Synonyms: "
             * Preserve colons in translations
 
         """
-
-        relations = self.check_relations(relations, reduce)
+        if not relations:
+            relations = self.supported_relations
+        else:
+            relations = self.check_relations(relations, reduce)
 
         if isinstance(word, str):
             word = self.query(word)
@@ -123,17 +126,18 @@ class Wiktionary(BaseWiktionary, LexicographicDictionary):
             for i in dicts:
                 cleaned = []
                 for wrd in dicts[i]:
+
                     if "(" in wrd:
                         wrd = remove_text_inside_brackets(wrd)
-                        wrd = wrd.strip(": ")
-                    # if include_partial_matches:
-                    #     cleaned += word_tokenize(wrd)
-                    # deal with mwus
+                    wrd = wrd.strip(":")
+                    wrd = wrd.strip()
+                    wrd = wrd.strip(",")
                     wrd = wrd.split(",")
                     for mwu in wrd:
                         mwu = strip_non_alphabetical_characters(mwu,
                                                                 ignore=("-",
                                                                         " "))
+                        # print(mwu)
                         mwu = mwu.strip()
                         for see in ["see", "see also", "See", "See also"]:
                             if mwu.startswith(see):
@@ -297,87 +301,6 @@ def _get_relations_full(word):
             rel_dict[i[0]] += i[1]
     return rel_dict
 
-
-
-# @functools.lru_cache(maxsize=None)
-# def get_words_in_wiktionary_definitions(word):
-#     #todo make an option for removing bracketed content, and make it callable generally
-#     word = ldt.dicts.cleanup.noise.wikidata(word)
-#     if word != None:
-#         defs = []
-#         cleaned = []
-#         words = []
-#         for i in word:
-#             for n in i.items():
-#                 if n[0] == "definitions":
-#                     for m in n[1]:
-#                         defs.append(m["text"])
-#         # get rid of the comments
-#         defs = list(set(defs))
-#         for d in defs:
-#             d = d.strip()
-#             for i in d.split("\n"):
-#                 cleaned.append(i)
-#         for i in cleaned:
-#             if len(i) > 0:
-#                 if i[0].isalpha():  # to get rid of lines that start with
-# years and are obvious examples
-#                     if "." in i:
-#                         i = i.split(".")[0]
-#                     if "(" in i or "[" in i:
-#                         i = remove_text_inside_brackets(i, brackets="()[]“”")
-#                     if sum(1 for char in i if char.isupper()) < 2:
-#                         if i.count(" ") > 1:
-#                             words.append(i)
-#         words = list(set(words))
-#         return words
-#
-#
-# #print(get_words_in_wiktionary_definitions("car"))
-#
-# @functools.lru_cache(maxsize=None)
-# def words_in_definitions(word, stop = stopWords, wn = True, wiki = True):
-#     defs = []
-#     if wn:
-#         defs += get_words_in_wn_definitions(word)
-#     if wiki:
-#         wiki_defs = get_words_in_wiktionary_definitions(word)
-#     res = set()
-#     if len(defs) == 0:
-#         return res
-#     # assumes input is a list of strings
-#     for d in defs:
-#         d = d.lower()
-#         splitted = word_tokenize(d)
-#         for w in splitted:
-#             if w.isalpha():
-#                 if not w in stop:
-#                     # only do lemmatization on words that might need it:
-#                     if w[-1] in ["s", "d", "r", "t"]:
-#                         lemma = ldt.dicts.cleanup.noise.wn_lemmatize(w)
-#                         for i in lemma:
-#                             res.add(i)
-#                         res.add(w)
-#                     else:
-#                         res.add(w)
-#     return res
-#
-# @functools.lru_cache(maxsize=None)
-# def get_words_in_definitions(word):
-#     spellings = list(word.spellings.keys())
-#     stems = list(word.stems.keys())
-#     defs = set()
-#     stem_defs = set()
-#     for s in spellings:
-#         words = words_in_definitions(s)
-#         defs = defs|words #2review
-#     for stem in stems:
-#         words = words_in_definitions(stem)
-#         stem_defs = stem_defs|words
-#     word.words_in_definitions = defs
-#     word.words_in_stem_definitions = stem_defs
-#     return word
-#
-#
-#
-# #print(words_in_definitions("car", stopWords))
+if __name__ == '__main__':
+    d = Wiktionary()
+    print(d.get_relations("close"))

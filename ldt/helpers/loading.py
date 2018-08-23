@@ -7,6 +7,7 @@ import ruamel.yaml as yaml
 from hurry.filesize import size
 
 from ldt.helpers.exceptions import ResourceError as ResourceError
+from ldt.load_config import config as config
 
 def get_object_size(obj, seen=None):
     '''
@@ -48,7 +49,8 @@ def get_object_size(obj, seen=None):
 
 
 #todo add lowercasing
-def load_resource(path, format="infer", lowercasing=True):
+def load_resource(path, format="infer", lowercasing=config["lowercasing"],
+                  no_message=True):
     """
 
     A helper function for loading various files formats, optionally

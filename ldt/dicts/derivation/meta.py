@@ -95,7 +95,10 @@ class DerivationAnalyzer(Dictionary):
         """
         family = []
         if self.wordnet:
-            family += self.wordnet.get_related_words(word)
+            try:
+                family += self.wordnet.get_related_words(word)
+            except TypeError:
+                pass
 
         family += self.wiktionary.get_related_words(word)
         if family:

@@ -6,53 +6,41 @@ Example:
 
     >>> word = ldt.relations.word.Word("government")
     >>> word.all_info()
-    is_a_filename :  False
-    is_a_hashtag :  False
-    is_a_lemma :  True
-    is_a_number :  False
-    is_a_proper_noun :  False
-    is_a_url :  False
-    is_foreign :  False
-    is_misspelled :  False
-    is_noise :  False
-    lemmas :  ['government']
-    original_spelling :  government
-    pos :  ['noun']
-    prefixes :  []
-    related_words :  ['governor', 'governance', 'governing', 'government']
-    roots :  ['govern']
-    semantics :  {'synonyms': ['administration', 'authorities', 'governance',
-    'governing', 'government', 'government_activity', 'political_science',
-    'politics', 'regime'], 'hyponyms': ['ancien_regime', 'authoritarian_regime',
-    'authoritarian_state', 'big government', 'bureaucracy', 'court',
-    'downing_street', 'empire', 'federal government', 'federal_government',
-    'geopolitics', 'government-in-exile', 'lawmaking', 'legislating',
-    'legislation', 'local government', 'local_government', 'military government',
-    'military_government', 'minority government', 'misgovernment', 'misrule',
-    'municipal government', 'palace', 'papacy', 'parliamentary government',
-    'petticoat government', 'pontificate', 'practical_politics', 'pupet_regime',
-    'puppet government', 'puppet_government', 'puppet_state', 'realpolitik',
-    'representative government', 'royal_court', 'shadow government', 'state',
-    'state_government', 'stratocracy', 'totalitarian_state', 'totalitation_regime',
-    'trust_busting', 'unitary government'], 'hypernyms': ['polity',
-    'social_control', 'social_science', 'system', 'system_of_rules'], 'meronyms':
-    ['administration', 'bench', 'brass', 'division', 'establishment', 'executive',
-    'general_assembly', 'governance', 'governing_body', 'government_department',
-    'government_officials', 'judicatory', 'judicature', 'judicial_system',
-    'judiciary', 'law-makers', 'legislative_assembly', 'legislative_body',
-    'legislature', 'officialdom', 'organisation', 'organization']}
-    suffixes :  ['-ment']
+    ======MORPHOLOGICAL INFO======
+    POS :  ['adjective']
+    IsLemma :  True
+    Lemmas :  ['fishy']
+    ======DERIVATIONAL INFO======
+    Stems :  ['fish']
+    Suffixes :  ['-y']
+    Prefixes :  []
+    OtherDerivation :  []
+    RelatedWords :  ['cold fish', 'fishline', 'fishwoman', 'fish pondfishpond', 'fishery', 'fishmoth', 'unfishy', 'fishmonger', 'fish sauce', 'starfish', 'fish feed', 'jellyfish', 'shellfish', 'fishgig', 'fish tankfishtank', 'fish bowlfishbowl', 'surgeonfish', 'fishnetfishnet stockings', 'fishpox', 'theres plenty more fish in the sea', 'have other fish to fry', 'fishcake', 'fish hookfishhook', 'fish slice', 'fishling', 'drink like a fish', 'tuna fish', 'fishpound', 'lumpfish', 'queer fish', 'overfish', 'like shooting fish in a barrel', 'fish and chips', 'swim like a fish', 'fish pastefishpaste', 'fishless', 'fishtail', 'fish food', 'fishable', 'fishbrain', 'fishmeal', 'goatfish', 'dragonfish', 'goldfish', 'fishing', 'fisher', 'unfishiness', 'fishly', 'fish finger', 'fish-eating grin', 'fish out', 'give a man a fish and you feed him for a day teach a man to fish and you feed him for a lifetime', 'silverfish', 'fish', 'big fish in a small pond', 'fish ladder', 'fishskin', 'fish out of water', 'fish tape', 'fishkill', 'fishroom', 'fishworm', 'neither fish nor fowl', 'fishful', 'fishway', 'fishy', 'sailfish', 'fishwife', 'fishlike', 'fishskin disease', 'fisherman', 'fish supper', 'fishkind', 'bony fish']
+    ======SEMANTIC INFO======
+    Synonyms :  ['fishlike', 'fishly', 'fishy', 'fishy wishy', 'funny', 'ichthyic', 'piscine', 'shady', 'suspect', 'suspicious']
+    ======EXTRA WORD CLASSES======
+    ProperNouns :  False
+    Noise :  False
+    Numbers :  False
+    URLs :  False
+    Hashtags :  False
+    Filenames :  False
+    ForeignWords :  False
+    Misspellings :  False
 
 Todo:
 
     * better controls on the initialization parameters of constituent
     dictionaries.
-    * pretty printing per category info
-    * "senator" etymologies
+    * incorporate categories into the .info dict
+    * check parsing of "senator" etymologies
+    * pprint from yaml
+    *
 
 """
 
 import inspect
+import functools
 
 from ldt.dicts.normalize import Normalization as Normalizer
 from ldt.dicts.derivation.meta import DerivationAnalyzer as \
@@ -79,6 +67,7 @@ class Word(object):
         Initialize the word entry to be queried across the ldt.dicts resources.
         """
         #: str : the original spelling of a word
+
         self.original_spelling = original_spelling
 
         #: obj : the ldt.dicts.normalize  dictionary object
@@ -88,7 +77,6 @@ class Word(object):
                                           lowercasing=True)
         else:
             self._normalizer = normalizer
-        self._normalize(self.original_spelling)
 
         if not derivation_dict:
             self._derivation_dict = DerivationAnalyzer()
@@ -99,41 +87,53 @@ class Word(object):
             self._lex_dict = MetaDictionary()
         else:
             self._lex_dict = lex_dict
+        self.analyze(self.original_spelling)
 
-        if self.is_a_number or self.is_a_proper_noun or self.is_noise or \
-                self.is_a_url or self.is_a_filename or self.is_foreign:
-            lookup = False
-        else:
-            lookup = True
+
+
+    @functools.lru_cache(maxsize=None)
+    def analyze(self, word):
+        self.info = {}
+        self._normalize()
+
+        lookup = True
+        for i in ["Numbers", "ProperNouns", "Noise", "URLs", "Filenames",
+                  "ForeignWords"]:
+            if self.info[i]:
+                lookup = False
+                break
         if lookup:
-            self._analyze_derivation(self.lemmas[0])
-            self._get_lex_relations(self.lemmas[0])
+            self._analyze_derivation(self._lemma)
+            self._get_lex_relations(self._lemma)
 
-
-    def _normalize(self, word):
+    def _normalize(self):
         """Bringing in the information from the _normalizer class."""
-        res = self._normalizer.normalize(word)
+        res = self._normalizer.normalize(self.original_spelling)
         if res["word_categories"]:
-            self.is_a_proper_noun = "Names" in res["word_categories"]
-            self.is_noise = "Noise" in res["word_categories"]
-            self.is_a_number = "Numbers" in res["word_categories"]
-            self.is_a_url = "URLs" in res["word_categories"]
-            self.is_a_hashtag = "Hashtags" in res["word_categories"]
-            self.is_a_filename = "Filenames" in res["word_categories"]
-            self.is_foreign = "Foreign" in res["word_categories"]
-            self.is_misspelled = "Misspellings" in res["word_categories"]
-            if not res["lemmas"]:
+            self.info["ProperNouns"] = "Names" in res["word_categories"]
+            self.info["Noise"] = "Noise" in res["word_categories"]
+            self.info["Numbers"] = "Numbers" in res["word_categories"]
+            self.info["URLs"] = "URLs" in res["word_categories"]
+            self.info["Hashtags"] = "Hashtags" in res["word_categories"]
+            self.info["Filenames"] = "Filenames" in res["word_categories"]
+            self.info["ForeignWords"] = "Foreign" in res["word_categories"]
+            self.info["Misspellings"] = "Misspellings" in res["word_categories"]
+            self.info["OriginalForm"] = self.original_spelling
+            if not "lemmas" in res:
                 res["lemmas"] = []
+
             if len(res["lemmas"]) == 1 and res["lemmas"][0] == \
                     self.original_spelling:
-                self.is_a_lemma = True
+                self.info["IsLemma"] = True
             else:
-                self.is_a_lemma = False
-            self.lemmas = res["lemmas"]
+                self.info["IsLemma"] = False
+            if res["lemmas"]:
+                self._lemma = res["lemmas"][0]
+            self.info["Lemmas"] = frozenset(res["lemmas"])
             if res["pos"]:
-                self.pos = res["pos"]
+                self.info["POS"] = frozenset(res["pos"])
             else:
-                self.pos = ["unclear"]
+                self.info["POS"] = frozenset(["unclear"])
 
 
     def _analyze_derivation(self, word):
@@ -148,11 +148,11 @@ class Word(object):
             the Word object are updated with the derivational information.
         """
         res = self._derivation_dict.analyze(word)
-        self.roots = res["roots"]
-        self.suffixes = res["suffixes"]
-        self.prefixes = res["prefixes"]
-        self.related_words = res["related_words"]
-        self.deriv_other = res["other"]
+        self.info["Stems"] = frozenset(res["roots"])
+        self.info["Suffixes"] = frozenset(res["suffixes"])
+        self.info["Prefixes"] = frozenset(res["prefixes"])
+        self.info["RelatedWords"] = frozenset(res["related_words"])
+        self.info["OtherDerivation"] = frozenset(res["other"])
 
     def _get_lex_relations(self, word):
         """Query the lexicographic metadictionary for the information on
@@ -167,11 +167,42 @@ class Word(object):
         """
         res = self._lex_dict.get_relations(word)
         if res:
-            self.semantics = res
+            for rel in res:
+                if rel.capitalize() in ["Synonyms", "Antonyms", "Hypernyms",
+                                        "Meronyms", "Hyponyms"]:
+                    self.info[rel.capitalize()] = frozenset(res[rel])
+                else:
+                    if not "OtherRelations" in self.info:
+                        self.info["OtherRelations"] = res[rel]
+                    else:
+                        self.info["OtherRelations"] += res[rel]
+            if "OtherRelations" in self.info:
+                self.info["OtherRelations"] = frozenset(self.info["OtherRelations"])
 
     def all_info(self):
         """Pretty printing all the attributes of the word object."""
-        for i in inspect.getmembers(self):
-            if not i[0].startswith('_'):
-                if not inspect.ismethod(i[1]):
-                    print(i[0], ": ", i[1])
+
+        def print_rel(i, dictionary):
+            """Printing helper"""
+            if i in dictionary:
+                if isinstance(dictionary[i], frozenset):
+                    print(i, ": ", ', '.join(dictionary[i]))
+                else:
+                    print(i, ": ", dictionary[i])
+
+        print("\n======MORPHOLOGICAL INFO======")
+        for i in ["OriginalForm", "POS", "IsLemma", "Lemmas"]:
+            print_rel(i, self.info)
+        print("\n======DERIVATIONAL INFO======")
+        for i in ["Stems", "Suffixes", "Prefixes", "OtherDerivation",
+                  "RelatedWords"]:
+            print_rel(i, self.info)
+        print("\n======SEMANTIC INFO======")
+        for i in ["Synonyms", "Antonyms", "Meronyms", "Hyponyms",
+                  "Hypernyms", "Other"]:
+            print_rel(i, self.info)
+        print("\n======EXTRA WORD CLASSES======")
+        for i in ["ProperNouns", "Noise", "Numbers", "URLs", "Hashtags", "Filenames", \
+    "ForeignWords", "Misspellings"]:
+            print_rel(i, self.info)
+

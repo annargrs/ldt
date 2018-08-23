@@ -51,6 +51,7 @@ from ldt.dicts.derivation import wiktionary
 from ldt.dicts.derivation import meta
 
 from ldt.relations import word
+from ldt.relations import pair
 
 # import ldt.helpers
 # import ldt.dicts

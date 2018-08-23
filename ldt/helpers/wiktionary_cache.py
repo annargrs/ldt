@@ -22,6 +22,7 @@ Todo:
     * usage example in the module description
     * switch to lemma lists instead of page title lists
       (https://en.wiktionary.org/wiki/Category:English_lemmas)
+    * make sure that the words are in the given language
 
 """
 
