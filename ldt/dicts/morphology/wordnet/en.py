@@ -10,6 +10,7 @@ Princeton WordNet.
 
     Todo:
         * a wordnet metaclass that would call language-specific wordnets
+        * "governess" gets lemmatized as "govern"
 
 """
 
@@ -116,8 +117,9 @@ class MorphWordNet(MorphDictionary, BaseWordNet):
             noun = WordNetLemmatizer().lemmatize(word, 'n')
             if noun != word:
                 res.append(noun)
-        elif self.is_a_word(word):
-            res.append(word)
+        if not res:
+            if self.is_a_word(word):
+                res.append(word)
         # for synset in wn.synsets(word):
         #     if synset.name().split(".")[0] == word:
         #         res.append(word)

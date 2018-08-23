@@ -150,10 +150,13 @@ class MorphMetaDict(Dictionary):
         res = []
         dicts = self.is_a_word(word, minimal)
         if dicts:
-            for dictionary in dicts:
-                candidates = self._dicts[dictionary].get_pos(word, formatting="list")
-                if candidates:
-                    res += candidates
+            if not minimal:
+                for dictionary in dicts:
+                    candidates = self._dicts[dictionary].get_pos(word, formatting="list")
+                    if candidates:
+                        res += candidates
+            else:
+                res = self._dicts[dicts[0]].get_pos(word, formatting="list")
         if res:
             return res
         return None

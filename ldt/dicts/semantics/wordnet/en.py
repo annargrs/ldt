@@ -270,7 +270,7 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
             except timeout_decorator.timeout_decorator.TimeoutError:
                 print("WordNet query timed out: ", word, relation)
                 res = []
-            except wn.WordNetError:
+            except: # wn.WordNetError:
                 return []
 
         res = list(set(res))

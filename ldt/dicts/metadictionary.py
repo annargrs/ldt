@@ -161,10 +161,11 @@ class MetaDictionary(Dictionary):
                                                              reduce=True)
                 # print(relation_dict)
                 for relation in relation_dict:
-                    if not relation in res:
-                        res[relation] = relation_dict[relation]
-                    else:
-                        res[relation] += relation_dict[relation]
+                    if relation_dict[relation]:
+                        if not relation in res:
+                            res[relation] = relation_dict[relation]
+                        else:
+                            res[relation] += relation_dict[relation]
         for relation in res:
             res[relation] = list(set(res[relation]))
             res[relation] = sorted(res[relation])

@@ -85,3 +85,16 @@ def load_stopwords(language):
         return stopWords
     except OSError:
         return frozenset()
+
+def update_dict(dict1, dict2):
+    """Helper for :meth:`_productive_morphology`."""
+    for field in dict1:
+        if field in dict2:
+            dict1[field] += dict2[field]
+    for field in dict2:
+        if not field in dict1:
+            dict1[field] = dict2[field]
+    for field in dict1:
+        if dict1[field]:
+            dict1[field] = list(set(dict1[field]))
+    return dict1

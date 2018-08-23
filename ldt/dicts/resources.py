@@ -9,6 +9,7 @@ to implement an `is_a_word` method.
 Todo:
     * creation of default config file upon installation
     * the right error path in NLTK tokenizer
+    * for files and urls, identify words after stripping the extensions
 """
 
 import os

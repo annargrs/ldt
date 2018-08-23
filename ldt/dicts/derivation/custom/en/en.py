@@ -7,22 +7,41 @@ The current functionality includes:
 * Methods for identifying roots and productive affixes
 * Lookup from the dictionary of exceptions
 
+Examples:
+
+    >>> test_dict = ldt.dicts.derivation.custom.en.EnglishDerivation()
+    >>> test_dict.analyze_affixes("kindness")
+    {'original_word': ['kindness'], 'other': [], 'prefixes': [], 'roots': [
+    'kind'], 'suffixes': ['-ness']}
+    >>> test_dict.analyze_affixes("antiestablishment")
+    {'original_word': ['antiestablishment'], 'other': [], 'prefixes': [
+    'anti-'], 'roots': ['establishment', 'establish'], 'suffixes': ['-ment']}
+    >>> test_dict.analyze_affixes("bleed")
+    'original_word': ['bleed'], 'other': ['root_vowel_n/a>v'], 'prefixes': [
+    ], 'roots': ['blood', 'bleed'], 'suffixes': []}
+    >>> test_dict.decompose_compound("toothpaste")
+    {'original_word': [], 'other': [], 'prefixes': [], 'roots': ['tooth',
+    'paste'], 'suffixes': []}
+
 Todo:
 
     * Error on non-english language of the dictionary
 
 """
 
+from ldt.dicts.base.wordnet.en import BaseWordNet as BaseWordNet
+
 from ldt.dicts.derivation.custom.custom_dict import DerivationCustomDict as \
     DerivationCustomDict
 from ldt.helpers.formatting import dash_suffix as dash_suffix
 from ldt.helpers.formatting import _check_res as _check_res
+from ldt.dicts.morphology.wordnet.en import MorphWordNet as MorphWordNet
 
 class EnglishDerivation(DerivationCustomDict):
     """This class implements an interface for retrievning POS
     information from NLTK WordNet and lemmatization."""
 
-    def __init__(self, dictionary, morph_dictionary, language="en"):
+    def __init__(self, dictionary=None, morph_dictionary=None, language="en"):
         """ Initializing the base class.
 
         Args:
@@ -42,8 +61,14 @@ class EnglishDerivation(DerivationCustomDict):
         """
 
         super(EnglishDerivation, self).__init__(language=language)
-        self.dictionary = dictionary
-        self.morph_dictionary = morph_dictionary
+        if dictionary:
+            self.dictionary = dictionary
+        else:
+            self.dictionary = BaseWordNet()
+        if morph_dictionary:
+            self.morph_dictionary = morph_dictionary
+        else:
+            self.morph_dictionary = MorphWordNet()
         self.equidistant_patterns = ("root_vowel_n/a>v", "root_vowel_v>v")
 
     def _suffix_sion(self, word, res=None):

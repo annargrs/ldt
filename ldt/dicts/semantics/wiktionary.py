@@ -157,6 +157,11 @@ class Wiktionary(BaseWiktionary, LexicographicDictionary):
                         dicts[i].append(wrd)
             for relation in dicts:
                 dicts[relation] = self.post_process(dicts[relation])
+            for i in ["{{ws beginlist}}", "{{ws endlist}}'"]:
+                for rel in dicts:
+                    if dicts[rel]:
+                        if i in dicts[rel]:
+                            dicts[rel].remove(i)
 
             new_res = {k: v for k, v in dicts.items() if k in relations}
 

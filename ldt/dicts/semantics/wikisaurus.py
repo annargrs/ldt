@@ -223,6 +223,8 @@ class Wikisaurus(BaseWiktionary, LexicographicDictionary):
                 wikidata[relation] = cleaned
         for relation in wikidata:
             wikidata[relation] = self.post_process(wikidata[relation])
+            # if not wikidata[relation]:
+            #     wikidata[relation] = []
         return wikidata
 
     def get_relations(self, word, relations, reduce=False):
@@ -243,8 +245,17 @@ class Wikisaurus(BaseWiktionary, LexicographicDictionary):
         res = self._parse_wikisaurus_relations(word)
         res = self._cleanup_wikisaurus(res)
 
+        # for i in ["{{ws beginlist}}", "{{ws endlist}}'"]:
+        #     for rel in res:
+        #         if isinstance(res[rel], list):
+        #             if i in res[rel]:
+        #                 res[rel] = res[rel].remove(i)
         new_res = {k:v for k, v in res.items() if k in relations}
-
+        for rel in new_res:
+            if isinstance(new_res[rel], list):
+                for i in ["{{ws beginlist}}", "{{ws endlist}}'"]:
+                    if i in new_res[rel]:
+                        new_res[rel].remove(i)
         return new_res
 
 

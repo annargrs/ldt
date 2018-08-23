@@ -129,11 +129,17 @@ class Affixes(BaseCustomDict):
             for affix in self.exceptions.keys():
                 for key, value in self.exceptions[affix].items():
                     if key == word:
-                        res["suffixes"].append(affix)
+                        if "root_vowel" in affix:
+                            res["other"].append(affix)
+                        else:
+                            res["suffixes"].append(affix)
                         res["roots"].append(value)
                     elif affix in self.equidistant_patterns:
                         if value == word:
-                            res["suffixes"].append(affix)
+                            if "root_vowel" in affix:
+                                res["other"].append(affix)
+                            else:
+                                res["suffixes"].append(affix)
                             res["roots"].append(key)
         return res
 

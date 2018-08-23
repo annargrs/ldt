@@ -11,7 +11,7 @@ test_dict = ldt.dicts.normalize.Normalization(language="English",
 
 class Tests(unittest.TestCase):
     """
-    The tests in this block inspect the normalizer class.
+    The tests in this block inspect the _normalizer class.
     """
 
     def test_init(self):

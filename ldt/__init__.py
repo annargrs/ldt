@@ -48,7 +48,9 @@ from ldt.dicts.semantics import lex_dictionary
 from ldt.dicts.derivation.custom import en
 from ldt.dicts.derivation.wordnet import en
 from ldt.dicts.derivation import wiktionary
+from ldt.dicts.derivation import meta
 
+from ldt.relations import word
 
 # import ldt.helpers
 # import ldt.dicts

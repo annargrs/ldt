@@ -13,27 +13,36 @@ Examples:
                                               order=("wordnet", "custom"),
                                               lowercasing=True)
     >>> test_dict.normalize("grammar")
-    {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': ['Lexicon']}
+    {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': [
+    'Lexicon'], 'pos': ['noun']}
     >>> test_dict.normalize("grammars")
-    {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': ['Lexicon']}
+    {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': [
+    'Lexicon'], 'pos': ['noun']}
     >>> test_dict.normalize("grammarxyz")
     None
+    >>> test_dict.normalize("alice")
+    {'lemmas': ['alice'], 'word_categories': ['Names'], 'pos': ['noun']}
     >>> test_dict.normalize("grammaire")
      {'word_categories': ['Foreign']}
     >>> test_dict.normalize("gramar")
-    {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': ['Misspellings']}
+    {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': [
+    'Misspellings'], 'pos': ['noun']}
     >>> test_dict.normalize("%grammar")
-    {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': ['Misspellings']}
+    {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': [
+    'Misspellings'], 'pos': ['noun']}
     >>> test_dict.normalize("grammar.com")
-    {'word_categories': ['URLs']}
+    {'word_categories': ['URLs'], 'pos': ['noun']}
     >>> test_dict.normalize("grammar.jpg")
-    {'word_categories': ['Filenames']}
+    {'word_categories': ['Filenames'], 'pos': ['noun']}
     >>> test_dict.normalize("gram-mar")
-    {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': ['Misspellings']}
+    {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': [
+    'Misspellings'], 'pos': ['noun']}
     >>> test_dict.normalize("grammar.lexicon")
-    {'found_in': ['wordnet'], 'lemmas': ['grammar', "lexicon], 'word_categories': ['Misspellings']}
+    {'found_in': ['wordnet'], 'lemmas': ['grammar', "lexicon],
+    'word_categories': ['Misspellings'], 'pos': ['noun']}
     >>> test_dict.normalize("grammarlexicon")
-    {'found_in': ['wordnet'], 'lemmas': ['grammar', "lexicon], 'word_categories': ['Misspellings']}
+    {'found_in': ['wordnet'], 'lemmas': ['grammar', "lexicon],
+    'word_categories': ['Misspellings'], 'pos': ['noun']}
 
 Todo:
     * check the checking of foreign words against wiktionary output
@@ -109,7 +118,7 @@ def turn_to_words(word):
     return res
 
 class Normalization(MorphMetaDict):
-    """The normalizer class brings together many ldt resources for
+    """The _normalizer class brings together many ldt resources for
     fixing frequent tokenization and spelling problems in the word
     embeddings vocabulary."""
 
@@ -117,7 +126,7 @@ class Normalization(MorphMetaDict):
                  lowercasing=config["lowercasing"], order=("wordnet",
                                                            "wiktionary",
                                                            "custom")):
-        """ Initializing the normalizer class.
+        """ Initializing the _normalizer class.
 
         Args:
             language (str): the query language
@@ -158,6 +167,7 @@ class Normalization(MorphMetaDict):
         res = {}
         if word.isnumeric():
             res["word_categories"] = ["Numbers"]
+            res["pos"] = ["numeral"]
         else:
             res["word_categories"] = ["Noise"]
         return res
@@ -177,16 +187,20 @@ class Normalization(MorphMetaDict):
 
         if self.numberdict.is_a_word(word):
             res["word_categories"] = ["Numbers"]
+            res["pos"] = ["numeral"]
         elif self.webdict.is_a_word(word):
             res["word_categories"] = ["URLs"]
+            res["pos"] = ["noun"]
         elif self.filedict.is_a_word(word):
             res["word_categories"] = ["Filenames"]
+            res["pos"] = ["noun"]
         elif word.startswith("#"):
             attempt = self.is_a_word(word.strip("#"))
             if attempt:
                 res["word_categories"] = ["Hashtags"]
                 res["found_in"] = attempt
                 res["lemmas"] = self.lemmatize(word.strip("#"))
+                res["pos"] = self.get_pos(word.strip("#"), minimal=True)
         else:
             res = self._subwords(word)
         if res:
@@ -201,7 +215,7 @@ class Normalization(MorphMetaDict):
             word (str): the word to check.
 
         Note:
-            The normalizer class should include at least wiktionary in the
+            The _normalizer class should include at least wiktionary in the
             dictionary order option to be able to handle articles,
             prepositions etc. that are erroneously appended to a word (e.g.
             "cats.and"), as they are not included in WordNet.
@@ -216,6 +230,7 @@ class Normalization(MorphMetaDict):
             res["lemmas"] = []
             res["found_in"] = []
             res["word_categories"] = ["Misspellings"]
+            res["pos"] = []
             for subword in subwords:
                 lemmas = self.lemmatize(subword)
                 if not lemmas:
@@ -223,10 +238,11 @@ class Normalization(MorphMetaDict):
                 else:
                     res["lemmas"] += lemmas
                     res["found_in"] += self.is_a_word(subword, minimal=True)
-
+                    res["pos"] += self.get_pos(lemmas[0])
             # if len(res["found_in"]) == len(subwords):
             res["lemmas"] = list(set(res["lemmas"]))
             res["found_in"] = list(set(res["found_in"]))
+            res["pos"] = list(set(res["pos"]))
             return res
 
     def _word(self, word):
@@ -246,15 +262,18 @@ class Normalization(MorphMetaDict):
         if num:
             res["word_categories"].append("Numbers")
             res["lemmas"] = [word]
+            res["pos"] = ["numeral"]
 
         attempt = self.is_a_word(word)
         if attempt:
             res["found_in"] = attempt
             res["lemmas"] = self.lemmatize(word)
             res["word_categories"].append("Lexicon")
+            res["pos"] = self.get_pos(word, minimal=True)
         if self.namedict.is_a_word(word):
             res["word_categories"].append("Names")
             res["lemmas"] = [word]
+            res["pos"] = ["noun"]
         if not res["word_categories"]:
             if self.spelldict.is_foreign(word):
                 res["word_categories"].append("Foreign")
@@ -267,6 +286,7 @@ class Normalization(MorphMetaDict):
                     res["found_in"] = self.is_a_word(lemmas[0])
                     res["lemmas"] = lemmas
                     res["word_categories"] = ["Misspellings"]
+                    res["pos"] = self.get_pos(lemmas[0])
 
         return res
 
@@ -288,6 +308,7 @@ class Normalization(MorphMetaDict):
                 res["lemmas"] = lemmas
                 res["found_in"] = self.is_a_word(lemmas[0])
                 res["word_categories"] = ["Misspellings"]
+                res["pos"] = self.get_pos(lemmas[0])
             if res:
                 return res
 
@@ -311,6 +332,7 @@ class Normalization(MorphMetaDict):
                     res["found_in"] = dicts
                     res["lemmas"] = [attempt]
                     res["word_categories"] = ["Misspellings"]
+                    res["pos"] = self.get_pos(attempt)
                     return res
 
     def _unspaced(self, word):
@@ -320,13 +342,13 @@ class Normalization(MorphMetaDict):
             word (str): the word to check.
 
         Todo:
-           * the min split length parameter to be settable in the normalizer
+           * the min split length parameter to be settable in the _normalizer
            dictionary
 
         Returns:
             (dict): word category labels and found lemmas, if any.
         """
-        res = {"word_categories": ["Misspellings"], "lemmas":[]}
+        res = {"word_categories": ["Misspellings"], "lemmas":[], "pos":[]}
         splits = self.splitter.split_compound(word, filtering="min_split_4")
         if splits:
             for split in splits:
@@ -335,10 +357,12 @@ class Normalization(MorphMetaDict):
                     if dicts:
                         res["found_in"] = dicts
                         res["lemmas"].append(subword)
+                        res["pos"] += self.get_pos(subword)
+        res["pos"] = list(set(res["pos"]))
         return res
 
     def normalize(self, word):
-        """The main normalizer function bringing together all functonality.
+        """The main _normalizer function bringing together all functonality.
 
         Args:
             word (str): the word to check.
