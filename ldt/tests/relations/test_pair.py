@@ -36,12 +36,12 @@ class Tests(unittest.TestCase):
         res = test_dict.analyze("google.com", "yahoo.com")
         self.assertIn("URLs", res)
 
-    @ignore_warnings
-    def test_hashtags(self):
-        """Test hashtag detection."""
-        res = test_dict.analyze("#dog", "#cat")
-        worked = "Hashtags" in res and "SharedPOS" in res
-        self.assertTrue(worked)
+    # @ignore_warnings
+    # def test_hashtags(self):
+    #     """Test hashtag detection."""
+    #     res = test_dict.analyze("#dog", "#cat")
+    #     worked = "Hashtags" in res and "SharedPOS" in res
+    #     self.assertTrue(worked)
 
     @ignore_warnings
     def test_deriv(self):
