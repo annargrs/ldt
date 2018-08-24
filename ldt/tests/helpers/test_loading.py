@@ -36,64 +36,64 @@ class Tests(unittest.TestCase):
 # testing 1-col vocab files
 
     def test_load_vocab(self):
-        res = ldt.helpers.loading.load_resource(format = "vocab", path =
-        os.path.join(path, "1col.vocab"))
+        res = ldt.helpers.loading.load_resource(format="vocab", path=
+        os.path.join(path, "1col.vocab"), silent=True)
         self.assertEqual(res, res_vocab)
 
     def test_load_vocab_upper(self):
-        res = ldt.helpers.loading.load_resource(format = "vocab", path =
-        os.path.join(path, "1col.vocab"), lowercasing = False)
+        res = ldt.helpers.loading.load_resource(format="vocab", path=
+        os.path.join(path, "1col.vocab"), lowercasing=False, silent=True)
         self.assertEqual(res, res_vocab_upper)
 
 # testing 2-col simple [word <tab> word] dicts
 
     def test_load_freqdict(self):
-        res = ldt.helpers.loading.load_resource(format = "freqdict", path =
-        os.path.join(path, "2cols.freqdict"), lowercasing = True)
+        res = ldt.helpers.loading.load_resource(format="freqdict", path=
+        os.path.join(path, "2cols.freqdict"), lowercasing=True, silent=True)
         self.assertEqual(res, res_2cols_freqdict)
 
     def test_load_simple_dict(self):
-        res = ldt.helpers.loading.load_resource(format = "tsv_dict", path =
-        os.path.join(path, "2cols.txt"))
+        res = ldt.helpers.loading.load_resource(format="tsv_dict", path=
+        os.path.join(path, "2cols.txt"), silent=True)
         self.assertEqual(res, res_2cols)
 
     def test_load_2coljson(self):
-        res = ldt.helpers.loading.load_resource(format = "json", path =
-        os.path.join(path, "2cols.json"))
+        res = ldt.helpers.loading.load_resource(format="json", path=
+        os.path.join(path, "2cols.json"), silent=True)
         self.assertEqual(res, res_2cols)
 
     def test_load_2coljson_upper(self):
-        res = ldt.helpers.loading.load_resource(format = "json", path =
-        os.path.join(path, "2cols.json"), lowercasing = False)
+        res = ldt.helpers.loading.load_resource(format="json", path=
+        os.path.join(path, "2cols.json"), lowercasing=False, silent=True)
         self.assertEqual(res, res_2cols_upper)
 
     def test_load_2colyaml(self):
-        res = ldt.helpers.loading.load_resource(format = "yaml", path =
-        os.path.join(path, "2cols.yaml"))
+        res = ldt.helpers.loading.load_resource(format="yaml", path=
+        os.path.join(path, "2cols.yaml"), silent=True)
         self.assertEqual(res, res_2cols)
 
     def test_load_tsv_dict(self):
-        res = ldt.helpers.loading.load_resource(format = "tsv_dict",
-                                                path =
-        os.path.join(path, "2cols_list.tsv"))
+        res = ldt.helpers.loading.load_resource(format="tsv_dict",
+                                                path=
+        os.path.join(path, "2cols_list.tsv"), silent=True)
         self.assertEqual(res, res_dict)
 
     def test_load_tsv_dict_upper(self):
-        res = ldt.helpers.loading.load_resource(format = "tsv_dict",
-                                                path =
-        os.path.join(path, "2cols_list.tsv"), lowercasing = False)
+        res = ldt.helpers.loading.load_resource(format="tsv_dict",
+                                                path=
+        os.path.join(path, "2cols_list.tsv"), lowercasing=False, silent=True)
         self.assertEqual(res, res_dict_upper)
 
     def test_load_json(self):
-        res = ldt.helpers.loading.load_resource(format = "json",
+        res = ldt.helpers.loading.load_resource(format="json",
                                                 path =
-        os.path.join(path, "2cols_list.json"))
+        os.path.join(path, "2cols_list.json"), silent=True)
         self.assertEqual(res, res_dict)
 
     def test_load_json(self):
-        res = ldt.helpers.loading.load_resource(format = "yaml",
-                                                path =
-        os.path.join(path, "2cols_list.yaml"))
+        res = ldt.helpers.loading.load_resource(format="yaml",
+                                                path=
+        os.path.join(path, "2cols_list.yaml"), silent=True)
         self.assertEqual(res, res_dict)
 
 

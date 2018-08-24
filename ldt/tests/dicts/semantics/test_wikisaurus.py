@@ -72,7 +72,6 @@ class Tests(unittest.TestCase):
         # test_dict.language = "english"
         time.sleep(0.5)
         res = test_dict.get_relations("cat", relations=("synonyms", "antonyms"))
-        print(res)
         worked = "hyponyms" not in res and "tabby" in res["synonyms"]
         self.assertTrue(worked)
 

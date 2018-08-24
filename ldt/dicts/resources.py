@@ -81,7 +81,7 @@ class ResourceDict(Dictionary):
 
         try:
             data = load_resource(self.path, format="infer",
-                                 lowercasing=lowercasing)
+                                 lowercasing=lowercasing, silent=True)
             self.data = data
         except FileNotFoundError:
             print("No resource was found, please check the file path "

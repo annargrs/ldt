@@ -6,7 +6,7 @@ import shutil
 
 from ldt.load_config import config as config
 
-path_to_resources = config["path_to_cache"]
+path_to_resources = config["path_to_resources"]
 
 class Tests(unittest.TestCase):
     '''
@@ -36,9 +36,10 @@ class Tests(unittest.TestCase):
         worked = "-dlula" in res
         self.assertTrue(worked)
 
-    def test_cleanup(self):
-        for f in os.listdir(path_to_resources):
-            os.remove(os.path.join(path_to_resources, f))
+    # def test_cleanup(self):
+    #     path_to_cache = os.path.join(path_to_resources, "cache")
+    #     for f in os.listdir(path_to_cache):
+    #         os.remove(os.path.join(path_to_cache, f))
 
 if __name__ == '__main__':
     unittest.main()

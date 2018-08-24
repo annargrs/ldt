@@ -50,7 +50,7 @@ def get_object_size(obj, seen=None):
 
 #todo add lowercasing
 def load_resource(path, format="infer", lowercasing=config["lowercasing"],
-                  no_message=True):
+                  silent=True):
     """
 
     A helper function for loading various files formats, optionally
@@ -76,7 +76,6 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
 
     if format == "infer":
         format = path.split(".")[-1]
-    no_message=False
 
     if format in ["freqdict", "tsv_dict", "json", "yaml"]:
 
@@ -85,7 +84,6 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
         if format == "freqdict":
             with open(path, "r", encoding="utf8") as f:
                 for line in f:
-                    print(line)
                     line = line.strip().split("\t")
                     try:
                         res[line[0]] = int(line[1])
@@ -93,7 +91,6 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
                         print("Wrong file format. [Word <tab> Number] per line expected.")
 
                         break
-            print(res)
 
         if format == "tsv_dict":
             with open(path, "r", encoding="utf8") as f:
@@ -154,7 +151,7 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
                         "for this language.")
                 if "cu" in res:
                     if res["cu"] == "Old Church Slavonic":
-                        no_message=True
+                        silent=True
 
         if lowercasing:
 
@@ -201,8 +198,8 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
               "* [vocab] for one-word-per-line vocab files.\n")
         return None
 
-    if len(res) > 0:
-        if not no_message:
+    if res:
+        if not silent:
             print(path, " loaded as ", size(get_object_size(res)))
         return res
 

@@ -44,7 +44,8 @@ def lookup_language(language, reverse=False):
     #     format="yaml")
     file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                              "generic_files/language_codes.yaml")
-    lang_dict = load_resource(file_path, lowercasing=False, format="yaml")
+    lang_dict = load_resource(file_path, lowercasing=False, format="yaml",
+                              silent=True)
     if not reverse:
         try:
             return lang_dict[language]

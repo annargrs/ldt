@@ -17,7 +17,7 @@ class Tests(unittest.TestCase):
 
     def test_init(self):
         """Test initialization."""
-        self.assertEqual(kindness.original_spelling, "cat")
+        self.assertEqual(kindness.original_spelling, "kindness")
 
     def test_lemma(self):
         """Test lemma detection."""

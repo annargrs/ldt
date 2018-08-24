@@ -117,7 +117,7 @@ def get_timestamped_vocab_filenames(filename, language=config[
         return res
 
 def update_wiktionary_cache(language=config["default_language"],
-                            path_to_cache=config["path_to_cache"],
+                            path_to_cache=config["path_to_resources"],
                             wikisaurus=False):
     ''' The main wiktionary cache updating function.
 
@@ -134,6 +134,9 @@ def update_wiktionary_cache(language=config["default_language"],
     '''
 
     # "0" is Wiktionary entries namespace, "110" is thesaurus entries namespace
+
+    if not path_to_cache.endswith("cache"):
+        path_to_cache = os.path.join(path_to_cache, "cache")
 
     if wikisaurus:
         namespace = "110"
@@ -191,7 +194,7 @@ def update_wiktionary_cache(language=config["default_language"],
 
 def load_wiktionary_cache(language=config["default_language"],
                           lowercasing=config["lowercasing"],
-                          path_to_cache=config["path_to_cache"],
+                          path_to_cache=config["path_to_resources"],
                           wikisaurus =False):
     '''
 
@@ -213,6 +216,7 @@ def load_wiktionary_cache(language=config["default_language"],
 
     '''
 
+    path_to_cache = os.path.join(path_to_cache, "cache")
     filename = find_vocab_file(language, path_to_cache, wikisaurus=wikisaurus)
 
     if filename != "none":
