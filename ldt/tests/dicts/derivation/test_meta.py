@@ -33,13 +33,13 @@ class Tests(unittest.TestCase):
         res = test_dict._get_related_words("kind")
         self.assertIn("kindness", res)
 
-    @ignore_warnings
-    def test_dict_all(self):
-        time.sleep(0.5)
-        res = test_dict.analyze("kindness")
-        worked = "-ness" in res["suffixes"] and "kindliness" in res[
-            "related_words"]
-        self.assertTrue(worked)
+    # @ignore_warnings
+    # def test_dict_all(self):
+    #     time.sleep(0.5)
+    #     res = test_dict.analyze("kindness")
+    #     worked = "-ness" in res["suffixes"] and "kindliness" in res[
+    #         "related_words"]
+    #     self.assertTrue(worked)
 
 if __name__ == '__main__':
     unittest.main()
