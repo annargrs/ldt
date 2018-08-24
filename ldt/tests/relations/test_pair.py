@@ -58,36 +58,5 @@ class Tests(unittest.TestCase):
         worked = "SharedPOS" in res and "Antonyms" in res
         self.assertTrue(worked)
 
-    # @ignore_warnings
-    # def test_pos(self):
-    #     """Test hashtag detection."""
-    #     res = test_dict.analyze("dog", "cat")
-    #     self.assertIn("SharedPOS", res)
-
-
-    # def test_lemma(self):
-    #     """Test lemma detection."""
-    #     self.assertTrue(cat.info["IsLemma"])
-    #
-    # def test_name(self):
-    #     """Test lemma detection."""
-    #     self.assertFalse(cat.info["ProperNouns"])
-    #
-    # def test_number(self):
-    #     """Test number detection."""
-    #     self.assertFalse(cat.info["Numbers"])
-    #
-    # def test_pos(self):
-    #     """Test pos detection."""
-    #     self.assertIn("noun", cat.info["POS"])
-    #
-    # def test_affixes(self):
-    #     """Test pos detection."""
-    #     self.assertIn("-ness", kindness.info["Suffixes"])
-    #
-    # def test_sem(self):
-    #     """Test pos detection."""
-    #     self.assertIn("feline", cat.info["Hypernyms"])
-
 if __name__ == '__main__':
     unittest.main()

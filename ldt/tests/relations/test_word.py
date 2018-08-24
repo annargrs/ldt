@@ -6,7 +6,7 @@ import ldt
 
 from ldt.helpers.ignore import ignore_warnings as ignore_warnings
 
-cat = ldt.relations.word.Word("cat")
+# cat = ldt.relations.word.Word("cat")
 kindness = ldt.relations.word.Word("kindness")
 
 class Tests(unittest.TestCase):
@@ -17,31 +17,31 @@ class Tests(unittest.TestCase):
 
     def test_init(self):
         """Test initialization."""
-        self.assertEqual(cat.original_spelling, "cat")
+        self.assertEqual(kindness.original_spelling, "cat")
 
     def test_lemma(self):
         """Test lemma detection."""
-        self.assertTrue(cat.info["IsLemma"])
+        self.assertTrue(kindness.info["IsLemma"])
 
     def test_name(self):
         """Test lemma detection."""
-        self.assertFalse(cat.info["ProperNouns"])
+        self.assertFalse(kindness.info["ProperNouns"])
 
     def test_number(self):
         """Test number detection."""
-        self.assertFalse(cat.info["Numbers"])
+        self.assertFalse(kindness.info["Numbers"])
 
     def test_pos(self):
         """Test pos detection."""
-        self.assertIn("noun", cat.info["POS"])
+        self.assertIn("noun", kindness.info["POS"])
 
     def test_affixes(self):
         """Test pos detection."""
         self.assertIn("-ness", kindness.info["Suffixes"])
 
-    def test_sem(self):
-        """Test pos detection."""
-        self.assertIn("feline", cat.info["Hypernyms"])
+    # def test_sem(self):
+    #     """Test pos detection."""
+    #     self.assertIn("feline", cat.info["Hypernyms"])
 
 if __name__ == '__main__':
     unittest.main()
