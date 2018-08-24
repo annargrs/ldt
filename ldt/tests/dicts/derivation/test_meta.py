@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-
+import time
 import ldt
 
 from ldt.helpers.ignore import ignore_warnings as ignore_warnings
@@ -35,6 +35,7 @@ class Tests(unittest.TestCase):
 
     @ignore_warnings
     def test_dict_all(self):
+        time.sleep(0.5)
         res = test_dict.analyze("kindness")
         worked = "-ness" in res["suffixes"] and "kindliness" in res[
             "related_words"]
