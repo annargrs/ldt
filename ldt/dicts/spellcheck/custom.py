@@ -152,7 +152,7 @@ class Spellchecker(Dictionary):
 
     @functools.lru_cache(maxsize=None)
     def in_foreign_dicts(self, word):
-        """Returns True if the word is found in the spellchecker resoures
+        """Returns True if the word is found in the spellchecker resources
         for the specified foreign languages.
 
         Example:

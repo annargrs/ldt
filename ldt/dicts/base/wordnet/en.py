@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """ This module provides base interface for the NLTK's Princeton WordNet.
 
-    The current functionality includes:
+The current functionality includes:
 
-     - Determining whether a word entry exists;
-     - Raising DictError for any language other than English
+ - Determining whether a word entry exists;
+ - Raising DictError for any language other than English.
 
-    Todo:
-        * a wordnet metaclass that would call language-specific wordnets
+Todo:
+
+ - a wordnet metaclass that would call language-specific wordnets.
 
 """
 

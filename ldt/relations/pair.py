@@ -16,7 +16,8 @@ Todo:
 """
 
 import functools
-
+import os
+import ruamel.yaml as yaml
 
 from ldt.relations.word import Word as Word
 from ldt.dicts.normalize import Normalization as Normalizer
@@ -143,3 +144,39 @@ def are_related_as(target, neighbor):
                     if word in neighbor.info[rel]:
                         res.append(rel)
     return list(set(res))
+
+class DerivationalAntonymy(object):
+
+    def __init__(self, language):
+
+
+
+
+def antonymy_by_derivation(self, target, neighbor):
+    """Sometimes dictionaries lack antonymy relations for derivational pairs
+    where one of the word has a negative suffix or prefix (e.g. *regular ~
+    irregular*). LDT attempts to establish the relation through lists of
+    such language-specific suffixes/prefixes.
+    establish the antonymy relation
+    :param neighbor, : ldt word object
+    :return: ldt word object
+    """
+    suffixes = ["-less", "-free"]
+    prefixes = ["a-", "anti-", "contra-", "counter-", "il-", "im-", "in-", "ir-", "mis-", "non-", "pseudo-", "un-"]
+
+    for i in prefixes:
+        if i in neighbor.affixes:
+            for w in list(neighbor.spellings.keys())+[neighbor.original_spelling]:
+                if w.startswith(i[:-1]):
+                    stem = w[len(i)-1:]
+#                elif w.startswith(i[:-1]):
+                    if stem in target.spellings:
+                        return True
+    for i in suffixes:
+        if i in neighbor.affixes:
+            for w in list(neighbor.spellings.keys())+[neighbor.original_spelling]:
+                if w.endswith(i[1:]):
+                    stem = w[:len(i)]
+                    if stem in target.spellings:
+                        return True
+    return False

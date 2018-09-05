@@ -16,8 +16,10 @@
      - retrieving BabelNet nodes and edges;
 
     Todo:
-        cache that would save between sessions
-        authorization error for babelnet on invalid key
+
+     - cache saved between sessions;
+     - authorization error for babelnet on invalid key;
+     - querying offline dump of BabelNet.
 
 """
 

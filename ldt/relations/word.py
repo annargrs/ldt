@@ -35,7 +35,6 @@ Todo:
     * incorporate categories into the .info dict
     * check parsing of "senator" etymologies
     * pprint from yaml
-    *
 
 """
 

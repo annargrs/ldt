@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """ This module provides base interface for the LDT custom base dictionary.
 
-    Currently only English is supported.
+Currently only English is supported.
 
-     - Raising DictError on setting the language other than English
-     - Adding a Dictionary argument for is_a_word method.
+ - Raising DictError on setting the language other than English
+ - Adding a Dictionary argument for is_a_word method.
 
-    Todo:
+Todo:
 
-        - Handling other languages on initialization
+ - Handling other languages on initialization
 
 """
 

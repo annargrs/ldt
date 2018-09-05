@@ -205,3 +205,18 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
 
     else:
         return None
+
+def load_language_file(dir_path, language):
+
+    resources_path = os.path.join(dir_path,
+                                  language + "/" + language + ".yaml")
+    # print(resources_path)
+    if not os.path.isfile(resources_path):
+        raise ResourceError(self.language + ".yaml not found.")
+
+    with open(resources_path) as stream:
+        try:
+            resources = yaml.safe_load(stream)
+        except yaml.YAMLError:
+            raise ResourceError("Something is wrong with the .yaml file "
+                                "for this language.")

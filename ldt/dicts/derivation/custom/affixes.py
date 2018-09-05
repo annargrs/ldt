@@ -58,18 +58,18 @@ class Affixes(BaseCustomDict):
         self.equidistant_patterns = []
 
         # resources_path = "."+self.language+ ".yaml"
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        resources_path = os.path.join(dir_path, self.language+"/"+self.language+ ".yaml")
-        # print(resources_path)
-        if not os.path.isfile(resources_path):
-            raise ResourceError(self.language+".yaml not found.")
-
-        with open(resources_path) as stream:
-            try:
-                resources = yaml.safe_load(stream)
-            except yaml.YAMLError:
-                raise ResourceError("Something is wrong with the .yaml file "
-                                    "for this language.")
+        # dir_path = os.path.dirname(os.path.realpath(__file__))
+        # resources_path = os.path.join(dir_path, self.language+"/"+self.language+ ".yaml")
+        # # print(resources_path)
+        # if not os.path.isfile(resources_path):
+        #     raise ResourceError(self.language+".yaml not found.")
+        #
+        # with open(resources_path) as stream:
+        #     try:
+        #         resources = yaml.safe_load(stream)
+        #     except yaml.YAMLError:
+        #         raise ResourceError("Something is wrong with the .yaml file "
+        #                             "for this language.")
 
             self.vowels = set(resources["vowels"])
             self.prefixes = resources["prefixes"]

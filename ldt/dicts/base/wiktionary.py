@@ -17,20 +17,12 @@
 
 import functools
 
-# from nltk.tokenize import word_tokenize
 from wiktionaryparser import WiktionaryParser
 
 from ldt.helpers.resources import lookup_language as lookup_language
 from ldt.helpers.wiktionary_cache import load_wiktionary_cache as \
     load_wiktionary_cache
 from ldt.dicts.dictionary import Dictionary as Dictionary
-# from ldt.helpers.formatting import remove_text_inside_brackets as \
-#     remove_text_inside_brackets
-# from ldt.helpers.formatting import strip_non_alphabetical_characters as \
-#     strip_non_alphabetical_characters
-# from ldt.config import lowercasing as config_lowercasing
-# from ldt.config import language as config_language
-# from ldt.config import split_mwu as config_split_mwu
 from ldt.load_config import config as config
 
 
