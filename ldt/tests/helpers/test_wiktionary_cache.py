@@ -9,10 +9,10 @@ from ldt.load_config import config as config
 path_to_resources = config["path_to_resources"]
 
 class Tests(unittest.TestCase):
-    '''
+    """
     The tests in this block inspect the Wiktionary cache:
     updating the vocab list cache for a given language.
-    '''
+    """
 
     def test_find_wiktionary_vocab(self):
         res = ldt.helpers.wiktionary_cache.find_vocab_file(language="zu",
@@ -36,10 +36,10 @@ class Tests(unittest.TestCase):
         worked = "-dlula" in res
         self.assertTrue(worked)
 
-    # def test_cleanup(self):
-    #     path_to_cache = os.path.join(path_to_resources, "cache")
-    #     for f in os.listdir(path_to_cache):
-    #         os.remove(os.path.join(path_to_cache, f))
+    def test_cleanup(self):
+        path_to_cache = os.path.join(path_to_resources, "cache")
+        for f in os.listdir(path_to_cache):
+            os.remove(os.path.join(path_to_cache, f))
 
 if __name__ == '__main__':
     unittest.main()
