@@ -40,6 +40,8 @@ class Tests(unittest.TestCase):
         path_to_cache = os.path.join(path_to_resources, "cache")
         for f in os.listdir(path_to_cache):
             os.remove(os.path.join(path_to_cache, f))
+        files = os.listdir(path_to_cache)
+        self.assertEqual(len(files), 0)
 
 if __name__ == '__main__':
     unittest.main()

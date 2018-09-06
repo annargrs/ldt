@@ -135,9 +135,9 @@ def update_wiktionary_cache(language=config["default_language"],
 
     # "0" is Wiktionary entries namespace, "110" is thesaurus entries namespace
 
-    if not path_to_cache.endswith("cache"):
-        path_to_cache = os.path.join(path_to_cache, "cache")
-
+    # if not path_to_cache.endswith("cache"):
+    #     path_to_cache = os.path.join(path_to_cache, "cache")
+    path_to_cache = get_cache_dir(path_to_cache)
     if wikisaurus:
         namespace = "110"
     else:
@@ -216,7 +216,7 @@ def load_wiktionary_cache(language=config["default_language"],
 
     '''
 
-    path_to_cache = os.path.join(path_to_cache, "cache")
+    path_to_cache = get_cache_dir(path_to_cache)
     filename = find_vocab_file(language, path_to_cache, wikisaurus=wikisaurus)
 
     if filename != "none":
@@ -237,3 +237,22 @@ def load_wiktionary_cache(language=config["default_language"],
     else:
         wiktionary_cache = load_resource(path=path, format="vocab")
     return wiktionary_cache
+
+def get_cache_dir(path_to_cache=config["path_to_resources"]):
+    """Helper function that formats the path to cache and creates it,
+    if necessary.
+
+    Args:
+        path_to_cache (str): the path to resource directory. If "cache"
+        subfolder does not exist. it will be created.
+
+    Returns:
+        (str): the path to the cache directory.
+
+    """
+    if not path_to_cache.endswith("/cache"):
+        path_to_cache = os.path.join(path_to_cache, "cache")
+    if not os.path.exists(path_to_cache):
+        os.mkdir(path_to_cache)
+    return path_to_cache
+
