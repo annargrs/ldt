@@ -22,19 +22,27 @@ from ldt.helpers.loading import load_resource as load_resource
 # import ldt.helpers.loading
 
 
-def lookup_language(language, reverse=False):
+def lookup_language_by_code(language, reverse=False):
     """
 
     LDT uses mainly 2-letter language codes for language settings; they are
     also used in Wiktionary abd BabelNet. This function converts canonical
     language names to codes and vice versa.
 
+    Examples:
+        >>> ldt.helpers.resources.lookup_language_by_code("en")
+        "English"
+        >>> ldt.helpers.resources.lookup_language_by_code("English", reverse=True)
+        "en"
+
     Args:
-        language (str): a `2-letter language code <https://en.wiktionary.org/wiki/Wiktionary:List_of_languages#Two-letter_codes>`_
+        language (str): the canonical name of the language, or a `2-letter
+        language code <https://en.wiktionary.org/wiki/Wiktionary
+        :List_of_languages#Two-letter_codes>`_
         reverse (bool): if True, returns the language code for the language
 
     Returns:
-        (str): the canonical name of that language
+        (str): the canonical name of that language or its 2-letter code
 
     Raises:
         LanguageError: the language was not found
@@ -46,23 +54,21 @@ def lookup_language(language, reverse=False):
                              "generic_files/language_codes.yaml")
     lang_dict = load_resource(file_path, lowercasing=False, format="yaml",
                               silent=True)
+    error_message = language + ": no such language was found. If it is " \
+                               "supposed to be supported, check the " \
+                               "definition in the file " + file_path
     if not reverse:
         try:
             return lang_dict[language]
         except KeyError:
-            raise LanguageError(lang_dict[language] +
-                                ": no such language code defined. If it is  "
-                                "supposed to be supported, check the "
-                                "definition in the file " + file_path)
+            raise LanguageError(error_message)
     else:
         if not language[0].isupper():
             language = language.capitalize()
         for k in lang_dict.keys():
             if lang_dict[k] == language:
                 return k
-        raise LanguageError(language + ": no such language defined. If it is "
-                                       "supposed to be supported, check the "
-                                       "definition in the file " + file_path)
+        raise LanguageError(error_message)
 
 def load_stopwords(language):
 
@@ -80,7 +86,7 @@ def load_stopwords(language):
     """
 
     if len(language) == 2:
-        language = lookup_language(language).lower()
+        language = lookup_language_by_code(language).lower()
     try:
         stopWords = frozenset(stopwords.words(language))
         return stopWords

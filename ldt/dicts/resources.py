@@ -20,7 +20,8 @@ from abc import ABCMeta, abstractmethod
 from ldt.dicts.dictionary import Dictionary as Dictionary
 from ldt.helpers.exceptions import DictError as DictError
 from ldt.helpers.resources import load_stopwords as load_stopwords
-from ldt.helpers.resources import lookup_language as lookup_language
+from ldt.helpers.resources import lookup_language_by_code as \
+    lookup_language_by_code
 from ldt.helpers.loading import load_resource as load_resource
 from ldt.helpers.formatting import get_spacing_variants as get_spacing_variants
 from ldt.load_config import config as config
@@ -54,7 +55,7 @@ class ResourceDict(Dictionary):
 
         super(ResourceDict, self).__init__()
         if len(language) > 2:
-            language = lookup_language(language, reverse=True)
+            language = lookup_language_by_code(language, reverse=True)
         #: the language of the resource
         self.language = language
 

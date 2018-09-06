@@ -41,7 +41,8 @@ import enchant
 
 from ldt.dicts.dictionary import Dictionary as Dictionary
 from ldt.load_config import config as config
-from ldt.helpers.resources import lookup_language as lookup_language
+from ldt.helpers.resources import lookup_language_by_code as \
+    lookup_language_by_code
 from ldt.helpers.exceptions import LanguageError as LanguageError
 
 class Spellchecker(Dictionary):
@@ -317,5 +318,5 @@ def check_language(language):
     """
 
     if len(language) > 2 and language[2] != "_":
-        language = lookup_language(language, reverse=True)
+        language = lookup_language_by_code(language, reverse=True)
     return language

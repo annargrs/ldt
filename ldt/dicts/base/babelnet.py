@@ -29,7 +29,8 @@ import json
 import gzip
 import functools
 from ldt.dicts.dictionary import Dictionary as Dictionary
-from ldt.helpers.resources import lookup_language as lookup_language
+from ldt.helpers.resources import lookup_language_by_code as \
+    lookup_language_by_code
 # from ldt.config import lowercasing as config_lowercasing
 # from ldt.config import language as config_language
 # from ldt.config import split_mwu as config_split_mwu
@@ -67,7 +68,7 @@ class BaseBabelNet(Dictionary):
         super(BaseBabelNet, self).__init__()
         self.queries = 0
         if len(self.language) > 2:
-            self.language = lookup_language(self.language, reverse=True)
+            self.language = lookup_language_by_code(self.language, reverse=True)
         self._language = self.language.upper()
         if babelnet_key:
             if babelnet_key != "None":
@@ -80,7 +81,7 @@ class BaseBabelNet(Dictionary):
     def _set_language(self, language):
         """This method ensures the language arg is a 2-letter code."""
         if len(language) > 2:
-            language = lookup_language(language, reverse=True)
+            language = lookup_language_by_code(language, reverse=True)
         self._language = language.upper()
 
 

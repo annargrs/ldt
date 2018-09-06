@@ -1,5 +1,6 @@
 import json
 import sys
+import os
 import random
 
 import ruamel.yaml as yaml
@@ -10,7 +11,7 @@ from ldt.helpers.exceptions import ResourceError as ResourceError
 from ldt.load_config import config as config
 
 def get_object_size(obj, seen=None):
-    '''
+    """
 
     A function that recursively finds size of objects,
     from https://goshippo.com/blog/measure-real-size-any-python-object/
@@ -26,7 +27,7 @@ def get_object_size(obj, seen=None):
     Returns:
         (int): the size of the object in bytes.
 
-    '''
+    """
 
     size = sys.getsizeof(obj)
     if seen is None:
@@ -206,17 +207,15 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
     else:
         return None
 
-def load_language_file(dir_path, language):
+def load_language_file(resources_path, language):
 
-    resources_path = os.path.join(dir_path,
-                                  language + "/" + language + ".yaml")
-    # print(resources_path)
     if not os.path.isfile(resources_path):
-        raise ResourceError(self.language + ".yaml not found.")
+        raise ResourceError(language + ".yaml not found.")
 
     with open(resources_path) as stream:
         try:
             resources = yaml.safe_load(stream)
+            return resources
         except yaml.YAMLError:
             raise ResourceError("Something is wrong with the .yaml file "
                                 "for this language.")

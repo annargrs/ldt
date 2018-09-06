@@ -19,7 +19,8 @@ import functools
 
 from wiktionaryparser import WiktionaryParser
 
-from ldt.helpers.resources import lookup_language as lookup_language
+from ldt.helpers.resources import lookup_language_by_code as \
+    lookup_language_by_code
 from ldt.helpers.wiktionary_cache import load_wiktionary_cache as \
     load_wiktionary_cache
 from ldt.dicts.dictionary import Dictionary as Dictionary
@@ -68,7 +69,7 @@ class BaseWiktionary(Dictionary):
                                              split_mwu=split_mwu)
         self.language = language
         if len(self.language) > 2:
-            self.language = lookup_language(self.language, reverse=True)
+            self.language = lookup_language_code(self.language, reverse=True)
         # self._language = language
         if not cache:
             self.cache = None
@@ -82,7 +83,7 @@ class BaseWiktionary(Dictionary):
     def _set_language(self, language):
         """This method ensures the language arg is a 2-letter code."""
         if len(language) > 2:
-            language = lookup_language(language, reverse=True)
+            language = lookup_language_by_code(language, reverse=True)
         self._language = language
 
     def load_cache(self):
@@ -137,7 +138,7 @@ class BaseWiktionary(Dictionary):
         """
 
         #convert from language code to canonical name for Wiktionary parser
-        language = lookup_language(self._language)
+        language = lookup_language_by_code(self._language)
 
         #set language
         parser = WiktionaryParser()

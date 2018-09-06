@@ -21,7 +21,8 @@ import functools
 import json
 
 
-from ldt.helpers.resources import lookup_language as lookup_language
+from ldt.helpers.resources import lookup_language_by_code as \
+    lookup_language_by_code
 from ldt.helpers.wiktionary_cache import load_wiktionary_cache as \
     load_wiktionary_cache
 from ldt.dicts.semantics.lex_dictionary import LexicographicDictionary as \
@@ -81,7 +82,7 @@ class Wikisaurus(BaseWiktionary, LexicographicDictionary):
                                          split_mwu=split_mwu)
     #     super(Wikisaurus, self).__init__()
     #     if len(language) > 2:
-    #         language = lookup_language(language, reverse=True)
+    #         language = lookup_language_by_code(language, reverse=True)
     #     self._language = language
     #     if not wiktionary_cache:
     #         self.cache = None
@@ -95,7 +96,7 @@ class Wikisaurus(BaseWiktionary, LexicographicDictionary):
     # def _set_language(self, language):
     #     """This method ensures the language arg is a 2-letter code."""
     #     if len(language) > 2:
-    #         language = lookup_language(language, reverse=True)
+    #         language = lookup_language_by_code(language, reverse=True)
     #     self._language = language
     #
     def load_cache(self):
@@ -188,7 +189,8 @@ class Wikisaurus(BaseWiktionary, LexicographicDictionary):
                "Various":[], "Related terns":[], "Derived terms":[],
                "See also":[]}
 
-        wikisaurus_language = lookup_language(self.language).capitalize()
+        wikisaurus_language = lookup_language_by_code(
+            self.language).capitalize()
 
         for rel in wikidata:
             if wikisaurus_language in rel:

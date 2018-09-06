@@ -34,7 +34,7 @@
 from ldt.dicts.semantics.lex_dictionary import LexicographicDictionary as \
     LexicographicDictionary
 from ldt.dicts.base.babelnet import BaseBabelNet as BaseBabelNet
-# from ldt.helpers.resources import lookup_language as lookup_language
+# from ldt.helpers.resources import lookup_language_by_code as lookup_language_by_code
 # from ldt.config import lowercasing as config_lowercasing
 # from ldt.config import language as config_language
 # from ldt.config import split_mwu as config_split_mwu
@@ -84,7 +84,7 @@ class BabelNet(BaseBabelNet, LexicographicDictionary):
                                        babelnet_key=babelnet_key)
         # self.queries = 0
         # if len(language) > 2:
-        #     language = lookup_language(language, reverse=True)
+        #     language = lookup_language_by_code(language, reverse=True)
         # self._language = language.upper()
         # if config_babelnet_key:
         #     self.babelnet_key = config_babelnet_key
@@ -98,7 +98,7 @@ class BabelNet(BaseBabelNet, LexicographicDictionary):
     # def _set_language(self, language):
     #     """This method ensures the language arg is a 2-letter code."""
     #     if len(language) > 2:
-    #         language = lookup_language(language, reverse=True)
+    #         language = lookup_language_by_code(language, reverse=True)
     #     self._language = language.upper()
 
 

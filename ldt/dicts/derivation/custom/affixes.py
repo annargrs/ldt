@@ -24,6 +24,7 @@ from ldt.load_config import config as config
 from ldt.helpers.formatting import rreplace as rreplace
 from ldt.helpers.formatting import dash_suffix as dash_suffix
 from ldt.helpers.formatting import _check_res as _check_res
+from ldt.helpers.loading import load_language_file as load_language_file
 from ldt.helpers.exceptions import ResourceError as ResourceError
 
 #pylint: disable=too-many-instance-attributes
@@ -58,8 +59,9 @@ class Affixes(BaseCustomDict):
         self.equidistant_patterns = []
 
         # resources_path = "."+self.language+ ".yaml"
-        # dir_path = os.path.dirname(os.path.realpath(__file__))
-        # resources_path = os.path.join(dir_path, self.language+"/"+self.language+ ".yaml")
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        resources_path = os.path.join(dir_path, self.language+"/"+self.language+ ".yaml")
+        resources = load_language_file(resources_path, self.language)
         # # print(resources_path)
         # if not os.path.isfile(resources_path):
         #     raise ResourceError(self.language+".yaml not found.")
@@ -71,23 +73,23 @@ class Affixes(BaseCustomDict):
         #         raise ResourceError("Something is wrong with the .yaml file "
         #                             "for this language.")
 
-            self.vowels = set(resources["vowels"])
-            self.prefixes = resources["prefixes"]
-            self.suffixes = resources["suffixes"]
-            self.suffix_families = resources["suffix_families"]
-            self.exceptions = resources["exceptions"]
-            self.replacements_before_vowels = resources[
-                "replacements_before_vowels"]
-            self.replacements_before_consonants = resources[
-                "replacements_before_consonants"]
-            self.replacements_in_suffixes = resources[
-                "replacements_in_suffixes"]
-            self.replacements_in_prefixes = resources[
-                "replacements_in_prefixes"]
-            self.insertions_before_vowels = resources[
-                "insertions_before_vowels"]
-            self.insertions_before_consonants = resources[
-                "insertions_before_consonants"]
+        self.vowels = set(resources["vowels"])
+        self.prefixes = resources["prefixes"]
+        self.suffixes = resources["suffixes"]
+        self.suffix_families = resources["suffix_families"]
+        self.exceptions = resources["exceptions"]
+        self.replacements_before_vowels = resources[
+            "replacements_before_vowels"]
+        self.replacements_before_consonants = resources[
+            "replacements_before_consonants"]
+        self.replacements_in_suffixes = resources[
+            "replacements_in_suffixes"]
+        self.replacements_in_prefixes = resources[
+            "replacements_in_prefixes"]
+        self.insertions_before_vowels = resources[
+            "insertions_before_vowels"]
+        self.insertions_before_consonants = resources[
+            "insertions_before_consonants"]
 
     def is_a_vowel(self, letter):
         """Returns True is the letter is a vowel

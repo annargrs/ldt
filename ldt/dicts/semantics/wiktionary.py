@@ -15,7 +15,7 @@ import functools
 # from nltk.tokenize import word_tokenize
 # from wiktionaryparser import WiktionaryParser
 
-# from ldt.helpers.resources import lookup_language as lookup_language
+# from ldt.helpers.resources import lookup_language_by_code as lookup_language_by_code
 # from ldt.helpers.wiktionary_cache import load_wiktionary_cache as \
 #     load_wiktionary_cache
 from ldt.dicts.semantics.lex_dictionary import LexicographicDictionary as \
@@ -76,7 +76,7 @@ class Wiktionary(BaseWiktionary, LexicographicDictionary):
         # super().__init__(wiktionary_cache, language, split_mwu)
         # super(Wiktionary, self).__init__()
         # if len(language) > 2:
-        #     language = lookup_language(language, reverse=True)
+        #     language = lookup_language_by_code(language, reverse=True)
         # self._language = language
         # if not wiktionary_cache:
         #     self.cache = None

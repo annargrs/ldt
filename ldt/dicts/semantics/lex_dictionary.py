@@ -24,7 +24,8 @@ from nltk.tokenize import word_tokenize
 from ldt.dicts.dictionary import Dictionary as Dictionary
 from ldt.helpers.exceptions import DictError as DictError
 from ldt.helpers.resources import load_stopwords as load_stopwords
-from ldt.helpers.resources import lookup_language as lookup_language
+from ldt.helpers.resources import lookup_language_by_code as \
+    lookup_language_by_code
 from ldt.helpers.formatting import get_spacing_variants as get_spacing_variants
 from ldt.helpers.formatting import remove_text_inside_brackets as \
     remove_text_inside_brackets
@@ -314,7 +315,7 @@ class DictionaryWithDefinitions(LexicographicDictionary, metaclass=ABCMeta):
         # words = text.split()
 
         if len(self.language) == 2:
-            nltk_language = lookup_language(self.language).lower()
+            nltk_language = lookup_language_by_code(self.language).lower()
         else:
             nltk_language = self.language.lower()
         # try:
