@@ -1,3 +1,5 @@
 ---
-prefixes: [a-, anti-, contra-, counter-, il-, im-, in-, ir-, mis-, non-, pseudo-, un-]
-suffixes: [-less, -free]
+Prefixes: [a-, anti-, contra-, counter-, il-, im-, in-, ir-, mis-, non-, pseudo-, un-]
+Suffixes: [-less, -free]
+Suffix_pairs: [[-less, -ful], [-less, -ing]]
+Prefix_pairs: [[pre-, post-]]
