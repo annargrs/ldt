@@ -16,6 +16,7 @@ class Tests(unittest.TestCase):
     @classmethod
     @ignore_warnings
     def setUpClass(cls):
+        """Setting up the test variables."""
         cls.cat = ldt.relations.word.Word("cat")
         cls.irregular = ldt.relations.word.Word("irregular")
         cls.regular = ldt.relations.word.Word("regular")
@@ -26,6 +27,19 @@ class Tests(unittest.TestCase):
         cls.postwar = ldt.relations.word.Word("post-war")
         cls.test_dict = ldt.relations.antonymy_by_derivation.DerivationalAntonymy(
             language="English")
+
+    @classmethod
+    def tearDownClass(cls):
+        """Clearning up the test variables."""
+        cls.cat = None
+        cls.irregular = None
+        cls.regular = None
+        cls.careful = None
+        cls.careless = None
+        cls.care = None
+        cls.prewar = None
+        cls.postwar = None
+        cls.test_dict = None
 
     def test_init(self):
         """Test initialization."""
@@ -43,7 +57,7 @@ class Tests(unittest.TestCase):
     def test_antonymy_reverse(self):
         """Detecting antonymy in prefixes."""
         self.assertTrue(self.test_dict.detect_antonymy(self.irregular,
-                                                   self.regular))
+                                                       self.regular))
 
     def test_antonymy_sanity(self):
         """Sanity check for antonymy in prefixes."""
