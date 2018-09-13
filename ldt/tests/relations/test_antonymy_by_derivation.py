@@ -17,14 +17,15 @@ class Tests(unittest.TestCase):
     @ignore_warnings
     def setUpClass(cls):
         """Setting up the test variables."""
-        cls.cat = ldt.relations.word.Word("cat")
-        cls.irregular = ldt.relations.word.Word("irregular")
-        cls.regular = ldt.relations.word.Word("regular")
-        cls.careful = ldt.relations.word.Word("careful")
-        cls.careless = ldt.relations.word.Word("careless")
-        cls.care = ldt.relations.word.Word("care")
-        cls.prewar = ldt.relations.word.Word("pre-war")
-        cls.postwar = ldt.relations.word.Word("post-war")
+        wn = ldt.dicts.semantics.wordnet.en.WordNet()
+        cls.cat = ldt.relations.word.Word("cat", lex_dict=wn)
+        cls.irregular = ldt.relations.word.Word("irregular", lex_dict=wn)
+        cls.regular = ldt.relations.word.Word("regular", lex_dict=wn)
+        cls.careful = ldt.relations.word.Word("careful", lex_dict=wn)
+        cls.careless = ldt.relations.word.Word("careless", lex_dict=wn)
+        cls.care = ldt.relations.word.Word("care", lex_dict=wn)
+        cls.prewar = ldt.relations.word.Word("pre-war", lex_dict=wn)
+        cls.postwar = ldt.relations.word.Word("post-war", lex_dict=wn)
         cls.test_dict = ldt.relations.antonymy_by_derivation.DerivationalAntonymy(
             language="English")
 

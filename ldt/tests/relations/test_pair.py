@@ -26,7 +26,6 @@ class Tests(unittest.TestCase):
             normalizer=normalizer, derivation_dict=DerivationAnalyzer,
             lex_dict=LexDict)
 
-
     @classmethod
     def tearDownClass(cls):
         """Clearning up the test variables."""
