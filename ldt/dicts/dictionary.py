@@ -32,10 +32,6 @@ from ldt.helpers.resources import lookup_language_by_code as lookup_language
 from ldt.helpers.formatting import get_spacing_variants as get_spacing_variants
 from ldt.helpers.formatting import remove_text_inside_brackets as \
     remove_text_inside_brackets
-#from ldt.config import path_to_resources as config_path_to_resources
-# from ldt.config import lowercasing as config_lowercasing
-# from ldt.config import language as config_language
-# from ldt.config import split_mwu as config_split_mwu
 from ldt.load_config import config as config
 
 class Dictionary(metaclass=abc.ABCMeta):

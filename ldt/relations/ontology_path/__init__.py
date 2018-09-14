@@ -1,0 +1,1 @@
+from .ontodict import OntoDict

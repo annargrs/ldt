@@ -2,7 +2,7 @@
 """This module provides functionality for detecting relations in a pair of
 words.
 
-Example:
+Examples:
     >>> test_dict = ldt.relations.RelationsInPair()
     >>> test_dict.analyze("black", "white")
     ['SharedPOS', 'SharedMorphForm', 'Antonyms']
@@ -11,29 +11,42 @@ Example:
 
 
 Todo:
-    morph form detection (cat, cats)
+   - morph form detection (cat, cats)
 
 """
 
 import functools
 import os
 import ruamel.yaml as yaml
+import timeout_decorator
+
+from nltk.corpus import wordnet as wn
 
 from ldt.relations.word import Word as Word
+from ldt.dicts.dictionary import Dictionary as Dictionary
 from ldt.dicts.normalize import Normalization as Normalizer
 from ldt.dicts.derivation.meta import DerivationAnalyzer as \
     DerivationAnalyzer
 from ldt.dicts.metadictionary import MetaDictionary as MetaDictionary
 from ldt.relations.word import Word as Word
+from ldt.relations.ontology_path.ontodict import OntoDict as OntoDict
+from ldt.load_config import config as config
 
-
-class RelationsInPair(object):
+class RelationsInPair(Dictionary):
     """This class implements analyzer for all possible relation types in a word
     pair."""
-    def __init__(self, derivation_dict=None, normalizer=None, lex_dict=None):
+    def __init__(self, language=config["default_language"],
+                 lowercasing=config["lowercasing"],
+                 derivation_dict=None, normalizer=None,
+                 lex_dict=None):
+
+        super(RelationsInPair, self).__init__(language=language,
+                                              lowercasing=lowercasing)
+
+        self.OntoDict = OntoDict(language=language)
 
         if not normalizer:
-            self._normalizer = Normalizer(language="English",
+            self._normalizer = Normalizer(language=self.language,
                                           order=("wordnet", "custom"),
                                           lowercasing=True)
         else:
@@ -50,6 +63,9 @@ class RelationsInPair(object):
             self._lex_dict = MetaDictionary()
         else:
             self._lex_dict = lex_dict
+
+    def is_a_word(self, word):
+        raise NotImplementedError
 
     @functools.lru_cache(maxsize=None)
     def analyze(self, target, neighbor, silent=True):
@@ -73,7 +89,15 @@ class RelationsInPair(object):
         if not silent:
             print(target.all_info())
             print(neighbor.all_info())
-        res = _binary_rels(target, neighbor)
+        rels = _binary_rels(target, neighbor)
+        res = {}
+        for rel in rels:
+            res[rel] = True
+        shortest_path = self.OntoDict.get_shortest_path(target.info[
+                                                       "OriginalForm"],
+                                                   neighbor.info[
+                                                       "OriginalForm"])
+        res["ShortestPath"] = shortest_path
         return res
 
 def _binary_rels(target, neighbor):

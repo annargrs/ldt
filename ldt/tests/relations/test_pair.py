@@ -63,6 +63,7 @@ class Tests(unittest.TestCase):
     def test_antonyms(self):
         """Test hashtag detection."""
         res = self.test_dict.analyze("beautiful", "ugly")
+        print(res)
         worked = "SharedPOS" in res and "Antonyms" in res
         self.assertTrue(worked)
 
