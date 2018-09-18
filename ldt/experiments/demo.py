@@ -5,7 +5,7 @@ vocabulary sample.
 """
 
 import os
-import vsmlib
+import vecto.embeddings
 import pandas as pd
 
 import ldt
@@ -19,7 +19,8 @@ def ldt_demo(top_n):
     out_path = os.path.join(sample_path, "demo_results.tsv")
     sample_vocab = ["cat", "dog", "walk", "buy", "pretty", "new", "often",
                     "rare"]
-    embeddings = vsmlib.model.load_from_dir(sample_path)
+    embeddings = vecto.embeddings.load_from_dir(sample_path)
+    embeddings.normalize()
     top_n = 10 #number of neighours to retrieve
 
     # setting up LDT resources
