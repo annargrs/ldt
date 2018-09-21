@@ -31,6 +31,7 @@ from ldt.dicts.metadictionary import MetaDictionary as MetaDictionary
 from ldt.relations.word import Word as Word
 from ldt.relations.ontology_path.ontodict import OntoDict as OntoDict
 from ldt.load_config import config as config
+from ldt.dicts.resources import AssociationDictionary as AssociationDictionary
 
 class RelationsInPair(Dictionary):
     """This class implements analyzer for all possible relation types in a word
@@ -44,6 +45,7 @@ class RelationsInPair(Dictionary):
                                               lowercasing=lowercasing)
 
         self.OntoDict = OntoDict(language=language)
+        self.AssociationDictionary = AssociationDictionary(language=language)
 
         if not normalizer:
             self._normalizer = Normalizer(language=self.language,
@@ -98,6 +100,9 @@ class RelationsInPair(Dictionary):
                                                    neighbor.info[
                                                        "OriginalForm"])
         res["ShortestPath"] = shortest_path
+        if self.AssociationDictionary.associate(target.info["OriginalForm"],
+                                                neighbor.info["OriginalForm"]):
+            res["Associations"] = True
         return res
 
 def _binary_rels(target, neighbor):

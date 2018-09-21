@@ -64,6 +64,11 @@ class Tests(unittest.TestCase):
         # print(list(test_dict.data.keys()))
         self.assertIn("eagle", test_dict.data["falcon"])
 
+    def test_associations_pair(self):
+        test_dict = ldt.dicts.resources.AssociationDictionary(
+            language="english", lowercasing=True)
+        self.assertTrue(test_dict.associate("eagle", "falcon"))
+
     def test_domain(self):
         self.assertTrue(self.web_dict.is_a_word("example.com"))
 

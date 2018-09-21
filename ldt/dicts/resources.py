@@ -199,7 +199,28 @@ class AssociationDictionary(ResourceDict):
                                              lowercasing=lowercasing,
                                              split_mwu=split_mwu, path=path,
                                              resource=resource)
+    def associate(self, word1, word2):
+        """Determining if two words are associated, in either direction.
 
+        Args:
+            word1, word2 (str): the words to check
+
+        Returns:
+            (bool): True if the words are associated, in either direction.
+
+        """
+
+        def test_pair(pair):
+            """Helper for :meth:`associate`"""
+            if pair[0] in self.data:
+                if pair[1] in self.data[pair[0]]:
+                    return True
+
+        if test_pair([word1, word2]):
+            return True
+        elif test_pair([word2, word1]):
+            return True
+        return False
 
 class WebDictionary(ResourceDict):
 

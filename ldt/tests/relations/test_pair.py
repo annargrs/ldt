@@ -67,5 +67,13 @@ class Tests(unittest.TestCase):
         worked = "SharedPOS" in res and "Antonyms" in res
         self.assertTrue(worked)
 
+    @ignore_warnings
+    def test_associations(self):
+        """Test hashtag detection."""
+        res = self.test_dict.analyze("falcon", "eagle")
+        print(res)
+        worked = "SharedPOS" in res and "Associations" in res
+        self.assertTrue(worked)
+
 if __name__ == '__main__':
     unittest.main()
