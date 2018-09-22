@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import os
 import time
 
 import ldt
@@ -17,9 +16,9 @@ class Tests(unittest.TestCase):
     @ignore_warnings
     def setUpClass(cls):
         """Setting up the test variables."""
-        cls.test_dict_fr = ldt.dicts.metadictionary.MetaDictionary(
+        cls.test_dict_fr = ldt.dicts.semantics.metadictionary.MetaDictionary(
             language="French", cache=False)
-        cls.test_dict_en = ldt.dicts.metadictionary.MetaDictionary(
+        cls.test_dict_en = ldt.dicts.semantics.metadictionary.MetaDictionary(
             language="English", cache=False)
 
     @classmethod

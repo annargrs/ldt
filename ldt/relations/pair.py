@@ -16,18 +16,12 @@ Todo:
 """
 
 import functools
-import os
-import ruamel.yaml as yaml
-import timeout_decorator
 
-from nltk.corpus import wordnet as wn
-
-from ldt.relations.word import Word as Word
 from ldt.dicts.dictionary import Dictionary as Dictionary
 from ldt.dicts.normalize import Normalization as Normalizer
 from ldt.dicts.derivation.meta import DerivationAnalyzer as \
     DerivationAnalyzer
-from ldt.dicts.metadictionary import MetaDictionary as MetaDictionary
+from ldt.dicts.semantics.metadictionary import MetaDictionary as MetaDictionary
 from ldt.relations.word import Word as Word
 from ldt.relations.ontology_path.ontodict import OntoDict as OntoDict
 from ldt.load_config import config as config

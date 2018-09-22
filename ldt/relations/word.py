@@ -38,13 +38,12 @@ Todo:
 
 """
 
-import inspect
 import functools
 
 from ldt.dicts.normalize import Normalization as Normalizer
 from ldt.dicts.derivation.meta import DerivationAnalyzer as \
     DerivationAnalyzer
-from ldt.dicts.metadictionary import MetaDictionary as MetaDictionary
+from ldt.dicts.semantics.metadictionary import MetaDictionary as MetaDictionary
 
 class Word(object):
     """Class that binds together all linguistic information about a word from

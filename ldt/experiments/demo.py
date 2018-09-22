@@ -10,7 +10,7 @@ import pandas as pd
 
 import ldt
 from ldt.load_config import config as config
-from ldt.relations.pair import RelationsInPair as RelationsInPair
+
 
 def ldt_demo(top_n):
 
@@ -27,7 +27,7 @@ def ldt_demo(top_n):
     normalizer = ldt.dicts.normalize.Normalization(language="English",order=(
         "wordnet", "custom"), lowercasing=True)
     DerivationAnalyzer = ldt.dicts.derivation.meta.DerivationAnalyzer()
-    LexDict = ldt.dicts.metadictionary.MetaDictionary()
+    LexDict = ldt.dicts.semantics.metadictionary.MetaDictionary()
 
     analyzer = ldt.relations.pair.RelationsInPair(normalizer=normalizer,
                                                    derivation_dict =

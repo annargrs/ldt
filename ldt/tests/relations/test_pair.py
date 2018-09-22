@@ -21,7 +21,7 @@ class Tests(unittest.TestCase):
                                                               "custom"),
                                                        lowercasing=True)
         DerivationAnalyzer = ldt.dicts.derivation.meta.DerivationAnalyzer()
-        LexDict = ldt.dicts.metadictionary.MetaDictionary()
+        LexDict = ldt.dicts.semantics.metadictionary.MetaDictionary()
         cls.test_dict = ldt.relations.pair.RelationsInPair(
             normalizer=normalizer, derivation_dict=DerivationAnalyzer,
             lex_dict=LexDict, gdeps=True, cooccurrence=True)
