@@ -34,7 +34,8 @@ class ResourceDict(Dictionary):
     def __init__(self, path=None, resource="names",
                  language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"]):
+                 split_mwu=config["split_mwu"],
+                 corpus=config["corpus"]):
         """ Initializing the vocab lookup class.
 
         Args:
@@ -64,17 +65,16 @@ class ResourceDict(Dictionary):
 
         if not path:
 
-            if resource in ["names", "numbers", "associations"]:
+            if resource in ["names", "numbers", "associations", "gdeps"]:
                 resource_type = "language_resources"
-            elif resource in ["freqdict", "vocabulary", "co-occurrence_data"]:
+                subfolder = self.language
+            elif resource in ["freqdict", "vocabulary", "cooccurrence"]:
                 resource_type = "corpus_resources"
+                subfolder = corpus
 
-            # if not self.language in path["resources"][resource_type]:
-            #     raise DictError("No resources for this language were found, "
-            #                     "check your configuration file.")
             path_to_dict = os.path.join(config["path_to_resources"],
-                                        resource_type, self.language,
-                                        config[resource_type][self.language][
+                                        resource_type, subfolder,
+                                        config[resource_type][subfolder][
                                             resource])
 
             #: the path from which the resource is loaded
@@ -88,13 +88,41 @@ class ResourceDict(Dictionary):
             print("No resource was found, please check the file path "
                   ""+self.path)
 
-
-
-#todo lowercasing and splitting mwus for the whole resource
     @functools.lru_cache(maxsize=None)
     def is_a_word(self, word):
         if word in self.data:
             return True
+        return False
+
+    @functools.lru_cache(maxsize=None)
+    def are_related(self, word1, word2):
+        """Determining if two words are related: a helper method for
+        resources with lists of related words per word entry.
+
+        Note:
+
+            The relations are assumed to be bidirectional. That does not
+            really apply to associations, but in the ldt use case (evaluation
+            of
+            target:neighbor word pairs) it is hard to justify that only one
+            direction should be taken into account, and if so, than what
+            direction it should be.
+
+        Args:
+            word1, word2 (str): the words to check
+
+        Returns:
+            (bool): True if the words are found to be related.
+
+        """
+
+
+        if word1 in self.data:
+            if word2 in self.data[word1]:
+                return True
+        if word2 in self.data:
+            if word1 in self.data[word2]:
+                return True
         return False
 
 
@@ -122,6 +150,9 @@ class NameDictionary(ResourceDict):
                                              lowercasing=lowercasing,
                                              split_mwu=split_mwu, path=path,
                                              resource=resource)
+
+    def are_related(self, word1, word2):
+        pass
 
 class NumberDictionary(ResourceDict):
     """A class for language-specific name resources."""
@@ -174,6 +205,9 @@ class NumberDictionary(ResourceDict):
                 return True
         return False
 
+    def are_related(self, word1, word2):
+        pass
+
 class AssociationDictionary(ResourceDict):
     """A class for language-specific name resources."""
 
@@ -199,28 +233,6 @@ class AssociationDictionary(ResourceDict):
                                              lowercasing=lowercasing,
                                              split_mwu=split_mwu, path=path,
                                              resource=resource)
-    def associate(self, word1, word2):
-        """Determining if two words are associated, in either direction.
-
-        Args:
-            word1, word2 (str): the words to check
-
-        Returns:
-            (bool): True if the words are associated, in either direction.
-
-        """
-
-        def test_pair(pair):
-            """Helper for :meth:`associate`"""
-            if pair[0] in self.data:
-                if pair[1] in self.data[pair[0]]:
-                    return True
-
-        if test_pair([word1, word2]):
-            return True
-        elif test_pair([word2, word1]):
-            return True
-        return False
 
 class WebDictionary(ResourceDict):
 
@@ -273,6 +285,8 @@ class WebDictionary(ResourceDict):
                 elif domain + "/" in word:
                     return True
 
+    def are_related(self, word1, word2):
+        pass
 
 class FileDictionary(ResourceDict):
 
@@ -322,6 +336,9 @@ class FileDictionary(ResourceDict):
             if "."+extension in self.data:
                     return True
         return False
+
+    def are_related(self, word1, word2):
+        pass
 
 # if __name__=="__main__":
 #     d={"A":["a"], "B":["B"], }

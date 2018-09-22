@@ -32,6 +32,7 @@ from ldt.relations.word import Word as Word
 from ldt.relations.ontology_path.ontodict import OntoDict as OntoDict
 from ldt.load_config import config as config
 from ldt.dicts.resources import AssociationDictionary as AssociationDictionary
+from ldt.relations.distribution import DistributionDict as DistributionDict
 
 class RelationsInPair(Dictionary):
     """This class implements analyzer for all possible relation types in a word
@@ -39,7 +40,8 @@ class RelationsInPair(Dictionary):
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"],
                  derivation_dict=None, normalizer=None,
-                 lex_dict=None):
+                 lex_dict=None, distr_dict=None, gdeps=False,
+                 cooccurrence=False):
 
         super(RelationsInPair, self).__init__(language=language,
                                               lowercasing=lowercasing)
@@ -65,6 +67,11 @@ class RelationsInPair(Dictionary):
             self._lex_dict = MetaDictionary()
         else:
             self._lex_dict = lex_dict
+
+        if not distr_dict:
+            self._distr_dict = DistributionDict(language=language,
+                                                gdeps=gdeps,
+                                                cooccurrence=cooccurrence)
 
     def is_a_word(self, word):
         raise NotImplementedError
@@ -100,9 +107,20 @@ class RelationsInPair(Dictionary):
                                                    neighbor.info[
                                                        "OriginalForm"])
         res["ShortestPath"] = shortest_path
-        if self.AssociationDictionary.associate(target.info["OriginalForm"],
-                                                neighbor.info["OriginalForm"]):
+        if self.AssociationDictionary.are_related(target.info["OriginalForm"],
+                                                  neighbor.info["OriginalForm"]):
             res["Associations"] = True
+        if not self._distr_dict.cooccur_in_corpus(target.info[
+                                                      "OriginalForm"],
+                                                  neighbor.info["OriginalForm"]):
+            res["NonCooccurring"] = True
+        if self._distr_dict.cooccur_in_gdeps(target.info["OriginalForm"],
+                                             neighbor.info["OriginalForm"]):
+            res["GDeps"] = True
+        res["TargetFrequency"] = self._distr_dict.frequency_in_corpus(
+            target.info["OriginalForm"])
+        res["NeighborFrequency"] = self._distr_dict.frequency_in_corpus(
+            neighbor.info["OriginalForm"])
         return res
 
 def _binary_rels(target, neighbor):

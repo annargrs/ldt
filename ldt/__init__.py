@@ -52,6 +52,7 @@ from ldt.dicts.derivation import meta
 
 from ldt.relations import word
 from ldt.relations import pair
+from ldt.relations import distribution
 
 # import ldt.helpers
 # import ldt.dicts

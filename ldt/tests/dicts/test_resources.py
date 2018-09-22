@@ -7,9 +7,8 @@ import ldt
 
 class Tests(unittest.TestCase):
     """
-    The tests in this block inspect the base spellchecker functionality:
-    checking if the word is in a given language, or a pre-defined set of
-    foreign languages.
+    The tests in this block inspect the loading of various resources: names,
+    numbers, associations, file and url detection.
 
     """
 
@@ -67,7 +66,7 @@ class Tests(unittest.TestCase):
     def test_associations_pair(self):
         test_dict = ldt.dicts.resources.AssociationDictionary(
             language="english", lowercasing=True)
-        self.assertTrue(test_dict.associate("eagle", "falcon"))
+        self.assertTrue(test_dict.are_related("eagle", "falcon"))
 
     def test_domain(self):
         self.assertTrue(self.web_dict.is_a_word("example.com"))
