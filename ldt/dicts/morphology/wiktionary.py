@@ -67,8 +67,8 @@ class MorphWiktionary(MorphDictionary, BaseWiktionary):
         return res
 
     def lemmatize(self, word):
-        """Wiktionary currently does not support lookup in non-lemmatized
-        forms. If a word is found, LDT assumes that it is a lemma.
+        """Wiktionary does not support lookup in non-lemmatized forms. If a
+        word is found, LDT assumes that it is a lemma.
 
         Args:
             word (str): the word to be looked up

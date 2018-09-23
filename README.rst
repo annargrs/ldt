@@ -23,8 +23,6 @@ LDT is a shiny new Python library for doing two things:
 
 If you have never heard about word embeddings -- you're missing out, here's `an introduction <https://www.shanelynn.ie/get-busy-with-word-embeddings-introduction/>`_.  If you have, head  over to the `project website <ldtoolkit.space>`_ for some new research results. And if you don't care about word embeddings, you can still just use LDT as a supplement to NLTK, SpaCy, and other great NLP tools.
 
-**Note:** LDT is undergoing refactoring, and not all the LD scores published** `in the paper <http://aclweb.org/anthology/C18-1228>`_ are in the public build yet. Check back for the rest of the code and detailed tutorial in the end of August.
-
 .. inclusion-marker-end-do-not-remove
 
 ----------------------

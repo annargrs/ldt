@@ -58,7 +58,10 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
-    'sphinx.ext.githubpages']
+    'sphinx.ext.githubpages',
+    'sphinx.ext.autosectionlabel']
+
+autosectionlabel_prefix_document: True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -128,8 +131,8 @@ html_theme_options = {
 "show_powered_by": False,
 "sidebar_collapse": True,
 "show_relbars": True,
-"font_size": "0.93em",
-"code_font_size": "0.85em",
+#"font_size": "0.98em",
+#"code_font_size": "0.89em",
 "sidebar_width":  "25em",
 "page_width": "90em",
 # "show_related": True,

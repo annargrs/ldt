@@ -58,7 +58,7 @@ class MorphMetaDict(Dictionary):
                  language=config["default_language"],
                  lowercasing=config["lowercasing"],
                  cache=config["wiktionary_cache"],
-                 babelnet_key=config["babelnet_key"]):
+                 babelnet_key=config["babelnet_key"], custom_base="wiktionary"):
 
         super(MorphMetaDict, self).__init__(language=language,
                                             lowercasing=lowercasing)
@@ -89,10 +89,10 @@ class MorphMetaDict(Dictionary):
                 self._dicts[dictionary] = self.wordnet
                 self._order.append(dictionary)
 
-            if dictionary == "custom" and language.lower() in ["en", "english"]:
-                self.custom = MorphCustomDict(dictionary=None)
-                self._dicts[dictionary] = self.custom
-                self._order.append(dictionary)
+        if language.lower() in ["en", "english"] and custom_base in self._dicts:
+            self.custom = MorphCustomDict(dictionary=self._dicts[custom_base])
+            self._dicts[dictionary] = self.custom
+            self._order.append(dictionary)
 
     @functools.lru_cache(maxsize=None)
     def is_a_word(self, word, minimal=True):
@@ -158,7 +158,7 @@ class MorphMetaDict(Dictionary):
             else:
                 res = self._dicts[dicts[0]].get_pos(word, formatting="list")
         if res:
-            return res
+            return list(set(res))
         return None
 
     @functools.lru_cache(maxsize=None)
@@ -172,13 +172,13 @@ class MorphMetaDict(Dictionary):
             (list): lemmas of the word
         """
         res = []
-        dicts = self.is_a_word(word, minimal=True)
-        if dicts:
-            for dictionary in dicts:
-                try:
-                    res += self._dicts[dictionary].lemmatize(word)
-                except NotImplementedError:
-                    pass
-        if res:
-            return res
+
+        if "wordnet" in self._dicts:
+            wordnet = self._dicts["wordnet"].lemmatize(word)
+            if wordnet:
+                return wordnet
+        if hasattr(self, "custom"):
+            res = self.custom.lemmatize(word)
+            if res:
+                return res
         return None

@@ -20,7 +20,7 @@ class Tests(unittest.TestCase):
         cls.test_dict_fr = ldt.dicts.morphology.meta.MorphMetaDict(
             language="French", cache=False)
         cls.test_dict_en = ldt.dicts.morphology.meta.MorphMetaDict(
-            language="English", cache=False)
+            language="English", cache=False, custom_base="wiktionary")
 
 
     @classmethod
@@ -44,7 +44,7 @@ class Tests(unittest.TestCase):
 
     @ignore_warnings
     def test_metadictionary_order(self):
-        self.assertEqual(self.test_dict_en._order, ["wordnet", "wiktionary"])
+        self.assertEqual(self.test_dict_en._order[0], "wordnet")
 
     @ignore_warnings
     def test_metadictionary_minimal(self):
@@ -58,25 +58,24 @@ class Tests(unittest.TestCase):
 
     @ignore_warnings
     def test_metadictionary_get_pos(self):
-        test_dict = ldt.dicts.morphology.meta.MorphMetaDict(order=["wordnet",
-                                                            "custom"])
+        test_dict = ldt.dicts.morphology.meta.MorphMetaDict(order=[
+            "wordnet"], custom_base="wordnet")
         res = test_dict.get_pos("nouned")
         self.assertEqual(res, ["verb"])
 
     @ignore_warnings
     def test_metadictionary_lemmatize(self):
-        test_dict = ldt.dicts.morphology.meta.MorphMetaDict(order=["wordnet",
-                                                            "custom"])
+        test_dict = ldt.dicts.morphology.meta.MorphMetaDict(order=[
+            "wordnet"], custom_base="wordnet")
         res = test_dict.lemmatize("nouned")
         self.assertEqual(res, ["noun"])
 
     @ignore_warnings
     def test_metadictionary_lemmatize(self):
         test_dict = ldt.dicts.morphology.meta.MorphMetaDict(order=["wordnet",
-                                                                   "wiktionary",
-                                                                   "custom"])
-        res = test_dict.lemmatize("abba")
-        self.assertEqual(res, ["abba"])
+                                                                   "wiktionary"], custom_base="wiktionary")
+        res = test_dict.lemmatize("GPUs")
+        self.assertEqual(res, ["GPU"])
 
     #
     # @ignore_warnings

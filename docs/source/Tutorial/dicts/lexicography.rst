@@ -2,6 +2,12 @@
 Lexicographic resources
 =======================
 
+.. contents:: :local:
+
+-------------
+What LDT does
+-------------
+
 LDT provides a unified interface to WordNet (via `NLTK <http://nltk.org>`_), Wiktionary (via `wiktionaryparser <https://github.com/Suyash458/WiktionaryParser>`_), Wikisaurus (via custom parser) and BabelNet (via BabelNet's API). Note that all of these resources except NLTK are currently queried online, so running large experiments may take time.
 
 Wiktionary, Wikisaurus and BabelNet are multilingual resources. The default query language is read from the :doc:`configuration file <../resources/configuration>` or specified at dictionary initialization. For WordNets, only the English WordNet is currently integrated.

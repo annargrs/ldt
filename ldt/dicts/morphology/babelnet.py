@@ -61,6 +61,16 @@ class MorphBabelNet(MorphDictionary, BaseBabelNet):
                 res[entry["pos"]] += 1
         res = {k.lower(): v for k, v in res.items()}
 
+        replacements = {"adv":"adverb", "adj":"adjective", "conj":
+            "conjunction", "prep": "preposition", "det": "determiner",
+                        "pron": "pronoun", "sym": "symbol", "intj":
+                            "interjection", "num": "numeral"}
+
+        if res:
+            for i in res:
+                if i in replacements:
+                    res[replacements[i]] = res.pop(i)
+
         if format == "list":
             res = list(res.keys())
         return res

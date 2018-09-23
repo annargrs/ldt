@@ -134,7 +134,7 @@ class DerivationWiktionary(BaseWiktionary):
         """
         if not dictionary:
             dictionary = Wiktionary(language=self.language, cache=self.cache)
-        related_terms = dictionary.get_relation(word, "derived terms")
+        related_terms = dictionary.get_relation(word, relation="derived terms")
         return related_terms
 
 # todo derivational families through the sem dict methods

@@ -6,3 +6,4 @@ from .babelnet import MorphBabelNet
 
 from .wiktionary import MorphWiktionary
 
+from .meta import MorphMetaDict
