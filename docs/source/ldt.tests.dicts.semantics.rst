@@ -36,6 +36,13 @@ ldt\.tests\.dicts\.semantics\.test\_wordnet module
     :undoc-members:
     :show-inheritance:
 
+ldt\.tests\.dicts\.test\_metadictionary module
+----------------------------------------------
+
+.. automodule:: ldt.tests.dicts.semantics.test_metadictionary
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 Module contents
 ---------------

@@ -278,7 +278,7 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
         return sorted(res)
 
     # pylint: disable=arguments-differ
-    def get_relations(self, word, relations="main", reduce=False,
+    def get_relations(self, word, relations="all", reduce=False,
                       synonyms=True):
 
         """ Aggregating all wWrdNet relations found for a word in a single

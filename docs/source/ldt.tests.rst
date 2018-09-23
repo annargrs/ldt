@@ -11,6 +11,7 @@ Subpackages
    ldt.tests.dicts.morphology
    ldt.tests.dicts.semantics
    ldt.tests.dicts.spellcheck
+   ldt.tests.relations
    ldt.tests.helpers
 
 

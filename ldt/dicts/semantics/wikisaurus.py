@@ -229,7 +229,7 @@ class Wikisaurus(BaseWiktionary, LexicographicDictionary):
             #     wikidata[relation] = []
         return wikidata
 
-    def get_relations(self, word, relations, reduce=False):
+    def get_relations(self, word, relations="all", reduce=False):
         """Retrieving relations from Wikisaurus entries
 
         Args:

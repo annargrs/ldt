@@ -133,6 +133,7 @@ def update_wiktionary_cache(language=config["default_language"],
 
     '''
 
+    print("Updating wiktionary cache.")
     # "0" is Wiktionary entries namespace, "110" is thesaurus entries namespace
 
     # if not path_to_cache.endswith("cache"):
@@ -216,6 +217,7 @@ def load_wiktionary_cache(language=config["default_language"],
 
     '''
 
+    print("Loading wiktionary cache.")
     path_to_cache = get_cache_dir(path_to_cache)
     filename = find_vocab_file(language, path_to_cache, wikisaurus=wikisaurus)
 

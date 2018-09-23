@@ -12,14 +12,6 @@ ldt\.tests\.dicts\.test\_dictionary module
     :undoc-members:
     :show-inheritance:
 
-ldt\.tests\.dicts\.test\_metadictionary module
-----------------------------------------------
-
-.. automodule:: ldt.tests.dicts.test_metadictionary
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 ldt\.tests\.dicts\.test\_resources module
 -----------------------------------------
 

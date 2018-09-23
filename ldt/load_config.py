@@ -37,7 +37,7 @@ else:
 def load_config(path=CONFIGPATH):
     """Loading config file from either the user home directory or the test
     directory"""
-
+    print("Loading configuration file:", path)
     if not os.path.isfile(path):
         raise ResourceError("Configuration yaml file was not found at "+path)
 

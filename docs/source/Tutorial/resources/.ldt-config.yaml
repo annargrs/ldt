@@ -25,11 +25,15 @@ language_resources:
     names: names.vocab
     numbers: numbers.vocab
     associations: associations.json
+    gdeps: gdeps.json
 
-# Extra corpus-specific resources
+# If corpus data is available, specify the corpus folder name. 
+corpus: Wiki201308
+# corpus: None
 
 corpus_resources:
+
   Wiki201308:
     freqdict: Wiki201308.freqdict
     vocabulary: Wiki201308.vocab
-    co-occurrence_data: 3gram.json
+    cooccurrence: 3grams.json

@@ -89,7 +89,7 @@ class Wiktionary(BaseWiktionary, LexicographicDictionary):
 
 
     @functools.lru_cache(maxsize=None)
-    def get_relations(self, word, relations=None,
+    def get_relations(self, word, relations="all",
                       reduce=False): #pylint: disable=arguments-differ
 
         """Parsing lexicographic relations in Wiktionary.

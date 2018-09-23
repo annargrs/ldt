@@ -82,3 +82,7 @@ the moment. But the infrastructure for adding other languages is already
 in place, so if you can find or create e.g. lists of affixes for your
 language, development would be easy. Get in touch if you'd like to get
 involved.
+
+Legal caveat: LDT is open-source free software. No hamsters were harmed in its production,
+and no harm should come from its usage. However, no guarantees of any kind.
+

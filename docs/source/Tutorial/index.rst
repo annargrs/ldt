@@ -7,4 +7,6 @@ LDT Tutorial
 
    installation
    resources/index
+   dicts/index
+   troubleshooting
    contact

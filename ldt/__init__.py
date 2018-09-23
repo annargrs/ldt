@@ -10,9 +10,10 @@ Subpackages
 """
 
 from ._version import __version__
-from ldt import load_config
+from ldt.load_config import config
 
 from ldt import helpers
 from ldt.helpers.loading import load_resource
+
 from ldt import dicts
 from ldt import relations
