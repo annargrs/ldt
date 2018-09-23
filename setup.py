@@ -7,6 +7,10 @@ import sys
 
 import ldt
 
+language: python
+python:
+  - "3.5"
+
 here = os.path.abspath(os.path.dirname(__file__))
 
 def read(*filenames, **kwargs):
