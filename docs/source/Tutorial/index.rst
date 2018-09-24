@@ -6,9 +6,10 @@ LDT Tutorial
    :titlesonly:
    :numbered:
 
+   workflow
    installation
    resources/index
    dicts/index
-   dicts/index/lexicography
+   word/index
    troubleshooting
    contact

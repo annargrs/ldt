@@ -9,4 +9,3 @@ Linguistic resources in LDT
    morphology
    spellchecking
    resources
-   normalization

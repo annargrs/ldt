@@ -10,8 +10,8 @@
 
 Examples:
     >>> test_dict = ldt.dicts.normalize.Normalization(language="English",
-                                              order=("wordnet", "custom"),
-                                              lowercasing=True)
+                                              order=("wordnet", "wiktionary"),
+                                              custom_base="wiktionary")
     >>> test_dict.normalize("grammar")
     {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': [
     'Lexicon'], 'pos': ['noun']}
@@ -124,8 +124,8 @@ class Normalization(MorphMetaDict):
 
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"], order=("wordnet",
-                                                           "wiktionary",
-                                                           "custom")):
+                                                           "wiktionary"),
+                 custom_base="wiktionary"):
         """ Initializing the _normalizer class.
 
         Args:
@@ -265,6 +265,7 @@ class Normalization(MorphMetaDict):
             res["pos"] = ["numeral"]
 
         attempt = self.is_a_word(word)
+        print(attempt)
         if attempt:
             res["found_in"] = attempt
             res["lemmas"] = self.lemmatize(word)
@@ -371,17 +372,14 @@ class Normalization(MorphMetaDict):
             (dict): word category labels and found lemmas, if any.
         """
         word = str(word)
-
         if not contains_a_letter(word):
         # the word contains nothing to analyze
             res = self._noise(word)
             if res:
                 return res
-
         res = self._dash(word)
         if res:
             return res
-
 
         if contains_non_letters(word):
             # URLs, filenames, numbers etc
@@ -392,7 +390,6 @@ class Normalization(MorphMetaDict):
         # the word is correctly spelled and is in dict, is a name or a
         # foreign word
         else:
-
             res = self._word(word)
             if res["word_categories"]:
                 return res
@@ -402,7 +399,10 @@ class Normalization(MorphMetaDict):
                     return res
 
         # # the word has to be modified
-        if not res:
-            res = self._fix(word)
+        res = self._fix(word)
+        if res:
             if res["lemmas"]:
                 return res
+        # give up
+        else:
+            return {"word_categories": "missing"}

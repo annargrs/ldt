@@ -330,8 +330,11 @@ class FileDictionary(ResourceDict):
 
     def is_a_word(self, word):
 
-        if word.count("/") > 2 or word.count("\\") > 2:
+        if word.count("/") > 2:
             return True
+        elif word.count("\\") > 2:
+            if not "\n" in word and not "\t" in word:
+                return True
 
         if not "." in word:
             return False
