@@ -329,6 +329,10 @@ class FileDictionary(ResourceDict):
                                             resource=resource)
 
     def is_a_word(self, word):
+
+        if word.count("/") > 2 or word.count("\\") > 2:
+            return True
+
         if not "." in word:
             return False
         else:

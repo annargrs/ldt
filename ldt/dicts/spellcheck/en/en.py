@@ -61,7 +61,7 @@ class SpellcheckerEn(Spellchecker):
 
 
     def filter_by_charset(self, word):
-        """An English-specific wrapper for :meth:`_filter_by_charset` that
+        """An English-specific wrapper for :meth:`filter_by_charset` that
         excludes words containing anything other than alphanumeric
         characters or hyphen.
 
@@ -80,7 +80,7 @@ class SpellcheckerEn(Spellchecker):
             return False
 
         # else:
-        #     return self._filter_by_charset(word, include=["latin", "digit",
+        #     return self.filter_by_charset(word, include=["latin", "digit",
         #                                    "hyphen-minus", "apostrophe"],
         #                                    exclude=["with"])
 

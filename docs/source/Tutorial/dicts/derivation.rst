@@ -45,7 +45,7 @@ For Wiktionary, the mechanism is the same:
  'first-of-its-kind',
  'kindness']
 
-Due to changes in wiktionaryparser the version is currently frozen at 0.0.4, but that may lead to problems with Python > 3.6. See :ref:`Wiktionary parser problems for derived terms`
+Due to changes in wiktionaryparser the version is currently frozen at 0.0.7.
 
 ----------------------
 Wiktionary etymologies
@@ -104,7 +104,7 @@ Derivation MetaDictionary
 All of the above resources are combined in ``DerivationAnalyzer`` class. It collects derivational families, etymologies and productive affix analysis, and outputs all the information.
 
 >>> derivation_dict = ldt.dicts.derivation.DerivationAnalyzer(language="en")
->>> test_dict.analyze("kindness")
+>>> derivation_dict.analyze("kindness")
 {'original_word': ['kindness'],
  'other': [],
   'prefixes': [],

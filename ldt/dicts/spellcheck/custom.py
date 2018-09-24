@@ -174,7 +174,7 @@ class Spellchecker(Dictionary):
         return False
 
     # pylint: disable=no-self-use
-    def _filter_by_charset(self, word, include=["latin", "digit"],
+    def filter_by_charset(self, word, include=["latin", "digit"],
                           exclude=["with"]):
         """Simple filter by character type: returns False for words with
         letters from any Unicode charset other than the the listed.
