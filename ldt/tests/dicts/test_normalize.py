@@ -81,12 +81,12 @@ class Tests(unittest.TestCase):
     @ignore_warnings
     def test_names(self):
         res = self.test_dict.normalize("alice")
-        self.assertIn("Names", res["word_categories"])
+        self.assertIn("ProperNouns", res["word_categories"])
 
     @ignore_warnings
     def test_foreign(self):
         res = self.test_dict.normalize("gouvernement")
-        self.assertIn("Foreign", res["word_categories"])
+        self.assertIn("ForeignWords", res["word_categories"])
 
     def test_denoise(self):
         res = ldt.dicts.normalize.denoise("#$%cats(*")

@@ -90,8 +90,8 @@ class RelationsInPair(Dictionary):
         neighbor = Word(neighbor, self._derivation_dict, self._normalizer,
                         self._lex_dict)
         if not silent:
-            print(target.all_info())
-            print(neighbor.all_info())
+            print(target.pp_info())
+            print(neighbor.pp_info())
         rels = _binary_rels(target, neighbor)
         res = {}
         for rel in rels:

@@ -65,9 +65,11 @@ Note that the roots may be Latin, Saxon, Old French etc..
 Productive derivation patterns
 ------------------------------
 
-``ldt.dicts.derivation.custom_dict.DerivationCustomDict()`` class provides a general language-independent interface for detecting compounds and words with prefixes and suffixes. Extending it to other languages could be as easy as providing the lists of affixes. See the API reference for more details.
+:meth:`~ldt.dicts.derivation.custom_dict.DerivationCustomDict` class
+provides a general language-independent interface for detecting compounds and words with prefixes and suffixes. Extending it to other languages could be as easy as providing the lists of affixes. See the API reference for more details.
 
-For English LDT provides ``EnglishDerivation`` class that combines the above with a few custom methods.
+For English LDT provides :meth:`~ldt.dicts.derivation.custom.en.EnglishDerivation` class
+that combines the above with a few custom methods.
 
 >>> derivation_dict = ldt.dicts.derivation.EnglishDerivation()
 >>> derivation_dict.analyze_affixes("antiestablishment")
@@ -101,7 +103,7 @@ Decomposing compounds is based on search for possible conjoined constituents tha
 Derivation MetaDictionary
 -------------------------
 
-All of the above resources are combined in ``DerivationAnalyzer`` class. It collects derivational families, etymologies and productive affix analysis, and outputs all the information.
+All of the above resources are combined in :meth:`~ldt.dicts.derivation.meta.DerivationAnalyzer` class. It collects derivational families, etymologies and productive affix analysis, and outputs all the information.
 
 >>> derivation_dict = ldt.dicts.derivation.DerivationAnalyzer(language="en")
 >>> derivation_dict.analyze("kindness")

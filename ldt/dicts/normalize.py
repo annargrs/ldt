@@ -265,19 +265,18 @@ class Normalization(MorphMetaDict):
             res["pos"] = ["numeral"]
 
         attempt = self.is_a_word(word)
-        print(attempt)
         if attempt:
             res["found_in"] = attempt
             res["lemmas"] = self.lemmatize(word)
             res["word_categories"].append("Lexicon")
             res["pos"] = self.get_pos(word, minimal=True)
         if self.namedict.is_a_word(word):
-            res["word_categories"].append("Names")
+            res["word_categories"].append("ProperNouns")
             res["lemmas"] = [word]
             res["pos"] = ["noun"]
         if not res["word_categories"]:
             if self.spelldict.is_foreign(word):
-                res["word_categories"].append("Foreign")
+                res["word_categories"].append("ForeignWords")
 
         if not res["word_categories"]:
             misspelled = self.spelldict.spelling_nazi(word)
@@ -405,4 +404,4 @@ class Normalization(MorphMetaDict):
                 return res
         # give up
         else:
-            return {"word_categories": "missing"}
+            return {"word_categories": "Missing"}
