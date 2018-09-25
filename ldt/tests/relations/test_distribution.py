@@ -21,7 +21,6 @@ class Tests(unittest.TestCase):
                                                         cooccurrence_freq=False)
         cls.test_dict_cooc = \
             ldt.relations.distribution.DistributionDict(language="english",
-                                                        gdeps=True,
                                                         cooccurrence=True,
                                                         cooccurrence_freq=True)
     @classmethod
@@ -55,14 +54,12 @@ class Tests(unittest.TestCase):
     def test_cooccurrence_wrap(self):
         """Test cooccurrence in the corpus (wrapper method)"""
         self.assertEqual(self.test_dict.cooccur_in_corpus("pinnock",
-                                                          "national",
-                                                          freq=False), True)
+                                                          "national"), True)
 
     def test_cooccurrence_wrap_num(self):
         """Test cooccurrence in the corpus (wrapper method)"""
         self.assertEqual(self.test_dict_cooc.cooccur_in_corpus("pinnock",
-                                                               "national",
-                                                               freq=True), 2)
+                                                               "national"), 2)
 
     def test_gdeps_wrap(self):
         """Test cooccurrence in google dependency ngrams (wrapper method)"""

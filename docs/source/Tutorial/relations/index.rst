@@ -6,3 +6,4 @@ Detecting relations in pairs of words
 
    relations
    pair
+   distribution

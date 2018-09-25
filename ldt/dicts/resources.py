@@ -52,6 +52,9 @@ class ResourceDict(Dictionary):
             resource (str): the resource to initialize (if path is a
                 dictionary), as indicated in the config file. For example,
                 "names", "numbers", "associations".
+            freq (bool): for cooccurrence dictionaries, True if integer
+                frequencies should be returned (otherwise booleans are
+                returned). Has no effect on anything else.
         """
 
         super(ResourceDict, self).__init__()

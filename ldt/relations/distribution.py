@@ -42,7 +42,8 @@ class DistributionDict():
             self.cooccurrence = ResourceDict(resource="cooccurrence",
                                              corpus=corpus,
                                              freq=cooccurrence_freq)
-
+        #: hidden parameter for :meth:`cooccur_in_corpus`
+        self._freq = cooccurrence_freq
         #: ResourceDict: frequency dictionary
         self.freqdict = ResourceDict(resource="freqdict", corpus=corpus)
 
@@ -61,7 +62,7 @@ class DistributionDict():
         except KeyError:
             return 0
 
-    def cooccur_in_corpus(self, word1, word2, freq=False):
+    def cooccur_in_corpus(self, word1, word2):
         """Wrapper method for retrieving cooccurrence information.
 
         Args:
@@ -72,7 +73,7 @@ class DistributionDict():
 
         """
         if hasattr(self, "cooccurrence"):
-            return self.cooccurrence.are_related(word1, word2, freq=freq)
+            return self.cooccurrence.are_related(word1, word2, freq=self._freq)
         return False
 
 
