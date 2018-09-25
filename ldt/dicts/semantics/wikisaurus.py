@@ -51,8 +51,7 @@ class Wikisaurus(BaseWiktionary, LexicographicDictionary):
     """
     def __init__(self, cache=config["wiktionary_cache"],
                  language=config["default_language"],
-                 lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"]):
+                 lowercasing=config["lowercasing"]):
         """ Initializing the Wikisaurus class.
 
         Unlike the basic Dictionary class, Wikisaurus checks the language
@@ -62,32 +61,11 @@ class Wikisaurus(BaseWiktionary, LexicographicDictionary):
         Args:
             language (str): the language of the dictionary
             lowercasing (bool): True if all data should be lowercased
-            split_mwu (bool): True if in addition to underscored spellings of
-            multi-word expressions their dashed and spaced versions should also
-            be produced (e.g. 'good night', 'good_night', "good-night")
 
         """
-        super(Wikisaurus, self).__init__(cache=cache, language=language,
-                                         split_mwu=split_mwu)
-    #     super(Wikisaurus, self).__init__()
-    #     if len(language) > 2:
-    #         language = lookup_language_by_code(language, reverse=True)
-    #     self._language = language
-    #     if not wiktionary_cache:
-    #         self.cache = None
-    #     else:
-    #         self.load_cache()
-    #     self.supported_relations = ("synonyms", "antonyms", "hyponyms",
-    #                                 "hypernyms", "meronyms", "holonyms",
-    #                                 "troponyms", "coordinate terms", "other")
-    #
-    #
-    # def _set_language(self, language):
-    #     """This method ensures the language arg is a 2-letter code."""
-    #     if len(language) > 2:
-    #         language = lookup_language_by_code(language, reverse=True)
-    #     self._language = language
-    #
+        super(Wikisaurus, self).__init__(cache=cache, language=language)
+
+
     def load_cache(self):
         """Loading the cached list of titles of existing Wikisaurus pages.
         If it doesn't exist, this list is created in the ldt resources directory

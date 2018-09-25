@@ -15,8 +15,7 @@ class MorphWiktionary(MorphDictionary, BaseWiktionary):
     Wiktionary. At the moment, only POS tags can be obtained."""
 
     def __init__(self, cache=config["wiktionary_cache"], language=config[
-        "default_language"], lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"]):
+        "default_language"], lowercasing=config["lowercasing"]):
         """ Initializing the base class.
 
         Args:
@@ -26,8 +25,7 @@ class MorphWiktionary(MorphDictionary, BaseWiktionary):
         """
 
         super(MorphWiktionary, self).__init__(cache=cache, language=language,
-                                              lowercasing=lowercasing,
-                                              split_mwu=split_mwu)
+                                              lowercasing=lowercasing)
 
     def get_pos(self, word, formatting="dict"):
         """Retrieving parts of speech for a given word.

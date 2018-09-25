@@ -49,8 +49,7 @@ class BaseWiktionary(Dictionary):
     """
     # pylint: disable=unused-argument
     def __init__(self, cache=config["wiktionary_cache"], language=config[
-        "default_language"], lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"]):
+        "default_language"], lowercasing=config["lowercasing"]):
         """ Initializing the Wiktionary class.
 
         Unlike the basic Dictionary class, Wiktionary checks the language
@@ -63,8 +62,7 @@ class BaseWiktionary(Dictionary):
 
         """
         super(BaseWiktionary, self).__init__(language=language,
-                                             lowercasing=lowercasing,
-                                             split_mwu=split_mwu)
+                                             lowercasing=lowercasing)
         self.language = language
         if len(self.language) > 2:
             self.language = lookup_language_code(self.language, reverse=True)

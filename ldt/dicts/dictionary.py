@@ -44,16 +44,12 @@ class Dictionary(metaclass=abc.ABCMeta):
     """
 
     def __init__(self, language=config["default_language"],
-                 lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"]):
+                 lowercasing=config["lowercasing"]):
         """ Initializing the generic dictionary class
 
         Args:
             language (str): the language of the dictionary
             lowercasing (bool): True if all data should be lowercased
-            split_mwu (bool): True if in addition to underscored spellings of
-                multi-word-expressions their dashed and spaced versions should
-                also be produced (e.g. 'good night', 'good_night', "good-night")
             main_relations (tuple): the relations that are currently defined
                 in all LDT resources
 
@@ -61,7 +57,6 @@ class Dictionary(metaclass=abc.ABCMeta):
 
         self._language = language
         self.lowercasing = lowercasing
-        self.split_mwu = split_mwu
 
     @property
     def language(self):

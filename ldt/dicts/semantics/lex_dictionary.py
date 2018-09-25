@@ -39,10 +39,6 @@ class LexicographicDictionary(Dictionary, metaclass=ABCMeta):
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored
-                spellings of multi-word expressions their dashed and spaced
-                versions should also be produced (e.g. 'good night',
-                'good_night', "good-night")
 
         """
 
@@ -165,11 +161,9 @@ class LexicographicDictionary(Dictionary, metaclass=ABCMeta):
         """Helper for processing the wordlists from different resources
         according to general config presets.
 
-        At the moment, the results can be automatically:
+        At the moment, the results can be automatically lowercased (
+        ``self.lowercasing = True``).
 
-          * lowercased (``self.lowercasing = True``);
-          * multi-word expressions can be split and added in all spacing
-                variations (``split_mwu = True``);
 
         Args:
             wordlist: the list of words to process
@@ -185,48 +179,30 @@ class LexicographicDictionary(Dictionary, metaclass=ABCMeta):
         if self.lowercasing:
             wordlist = [w.lower() for w in wordlist]
 
-        if self.split_mwu:
-            newres = []
-            for mwu in wordlist:
-                newres += get_spacing_variants(mwu)
-            wordlist = newres
+        # if self.split_mwu:
+        #     newres = []
+        #     for mwu in wordlist:
+        #         newres += get_spacing_variants(mwu)
+        #     wordlist = newres
         wordlist = list(set(wordlist))
         return wordlist
 
-# class DictionaryWithDefinitions(LexicographicDictionary, metaclass=ABCMeta):
+
 class DictionaryWithDefinitions(LexicographicDictionary, metaclass=ABCMeta):
     """A super-class for resources with definition functionality
 
     """
 
-    # def __init__(self, lowercasing=config_lowercasing,
-    #              split_mwu=config_split_mwu):
     def __init__(self):
         """ Initializing the base class.
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored
-                spellings of multi-word expressions their dashed and spaced
-                versions should also be produced (e.g. 'good night',
-                'good_night', "good-night")
 
         """
 
         super(DictionaryWithDefinitions, self).__init__()
 
-    # def is_a_word(self, word):
-    #     """Stub for the compulsory method for all subclasses that
-    #     determines the existence of an entry.
-    #
-    #     Args:
-    #         word (str): the word to be looked up
-    #
-    #     Returns:
-    #         (bool): whether the target word has an entry in the resource
-    #     """
-    #     raise NotImplementedError()
-    #     # pass
 
     def get_relations(self, word, relations):
         """Stub for the compulsory method for all subclasses that

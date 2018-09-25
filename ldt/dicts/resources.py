@@ -33,16 +33,11 @@ class ResourceDict(Dictionary):
     def __init__(self, path=None, resource="names",
                  language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"],
                  corpus=config["corpus"], freq=False):
         """ Initializing the vocab lookup class.
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored
-                spellings of multi-word expressions their dashed and spaced
-                versions should also be produced (e.g. 'good night',
-                'good_night', "good-night")
             path (str): if str, interpreted as the full direct path to
                 the resource to be used (one-column vocab text file expected).
                 Otherwise LDT will look for the file in the
@@ -154,15 +149,11 @@ class NameDictionary(ResourceDict):
 
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"], path=None, resource="names"):
+                 path=None, resource="names"):
         """ Initializing the names lookup class.
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored
-                spellings of multi-word expressions their dashed and spaced
-                versions should also be produced (e.g. 'good night',
-                'good_night', "good-night")
             path (str, dict): if str, interpreted as the full direct path to
                 the resource to be used (one-column vocab text file expected).
                 Otherwise LDT will look for the file in the
@@ -171,8 +162,7 @@ class NameDictionary(ResourceDict):
         """
         super(NameDictionary, self).__init__(language=language,
                                              lowercasing=lowercasing,
-                                             split_mwu=split_mwu, path=path,
-                                             resource=resource)
+                                             path=path, resource=resource)
 
     def are_related(self, word1, word2):
         pass
@@ -182,16 +172,11 @@ class NumberDictionary(ResourceDict):
 
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"], path=None,
                  resource="numbers"):
         """ Initializing the numbers lookup class.
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored
-                spellings of multi-word expressions their dashed and spaced
-                versions should also be produced (e.g. 'good night',
-                'good_night', "good-night")
             path (str, dict): if str, interpreted as the full direct path to
                 the resource to be used (one-column vocab text file expected).
                 Otherwise LDT will look for the file in the
@@ -200,8 +185,7 @@ class NumberDictionary(ResourceDict):
         """
         super(NumberDictionary, self).__init__(language=language,
                                              lowercasing=lowercasing,
-                                             split_mwu=split_mwu, path=None,
-                                             resource=resource)
+                                             path=None, resource=resource)
 
     @functools.lru_cache(maxsize=config["cache_size"])
     def is_a_word(self, word):
@@ -236,16 +220,11 @@ class AssociationDictionary(ResourceDict):
 
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"], path=None,
-                 resource="associations"):
+                 path=None, resource="associations"):
         """ Initializing the associations lookup class.
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored
-                spellings of multi-word expressions their dashed and spaced
-                versions should also be produced (e.g. 'good night',
-                'good_night', "good-night")
             path (str, dict): if str, interpreted as the full direct path to
                 the resource to be used (one-column vocab text file expected).
                 Otherwise LDT will look for the file in the
@@ -254,8 +233,7 @@ class AssociationDictionary(ResourceDict):
         """
         super(AssociationDictionary, self).__init__(language=language,
                                              lowercasing=lowercasing,
-                                             split_mwu=split_mwu, path=path,
-                                             resource=resource)
+                                             path=path, resource=resource)
 
 class WebDictionary(ResourceDict):
 
@@ -264,7 +242,7 @@ class WebDictionary(ResourceDict):
 
     def __init__(self, language="en",
                  lowercasing=False,
-                 split_mwu=False, path="helpers/generic_files/web_domains.vocab",
+                path="helpers/generic_files/web_domains.vocab",
                  resource="domain"):
         """ Initializing the class for detecting URLs.
 
@@ -276,10 +254,6 @@ class WebDictionary(ResourceDict):
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored
-                spellings of multi-word expressions their dashed and spaced
-                versions should also be produced (e.g. 'good night',
-                'good_night', "good-night")
             path (str, dict): if str, interpreted as the full direct path to
                 the resource to be used (one-column vocab text file expected).
                 Otherwise LDT will look for the file in the
@@ -290,7 +264,6 @@ class WebDictionary(ResourceDict):
         full_path=os.path.join(dir_path, path)
         super(WebDictionary, self).__init__(language=language,
                                             lowercasing=lowercasing,
-                                            split_mwu=split_mwu,
                                             path=full_path,
                                             resource=resource)
 
@@ -317,7 +290,6 @@ class FileDictionary(ResourceDict):
 
     def __init__(self, language="en",
                  lowercasing=False,
-                 split_mwu=False,
                  path="helpers/generic_files/file_extensions.vocab",
                  resource="file"):
         """ Initializing the class for detecting URLs.
@@ -333,10 +305,6 @@ class FileDictionary(ResourceDict):
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored
-                spellings of multi-word expressions their dashed and spaced
-                versions should also be produced (e.g. 'good night',
-                'good_night', "good-night")
             path (str, dict): if str, interpreted as the full direct path to
                 the resource to be used (one-column vocab text file expected).
                 Otherwise LDT will look for the file in the
@@ -347,7 +315,6 @@ class FileDictionary(ResourceDict):
         full_path=os.path.join(dir_path, path)
         super(FileDictionary, self).__init__(language=language,
                                             lowercasing=lowercasing,
-                                            split_mwu=split_mwu,
                                             path=full_path,
                                             resource=resource)
 

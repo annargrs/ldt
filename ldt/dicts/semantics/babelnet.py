@@ -45,7 +45,6 @@ class BabelNet(BaseBabelNet, LexicographicDictionary):
     # pylint: disable=unused-argument
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"],
                  babelnet_key=config["babelnet_key"]):
         """ Initializing the BabelNet class.
 
@@ -57,9 +56,6 @@ class BabelNet(BaseBabelNet, LexicographicDictionary):
             language (str): the language of the dictionary (automatically
             formatted to uppercase 2-letter code)
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored spellings of
-            multi-word expressions their dashed and spaced versions should also
-            be produced (e.g. 'good night', 'good_night', "good-night")
             queries (int): the number of queries to BabelNet performed in
             this session
             babelnet_key (str): the BabelNet user key (registration at
@@ -68,7 +64,6 @@ class BabelNet(BaseBabelNet, LexicographicDictionary):
         """
         super(BabelNet, self).__init__(language=language,
                                        lowercasing=lowercasing,
-                                       split_mwu=split_mwu,
                                        babelnet_key=babelnet_key)
         # self.queries = 0
         # if len(language) > 2:

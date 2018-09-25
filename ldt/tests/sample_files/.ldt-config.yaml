@@ -8,9 +8,6 @@ default_language: English
 # if you are working with embeddings that were made from a lowercased corpus, set this to True.
 lowercasing: True
 
-# If True, splits multi-word units returned by dictionaries (e.g. "animal_kingdom" > "animal kingdom")
-split_mwu: False
-
 # BabelNet key is required for querying BabelNet. Register at Babelnet.org/register for up to 1000 free queries a day.
 # If you don't plan to use BabelNet, the parameter should be set to "None".
 babelnet_key: None

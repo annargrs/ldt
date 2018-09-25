@@ -37,8 +37,7 @@ class Wiktionary(BaseWiktionary, LexicographicDictionary):
     """
     def __init__(self, cache=config["wiktionary_cache"],
                  language=config["default_language"],
-                 lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"]):
+                 lowercasing=config["lowercasing"]):
         """ Initializing the Wiktionary class.
 
         Unlike the basic Dictionary class, Wiktionary checks the language
@@ -50,24 +49,12 @@ class Wiktionary(BaseWiktionary, LexicographicDictionary):
             language should be cached to speed up queries
             language (str): the language of the dictionary
             lowercasing (bool): True if all data should be lowercased
-            split_mwu (bool): True if in addition to underscored spellings of
-            multi-word expressions their dashed and spaced versions should also
-            be produced (e.g. 'good night', 'good_night', "good-night")
 
         """
 
         super(Wiktionary, self).__init__(cache=cache, language=language,
-                                         lowercasing=lowercasing,
-                                         split_mwu=split_mwu)
-        # super().__init__(wiktionary_cache, language, split_mwu)
-        # super(Wiktionary, self).__init__()
-        # if len(language) > 2:
-        #     language = lookup_language_by_code(language, reverse=True)
-        # self._language = language
-        # if not wiktionary_cache:
-        #     self.cache = None
-        # else:
-        #     self.load_cache()
+                                         lowercasing=lowercasing)
+
         self.supported_relations = ("synonyms", "antonyms", "hyponyms",
                                     "hypernyms", "meronyms", "holonyms",
                                     "troponyms", "coordinate terms", "other",
@@ -133,12 +120,7 @@ class Wiktionary(BaseWiktionary, LexicographicDictionary):
 
                         else:
                             mwu = mwu.strip()
-                            # if self.split_mwu:
-                            #     cleaned += get_spacing_variants(mwu)
-                            # else:
                             cleaned.append(mwu)
-                # if self.lowercasing:
-                #     cleaned = [w.lower() for w in cleaned]
                 cleaned = list(set(cleaned))
                 cleaned = sorted(cleaned)
                 dicts[i] = []

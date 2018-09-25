@@ -37,53 +37,20 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
 
     """
 
-    def __init__(self, lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"]):
+    def __init__(self, lowercasing=config["lowercasing"]):
         """ Initializing the WordNet class.
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored spellings of
-            multi-word expressions their dashed and spaced versions should also
-            be produced (e.g. 'good night', 'good_night', "good-night")
 
         """
         super(WordNet, self).__init__(
-            lowercasing=lowercasing, split_mwu=split_mwu)
+            lowercasing=lowercasing)
 
-        # DictionaryWithDefinitions.__init__(lowercasing, split_mwu)
-        # BaseWordNet.__init__(lowercasing, split_mwu)
-        # BaseWordNet.__init__(self)
-        # DictionaryWithDefinitions.__init__(self)
-        # super().__init__()
-
-        # self._language = "en"
         self.supported_relations = ("synonyms", "antonyms", "hyponyms",
                                     "hypernyms", "part_meronyms",
                                     "member_meronyms", "substance_meronyms",
                                     "meronyms")
-
-    # def _set_language(self, language):
-    #     """This ensures the language is suppported."""
-    #     if language not in ["English", "english", "en"]:
-    #         raise LanguageError("Only English WordNet is supported at the "
-    #                             "moment.")
-    #     self._language = language
-    #
-    # def is_a_word(self, word):
-    #     """ Determines whether a WordNet entry exists for this word.
-    #
-    #     Args:
-    #         word (str): the input word to look up.
-    #
-    #     Returns:
-    #         (bool): *True* if the word entry was found.
-    #
-    #     """
-    #
-    #     if wn.synsets(word):
-    #         return True
-    #     return False
 
     @functools.lru_cache(maxsize=config["cache_size"])
     def _get_all_synonyms(self, word):
@@ -245,9 +212,6 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
         Returns:
             list: a list of words related to the target word in the specified
             way.
-
-        Todo:
-            * test split_mwu
 
         """
         if not self.is_a_word(word):

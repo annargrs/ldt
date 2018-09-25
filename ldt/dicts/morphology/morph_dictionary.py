@@ -32,10 +32,6 @@ class MorphDictionary(Dictionary, metaclass=ABCMeta):
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored
-                spellings of multi-word expressions their dashed and spaced
-                versions should also be produced (e.g. 'good night',
-                'good_night', "good-night")
 
         """
 

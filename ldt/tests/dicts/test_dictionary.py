@@ -50,9 +50,8 @@ class Tests(unittest.TestCase):
     def test_post_processing(self):
         test = MockDictionary()
         test.lowercasing = True
-        test.split_mwu = True
-        res = test.post_process(["Good night"])
-        self.assertIn("good_night", res)
+        res = test.post_process(["Good"])
+        self.assertIn("good", res)
 
 if __name__ == '__main__':
     unittest.main()

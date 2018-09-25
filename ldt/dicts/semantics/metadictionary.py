@@ -56,7 +56,6 @@ class MetaDictionary(Dictionary):
                               "babelnet"),
                  language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"],
                  cache=config["wiktionary_cache"],
                  babelnet_key=config["babelnet_key"]):
 
@@ -69,14 +68,12 @@ class MetaDictionary(Dictionary):
             if dictionary == "wiktionary":
                 self.wiktionary = Wiktionary(language=language,
                                              lowercasing=lowercasing,
-                                             split_mwu=split_mwu,
                                              cache=cache)
                 self._dicts[dictionary] = self.wiktionary
                 self._order.append(dictionary)
             if dictionary == "wikisaurus":
                 self.wikisaurus = Wikisaurus(language=language,
                                              lowercasing=lowercasing,
-                                             split_mwu=split_mwu,
                                              cache=cache)
                 self._dicts[dictionary] = self.wikisaurus
                 self._order.append(dictionary)
@@ -84,14 +81,13 @@ class MetaDictionary(Dictionary):
                 try:
                     self.babelnet = BabelNet(language=language,
                                              lowercasing=lowercasing,
-                                             split_mwu=split_mwu,
                                              babelnet_key=babelnet_key)
                     self._dicts[dictionary] = self.babelnet
                     self._order.append(dictionary)
                 except AuthorizationError:
                     pass
             if dictionary == "wordnet" and language.lower() in ["en", "english"]:
-                self.wordnet = WordNet(lowercasing, split_mwu)
+                self.wordnet = WordNet(lowercasing)
                 self._dicts[dictionary] = self.wordnet
                 self._order.append(dictionary)
 
