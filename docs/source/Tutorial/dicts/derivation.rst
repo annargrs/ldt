@@ -65,10 +65,10 @@ Note that the roots may be Latin, Saxon, Old French etc..
 Productive derivation patterns
 ------------------------------
 
-:meth:`~ldt.dicts.derivation.custom_dict.DerivationCustomDict` class
+:class:`~ldt.dicts.derivation.custom.custom_dict.DerivationCustomDict` class
 provides a general language-independent interface for detecting compounds and words with prefixes and suffixes. Extending it to other languages could be as easy as providing the lists of affixes. See the API reference for more details.
 
-For English LDT provides :meth:`~ldt.dicts.derivation.custom.en.EnglishDerivation` class
+For English LDT provides :class:`~ldt.dicts.derivation.custom.en.en.EnglishDerivation` class
 that combines the above with a few custom methods.
 
 >>> derivation_dict = ldt.dicts.derivation.EnglishDerivation()
@@ -79,7 +79,11 @@ that combines the above with a few custom methods.
  'other': [],
  'original_word': ['antiestablishment']}
 
-Most patterns are productive. The list is based on `MorphoQuantics BNC data <http://morphoquantics.co.uk/>`_. In particular, 97 prefixes and 124 suffixes are included at the moment. See ``ldt.dicts.derivation.custom.en`` for an example of language data file.
+Most patterns are productive. The list is based on `MorphoQuantics BNC data
+<http://morphoquantics.co.uk/>`_. In particular, 97 prefixes and 124
+suffixes are included at the moment.
+See ``ldt.dicts.derivation.custom.en.en.yaml`` for an example of language
+data file.
 
 A few historical patterns are also included:
 
@@ -103,7 +107,11 @@ Decomposing compounds is based on search for possible conjoined constituents tha
 Derivation MetaDictionary
 -------------------------
 
-All of the above resources are combined in :meth:`~ldt.dicts.derivation.meta.DerivationAnalyzer` class. It collects derivational families, etymologies and productive affix analysis, and outputs all the information.
+All of the above resources are combined in
+:class:`ldt.dicts.derivation.meta.DerivationAnalyzer` class. It collects
+derivational families, etymologies and productive affix analysis, and
+outputs all the information.
+
 
 >>> derivation_dict = ldt.dicts.derivation.DerivationAnalyzer(language="en")
 >>> derivation_dict.analyze("kindness")

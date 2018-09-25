@@ -188,13 +188,21 @@ Babelcoins cost of this query: 30.
 MetaDictionary
 --------------
 
-LDT's ``MetaDictionary`` class provides a way to combine information from different dictionaries in different ways. Strictly speaking, both WordNet and Wiktionary are already included in BabelNet, so just that resource should be sufficient (and Wiktionary parsing in BabelNet may be better). However, it does come with query limits (up to 50,000 per day for non-profit research). MetaDictionary provides a way to use WordNet and Wiktionary whenever possible, and to fall back to BabelNet only when a word is missing in both of these resources.
+LDT's :class:`ldt.dicts.semantics.metadictionary.MetaDictionary` class
+provides a way to combine information from different dictionaries in
+different ways. Strictly speaking, both WordNet and Wiktionary are already
+included in BabelNet, so just that resource should be sufficient (and
+Wiktionary parsing in BabelNet may be better). However, it does come with
+query limits (up to 50,000 per day for non-profit research). MetaDictionary
+provides a way to use WordNet and Wiktionary whenever possible, and to fall
+back to BabelNet only when a word is missing in both of these resources.
 
-MetaDictionary is initialized with a list of dictionaries (``order`` option) that specifies the order in which they should be queried.
+MetaDictionary is initialized with a list of dictionaries (``order`` option)
+ that specifies the order in which they should be queried.
 
 >>> metadictionary = ldt.dicts.metadictionary.MetaDictionary(language="English", order=['wordnet', 'wiktionary', "babelnet"])
 
-The methods of ``MetaDictionary`` have an additional boolean option ``minimal``. If set to True, the querying stops at the first resource in which an entry is found. WordNet is the least computationally expensive, with wiktionary and babelnet following suit, so this is the recommended order.
+The methods of :class:`ldt.dicts.semantics.metadictionary.MetaDictionary` have an additional boolean option ``minimal``. If set to True, the querying stops at the first resource in which an entry is found. WordNet is the least computationally expensive, with wiktionary and babelnet following suit, so this is the recommended order.
 
 Unlike the methods for individual dictionary resources, ``is_a_word()`` method of ``MetaDictionary`` returns not a boolean, but a list of resources in which entries for the queried word were found.
 

@@ -20,7 +20,8 @@ A list of possible POSes for a given lemma, together with number of senses per P
 >>> morph_wn.get_pos("cat")
 {'noun': 8, 'verb': 2}
 
-``lemmatize("word")`` method returns the lemma of the query word, or the word if it is already a lemma:
+:meth:`~ldt.dicts.morphology.wordnet.en.MorphWordNet.lemmatize()` method
+returns the lemma of the query word, or the word if it is already a lemma:
 
 >>> morph_wn.lemmatize("cat")
 ['cat']
@@ -84,9 +85,12 @@ The general syntax is the same:
 >>> morph_custom.lemmatize("cats")
 ['cat']
 
-``MorphCustomDict`` takes an optional ``dictionary`` argument that specifies the resource where the existence of potential lemmas should be checked. This can be Wiktionary or BabelNet.
+:class:`~ldt.dicts.morphology.custom.en.MorphCustomDict` takes an optional
+``dictionary`` argument that specifies the resource where the existence of
+potential lemmas should be checked. This can be Wiktionary or BabelNet.
 
-For example, WordNet does not have an entry for `GPU`, and therefore cannot un-inflect the plural of this word:
+For example, WordNet does not have an entry for `GPU`, and therefore cannot
+un-inflect the plural of this word:
 
 >>> morph_wn.lemmatize("GPUs")
 []
@@ -102,7 +106,12 @@ However, this can be done falling back on Wiktionary:
 MetaDictionary for morphological information
 --------------------------------------------
 
-In case of retrieving POS information the basic idea for ``MorphMetaDict`` is the same as for the metadictionary class that combines lexicographic information across resources. Depending on your needs and usage quotas, it provides a way to stop at the first resource in which an entry is found, and to not query further. The hierarchy of dictionaries is set with the order parameter.
+In case of retrieving POS information the basic idea for
+:class:`ldt.dicts.morphology.meta.MorphMetaDict` is
+the same as for the metadictionary class that combines lexicographic
+information across resources. Depending on your needs and usage quotas, it
+provides a way to stop at the first resource in which an entry is found, and
+ to not query further. The hierarchy of dictionaries is set with the order parameter.
 
 >>> morph_metadict = ldt.dicts.morphology.MorphMetaDict(language="English", order=("wordnet", "wiktionary", "babelnet"), custom_base="wiktionary")
 

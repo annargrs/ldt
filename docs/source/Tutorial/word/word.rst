@@ -3,11 +3,16 @@ Collecting all available information for a given word
 =====================================================
 
 LDT's :meth:`~ldt.relations.word.Word` class provides a convenient way to
-configure several resources and combine them for repeated queries. This class outputs a dictionary that records various properties of the queried word.
+configure several resources and combine them for repeated queries. This
+class outputs a dictionary that records various properties of the queried word.
 
-The first step of this analysis is input normalization described in section :ref:`Normalization and classification of input strings`.
+The first step of this analysis is input normalization described in section
+:ref:`Normalization and classification of input strings`.
 
-Once a word entry has been detected in one of configured lexicographic resources, LDT collects the words that are related to the queried word with various lexicographic relations. Derivational analysis is also performed to detect both derived words and word stems/affixes.
+Once a word entry has been detected in one of configured lexicographic
+resources, LDT collects the words that are related to the queried word with
+various lexicographic relations. Derivational analysis is also performed to
+detect both derived words and word stems/affixes.
 
 Word class takes the following parameters:
 
@@ -16,7 +21,9 @@ Word class takes the following parameters:
     :derivation_dict:     ldt.dicts.derivation.DerivationAnalyzer() instance
     :metadictionary:  ldt.dicts.semantics.MetaDictionary() instance
 
-You can leave it to LDT to initialize the default dictionary parameters, or you can pass your own objects, having set them up to your liking. This also saves time on initializing dictionaries in large-scale experiments.
+You can leave it to LDT to initialize the default dictionary parameters, or
+    you can pass your own objects, having set them up to your liking. This
+        also saves time on initializing dictionaries in large-scale experiments.
 
 All information is collected automatically from all the above resources upon
 initialization of a Word object. The information can later be accessed

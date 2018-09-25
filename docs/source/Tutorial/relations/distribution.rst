@@ -6,9 +6,14 @@ Distribution information in LDT
 What LDT does
 -------------
 
-Evaluating a word embedding model is only fair if you know what information it had to begin with. At the moment LDT provides access to pre-computed frequency and cooccurrence dictionary as well as google dependency ngrams.
+Evaluating a word embedding model is only fair if you know what information
+it had to begin with. At the moment LDT provides access to pre-computed
+frequency and cooccurrence dictionary as well as google dependency ngrams.
 
-Location and filenames of corpus-specific resources are specified in the ldt configuration file as described in section :ref:`Corpus-specific resources`. The interface to all of them is provided by :meth:`~ldt.relations.distribution.DIstributionDict` class.
+Location and filenames of corpus-specific resources are specified in the ldt
+configuration file as described in section :ref:`Corpus-specific resources`.
+The interface to all of them is provided by
+:class:`~ldt.relations.distribution.DistributionDict` class.
 
 -----------------------------------
 Word frequency in the source corpus
