@@ -13,8 +13,8 @@ Todo:
 """
 
 
-from ldt.dicts.dictionary import Dictionary as Dictionary
-from ldt.helpers.exceptions import LanguageError as LanguageError
+from ldt.dicts.dictionary import Dictionary
+from ldt.helpers.exceptions import LanguageError
 
 class BaseCustomDict(Dictionary):
     """The class providing the basic LDT dictionary class that implements

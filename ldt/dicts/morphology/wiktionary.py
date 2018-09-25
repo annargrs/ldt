@@ -6,10 +6,9 @@ Wiktionary.
 
 """
 
-from ldt.dicts.base.wiktionary import BaseWiktionary as BaseWiktionary
-from ldt.dicts.morphology.morph_dictionary import MorphDictionary as \
-    MorphDictionary
-from ldt.load_config import config as config
+from ldt.dicts.base.wiktionary import BaseWiktionary
+from ldt.dicts.morphology.morph_dictionary import MorphDictionary
+from ldt.load_config import config
 
 class MorphWiktionary(MorphDictionary, BaseWiktionary):
     """This class implements querying morphological information from

@@ -13,13 +13,9 @@ Todo:
 import os
 
 from nltk.corpus import stopwords
-# import ldt.load_config.
-from ldt.load_config import config as config
+from ldt.load_config import config
 from ldt.helpers.exceptions import LanguageError
-from ldt.helpers.loading import load_resource as load_resource
-#from ldt.helpers import loading
-
-# import ldt.helpers.loading
+from ldt.helpers.loading import load_resource
 
 
 def lookup_language_by_code(language, reverse=False):

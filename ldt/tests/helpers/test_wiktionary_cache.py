@@ -4,7 +4,7 @@ import ldt
 import os
 import shutil
 
-from ldt.load_config import config as config
+from ldt.load_config import config
 
 path_to_resources = config["path_to_resources"]
 

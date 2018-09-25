@@ -14,17 +14,13 @@ Todo:
 
 from ldt.helpers.exceptions import AuthorizationError
 
-from ldt.dicts.dictionary import Dictionary as Dictionary
+from ldt.dicts.dictionary import Dictionary
 from ldt.dicts.semantics.wikisaurus import Wikisaurus
 from ldt.dicts.semantics.wiktionary import Wiktionary
 from ldt.dicts.semantics.wordnet.en import WordNet
 from ldt.dicts.semantics.babelnet import BabelNet
 
-# from ldt.config import lowercasing as config_lowercasing
-# from ldt.config import language as config_language
-# from ldt.config import split_mwu as config_split_mwu
-# from ldt.config import wiktionary_cache as config_wiktionary_cache
-from ldt.load_config import config as config
+from ldt.load_config import config
 
 class MetaDictionary(Dictionary):
     """Class implementing a collection of dictionaries which are queried in

@@ -9,7 +9,7 @@ import vecto.embeddings
 import pandas as pd
 
 import ldt
-from ldt.load_config import config as config
+from ldt.load_config import config
 
 
 def ldt_demo(top_n):

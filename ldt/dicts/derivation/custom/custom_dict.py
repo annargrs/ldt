@@ -13,9 +13,9 @@ The current functionality includes loading of language-specific resources
 
 """
 
-from ldt.load_config import config as config
-from ldt.dicts.derivation.custom.affixes import Affixes as Affixes
-from ldt.dicts.derivation.custom.compounds import Compounds as Compounds
+from ldt.load_config import config
+from ldt.dicts.derivation.custom.affixes import Affixes
+from ldt.dicts.derivation.custom.compounds import Compounds
 
 class DerivationCustomDict(Affixes, Compounds):
     """This class implements a generic interface for custom

@@ -59,9 +59,8 @@ Todo:
 import functools
 
 from ldt.dicts.normalize import Normalization as Normalizer
-from ldt.dicts.derivation.meta import DerivationAnalyzer as \
-    DerivationAnalyzer
-from ldt.dicts.semantics.metadictionary import MetaDictionary as MetaDictionary
+from ldt.dicts.derivation.meta import DerivationAnalyzer
+from ldt.dicts.semantics.metadictionary import MetaDictionary
 from ldt.load_config import config
 
 class Word(object):

@@ -24,7 +24,7 @@ import json
 from ldt.helpers.resources import lookup_language_by_code
 from ldt.helpers.wiktionary_cache import load_wiktionary_cache
 from ldt.dicts.semantics.lex_dictionary import LexicographicDictionary
-from ldt.dicts.base.wiktionary import BaseWiktionary as BaseWiktionary
+from ldt.dicts.base.wiktionary import BaseWiktionary
 from ldt.load_config import config
 
 

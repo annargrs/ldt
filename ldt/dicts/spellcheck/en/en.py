@@ -31,7 +31,7 @@ Todo:
 #
 import operator
 
-from ldt.dicts.spellcheck.custom import Spellchecker as Spellchecker
+from ldt.dicts.spellcheck.custom import Spellchecker
 
 
 class SpellcheckerEn(Spellchecker):

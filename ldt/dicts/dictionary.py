@@ -22,17 +22,14 @@ Todo:
 """
 
 import abc
-#from abc import ABCMeta, abstractmethod
 from nltk.tokenize import word_tokenize
 
-#from ldt.config import path_to_resources, lowercasing, language, split_mwu
-from ldt.helpers.exceptions import DictError as DictError
-from ldt.helpers.resources import load_stopwords as load_stopwords
+from ldt.helpers.exceptions import DictError
+from ldt.helpers.resources import load_stopwords
 from ldt.helpers.resources import lookup_language_by_code as lookup_language
-from ldt.helpers.formatting import get_spacing_variants as get_spacing_variants
-from ldt.helpers.formatting import remove_text_inside_brackets as \
-    remove_text_inside_brackets
-from ldt.load_config import config as config
+from ldt.helpers.formatting import get_spacing_variants
+from ldt.helpers.formatting import remove_text_inside_brackets
+from ldt.load_config import config
 
 class Dictionary(metaclass=abc.ABCMeta):
     """The base LDT dictionary class.

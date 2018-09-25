@@ -6,10 +6,9 @@ BabelNet.
 
 """
 
-from ldt.dicts.base.babelnet import BaseBabelNet as BaseBabelNet
-from ldt.dicts.morphology.morph_dictionary import MorphDictionary as \
-    MorphDictionary
-from ldt.load_config import config as config
+from ldt.dicts.base.babelnet import BaseBabelNet
+from ldt.dicts.morphology.morph_dictionary import MorphDictionary
+from ldt.load_config import config
 
 class MorphBabelNet(MorphDictionary, BaseBabelNet):
     """This class implements querying morphological information from

@@ -4,7 +4,7 @@ import unittest
 import time
 import ldt
 
-from ldt.helpers.ignore import ignore_warnings as ignore_warnings
+from ldt.helpers.ignore import ignore_warnings
 
 test_dict = ldt.dicts.derivation.meta.DerivationAnalyzer(language="en")
 

@@ -21,7 +21,7 @@ from ldt.dicts.dictionary import Dictionary
 from ldt.dicts.normalize import Normalization
 from ldt.dicts.derivation.meta import DerivationAnalyzer
 from ldt.dicts.semantics.metadictionary import MetaDictionary
-from ldt.relations.word import Word as Word
+from ldt.relations.word import Word
 from ldt.relations.ontology_path.ontodict import OntoDict
 from ldt.load_config import config
 from ldt.dicts.resources import AssociationDictionary

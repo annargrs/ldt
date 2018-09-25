@@ -29,13 +29,12 @@ Todo:
 
 """
 
-from ldt.dicts.base.wordnet.en import BaseWordNet as BaseWordNet
+from ldt.dicts.base.wordnet.en import BaseWordNet
 
-from ldt.dicts.derivation.custom.custom_dict import DerivationCustomDict as \
-    DerivationCustomDict
-from ldt.helpers.formatting import dash_suffix as dash_suffix
-from ldt.helpers.formatting import _check_res as _check_res
-from ldt.dicts.morphology.wordnet.en import MorphWordNet as MorphWordNet
+from ldt.dicts.derivation.custom.custom_dict import DerivationCustomDict
+from ldt.helpers.formatting import dash_suffix
+from ldt.helpers.formatting import _check_res
+from ldt.dicts.morphology.wordnet.en import MorphWordNet
 
 class EnglishDerivation(DerivationCustomDict):
     """This class implements an interface for retrievning POS

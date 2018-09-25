@@ -21,27 +21,20 @@ Todo:
 from abc import ABCMeta, abstractmethod
 from nltk.tokenize import word_tokenize
 
-from ldt.dicts.dictionary import Dictionary as Dictionary
-from ldt.helpers.exceptions import DictError as DictError
-from ldt.helpers.resources import load_stopwords as load_stopwords
-from ldt.helpers.resources import lookup_language_by_code as \
-    lookup_language_by_code
-from ldt.helpers.formatting import get_spacing_variants as get_spacing_variants
-from ldt.helpers.formatting import remove_text_inside_brackets as \
-    remove_text_inside_brackets
-#from ldt.config import path_to_resources as config_path_to_resources
-# from ldt.config import lowercasing as config_lowercasing
-# from ldt.config import language as config_language
-# from ldt.config import split_mwu as config_split_mwu
+from ldt.dicts.dictionary import Dictionary
+from ldt.helpers.exceptions import DictError
+from ldt.helpers.resources import load_stopwords
+from ldt.helpers.resources import lookup_language_by_code
+from ldt.helpers.formatting import get_spacing_variants
+from ldt.helpers.formatting import remove_text_inside_brackets
 
-# class LexicographicDictionary(Dictionary, metaclass=ABCMeta):
+
 class LexicographicDictionary(Dictionary, metaclass=ABCMeta):
     """A super-class for resources with relations functionality
 
     """
     def __init__(self, **kw):
-    # def __init__(self, lowercasing=config_lowercasing,
-    #              split_mwu=config_split_mwu):
+
         """ Initializing the base class.
 
         Args:

@@ -19,9 +19,8 @@ Example:
 """
 
 import os
-from ldt.helpers.loading import load_language_file as load_language_file
-from ldt.helpers.resources import lookup_language_by_code as \
-    lookup_language_by_code
+from ldt.helpers.loading import load_language_file
+from ldt.helpers.resources import lookup_language_by_code
 from ldt.relations.word import Word
 
 class DerivationalAntonymy(object):

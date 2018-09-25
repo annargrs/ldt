@@ -19,8 +19,8 @@ Todo:
 from nltk.corpus import wordnet as wn
 
 
-from ldt.dicts.dictionary import Dictionary as Dictionary
-from ldt.helpers.exceptions import LanguageError as LanguageError
+from ldt.dicts.dictionary import Dictionary
+from ldt.helpers.exceptions import LanguageError
 
 
 class BaseWordNet(Dictionary):

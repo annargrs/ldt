@@ -13,9 +13,8 @@ Examples:
 """
 
 from importlib import import_module
-from ldt.dicts.dictionary import Dictionary as Dictionary
-from ldt.helpers.resources import lookup_language_by_code as \
-    lookup_language_by_code
+from ldt.dicts.dictionary import Dictionary
+from ldt.helpers.resources import lookup_language_by_code
 
 class OntoDict(Dictionary):
     """The class providing the interface to different language-specific

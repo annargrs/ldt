@@ -11,11 +11,11 @@ possible misspellings in LDT.
 import os
 import ruamel.yaml as yaml
 
-from ldt.dicts.base.custom.en import BaseCustomDict as BaseCustomDict
-from ldt.load_config import config as config
-from ldt.helpers.formatting import rreplace as rreplace
-from ldt.helpers.formatting import _check_res as _check_res
-from ldt.helpers.exceptions import ResourceError as ResourceError
+from ldt.dicts.base.custom.en import BaseCustomDict
+from ldt.load_config import config
+from ldt.helpers.formatting import rreplace
+from ldt.helpers.formatting import _check_res
+from ldt.helpers.exceptions import ResourceError
 
 
 class Compounds(BaseCustomDict):

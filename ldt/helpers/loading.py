@@ -7,8 +7,8 @@ import ruamel.yaml as yaml
 
 from hurry.filesize import size
 
-from ldt.helpers.exceptions import ResourceError as ResourceError
-from ldt.load_config import config as config
+from ldt.helpers.exceptions import ResourceError
+from ldt.load_config import config
 
 def get_object_size(obj, seen=None):
     """

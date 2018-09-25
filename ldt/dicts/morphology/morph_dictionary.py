@@ -19,9 +19,8 @@ Todo:
 
 from abc import ABCMeta, abstractmethod
 
-from ldt.dicts.dictionary import Dictionary as Dictionary
-#from ldt.config import path_to_resources as config_path_to_resources
-from ldt.load_config import config as config
+from ldt.dicts.dictionary import Dictionary
+from ldt.load_config import config
 
 class MorphDictionary(Dictionary, metaclass=ABCMeta):
     """A super-class for resources with relations functionality

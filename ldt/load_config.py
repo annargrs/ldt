@@ -11,10 +11,9 @@ import os
 import warnings
 import sys
 import shutil
-# import nltk
 import ruamel.yaml as yaml
 
-from ldt.helpers.exceptions import ResourceError as ResourceError
+from ldt.helpers.exceptions import ResourceError
 
 warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
 

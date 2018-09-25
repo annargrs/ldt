@@ -2,8 +2,7 @@ import unittest
 import os
 from hurry.filesize import size
 import ldt
-from ldt.load_config import config as config
-
+from ldt.load_config import config
 class Tests(unittest.TestCase):
     """The tests in this block inspect the file loaders for different
     formats."""

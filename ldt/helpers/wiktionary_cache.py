@@ -31,12 +31,9 @@ import urllib.request
 import datetime
 import gzip
 
-# import ldt.helpers
 
-# import ldt.config as config
-# from ldt.load_config import config
-from ldt.load_config import config as config
-from ldt.helpers.loading import load_resource as load_resource
+from ldt.load_config import config
+from ldt.helpers.loading import load_resource
 
 def find_vocab_file(language, path_to_cache, wikisaurus=False):
     '''

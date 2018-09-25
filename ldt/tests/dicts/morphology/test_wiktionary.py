@@ -2,7 +2,7 @@ import unittest
 
 import ldt
 import time
-from ldt.helpers.ignore import ignore_warnings as ignore_warnings
+from ldt.helpers.ignore import ignore_warnings
 
 class Tests(unittest.TestCase):
     """

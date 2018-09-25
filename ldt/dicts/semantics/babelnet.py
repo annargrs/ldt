@@ -26,21 +26,9 @@
 
 """
 
-# import urllib
-# import urllib.request
-# import json
-# import gzip
-# import functools
-from ldt.dicts.semantics.lex_dictionary import LexicographicDictionary as \
-    LexicographicDictionary
-from ldt.dicts.base.babelnet import BaseBabelNet as BaseBabelNet
-# from ldt.helpers.resources import lookup_language_by_code as lookup_language_by_code
-# from ldt.config import lowercasing as config_lowercasing
-# from ldt.config import language as config_language
-# from ldt.config import split_mwu as config_split_mwu
-from ldt.load_config import config as config
-# from ldt.helpers.exceptions import AuthorizationError as AuthorizationError
-# from ldt.helpers.exceptions import DictError as DictError
+from ldt.dicts.semantics.lex_dictionary import LexicographicDictionary
+from ldt.dicts.base.babelnet import BaseBabelNet
+from ldt.load_config import config
 
 class BabelNet(BaseBabelNet, LexicographicDictionary):
     """The class providing BabelNet interface for semantic relations.
