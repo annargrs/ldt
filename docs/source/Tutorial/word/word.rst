@@ -16,7 +16,7 @@ Word class takes the following parameters:
     :derivation_dict:     ldt.dicts.derivation.DerivationAnalyzer() instance
     :metadictionary:  ldt.dicts.semantics.MetaDictionary() instance
 
-You can leave it to LDT to initialize the default dictionary parameters, or you can pass your own objects, having set them up to your liking.
+You can leave it to LDT to initialize the default dictionary parameters, or you can pass your own objects, having set them up to your liking. This also saves time on initializing dictionaries in large-scale experiments.
 
 All information is collected automatically from all the above resources upon
 initialization of a Word object. The information can later be accessed

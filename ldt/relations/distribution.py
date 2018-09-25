@@ -19,12 +19,14 @@ class DistributionDict():
             (memory-intensive)
         cooccurrence (bool): whether to use cooccurrence information
             (memory-intensive)
+        cooccurrence_freq (bool): if True, cooccurrence counts are returned
+            rather than booleans (even more memory-intensive)
 
     """
 
     def __init__(self, language=config["default_language"],
                  corpus=config["corpus"], gdeps=False,
-                 cooccurrence=False):
+                 cooccurrence=False, cooccurrence_freq=False):
 
         super(DistributionDict, self).__init__()
 
@@ -38,7 +40,8 @@ class DistributionDict():
         if cooccurrence:
             #: ResourceDict: cooccurrence resource
             self.cooccurrence = ResourceDict(resource="cooccurrence",
-                                             corpus=corpus)
+                                             corpus=corpus,
+                                             freq=cooccurrence_freq)
 
         #: ResourceDict: frequency dictionary
         self.freqdict = ResourceDict(resource="freqdict", corpus=corpus)
@@ -58,7 +61,7 @@ class DistributionDict():
         except KeyError:
             return 0
 
-    def cooccur_in_corpus(self, word1, word2):
+    def cooccur_in_corpus(self, word1, word2, freq=False):
         """Wrapper method for retrieving cooccurrence information.
 
         Args:
@@ -69,7 +72,7 @@ class DistributionDict():
 
         """
         if hasattr(self, "cooccurrence"):
-            return self.cooccurrence.are_related(word1, word2)
+            return self.cooccurrence.are_related(word1, word2, freq=freq)
         return False
 
 

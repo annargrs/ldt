@@ -52,46 +52,51 @@ class Tests(unittest.TestCase):
 
     def test_antonymy(self):
         """Detecting antonymy in prefixes."""
-        self.assertTrue(self.test_dict.detect_antonymy(self.regular,
-                                                       self.irregular))
+        self.assertTrue(self.test_dict.are_related(self.regular,
+                                                   self.irregular))
+
+    @ignore_warnings
+    def test_antonymy_from_str(self):
+        """Detecting antonymy in prefixes."""
+        self.assertTrue(self.test_dict.are_related("regular", "irregular"))
 
     def test_antonymy_reverse(self):
         """Detecting antonymy in prefixes."""
-        self.assertTrue(self.test_dict.detect_antonymy(self.irregular,
-                                                       self.regular))
+        self.assertTrue(self.test_dict.are_related(self.irregular,
+                                                   self.regular))
 
     def test_antonymy_sanity(self):
         """Sanity check for antonymy in prefixes."""
-        self.assertFalse(self.test_dict.detect_antonymy(self.irregular,
-                                                       self.cat))
+        self.assertFalse(self.test_dict.are_related(self.irregular,
+                                                    self.cat))
 
     def test_antonymy_suf(self):
         """Detecting antonymy in suffixes."""
-        self.assertTrue(self.test_dict.detect_antonymy(self.care,
-                                                       self.careless))
+        self.assertTrue(self.test_dict.are_related(self.care,
+                                                   self.careless))
 
     def test_antonymy_suf_reverse(self):
         """Detecting antonymy in suffixes in reverse."""
-        self.assertTrue(self.test_dict.detect_antonymy(self.careless,
-                                                       self.care))
+        self.assertTrue(self.test_dict.are_related(self.careless,
+                                                   self.care))
 
     def test_antonymy_suf_pair(self):
         """Detecting antonymy in suffix pairs."""
-        self.assertTrue(self.test_dict.detect_antonymy(self.careful,
-                                                    self.careless))
+        self.assertTrue(self.test_dict.are_related(self.careful,
+                                                   self.careless))
 
     def test_antonymy_suf_pair_reverse(self):
         """Detecting antonymy in suffix pairs in reverse."""
-        self.assertTrue(self.test_dict.detect_antonymy(self.careless,
-                                                    self.careful))
+        self.assertTrue(self.test_dict.are_related(self.careless,
+                                                   self.careful))
 
     def test_antonymy_pref_pair(self):
         """Detecting antonymy in prefix pairs."""
-        self.assertTrue(self.test_dict.detect_antonymy(self.prewar,
-                                                      self.postwar))
+        self.assertTrue(self.test_dict.are_related(self.prewar,
+                                                   self.postwar))
 
     def test_antonymy_pref_pair_reverse(self):
         """Detecting antonymy in prefix pairs in reverse."""
-        self.assertTrue(self.test_dict.detect_antonymy(self.postwar,
-                                                      self.prewar))
+        self.assertTrue(self.test_dict.are_related(self.postwar,
+                                                   self.prewar))
 

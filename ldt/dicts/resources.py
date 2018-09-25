@@ -35,7 +35,7 @@ class ResourceDict(Dictionary):
                  language=config["default_language"],
                  lowercasing=config["lowercasing"],
                  split_mwu=config["split_mwu"],
-                 corpus=config["corpus"]):
+                 corpus=config["corpus"], freq=False):
         """ Initializing the vocab lookup class.
 
         Args:
@@ -81,8 +81,16 @@ class ResourceDict(Dictionary):
             self.path = path_to_dict
 
         try:
-            data = load_resource(self.path, format="infer",
-                                 lowercasing=lowercasing, silent=True)
+            if resource != "cooccurrence":
+                data = load_resource(self.path, format="infer",
+                                     lowercasing=lowercasing, silent=True)
+            else:
+                if freq:
+                    data = load_resource(self.path, format="json_freqdict",
+                                         lowercasing=lowercasing, silent=True)
+                else:
+                    data = load_resource(self.path, format="json",
+                                         lowercasing=lowercasing, silent=True)
             self.data = data
         except FileNotFoundError:
             print("No resource was found, please check the file path "
@@ -95,7 +103,7 @@ class ResourceDict(Dictionary):
         return False
 
     @functools.lru_cache(maxsize=None)
-    def are_related(self, word1, word2):
+    def are_related(self, word1, word2, freq=False):
         """Determining if two words are related: a helper method for
         resources with lists of related words per word entry.
 
@@ -110,20 +118,33 @@ class ResourceDict(Dictionary):
 
         Args:
             word1, word2 (str): the words to check
+            freq (bool): True if the entries are frequency dictionaries
+                (currently it's only the case for corpus cooccurrences)
 
         Returns:
-            (bool): True if the words are found to be related.
+            (bool, int): True if the words are found to be related,
+                or cooccurrence frequency in case of cooccurrence dictionary
+                resource
 
         """
 
+        if freq:
+            if word1 in self.data:
+                if word2 in self.data[word1]:
+                    return self.data[word1][word2]
+            if word2 in self.data:
+                if word1 in self.data[word2]:
+                    return self.data[word2][word1]
+            return 0
+        else:
+            if word1 in self.data:
+                if word2 in self.data[word1]:
+                    return True
+            if word2 in self.data:
+                if word1 in self.data[word2]:
+                    return True
+            return False
 
-        if word1 in self.data:
-            if word2 in self.data[word1]:
-                return True
-        if word2 in self.data:
-            if word1 in self.data[word2]:
-                return True
-        return False
 
 
 class NameDictionary(ResourceDict):

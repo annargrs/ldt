@@ -26,6 +26,8 @@ class Tests(unittest.TestCase):
         cls.res_dict_upper = {'falcon': {'bird', 'Hawk', 'eagle'}, 'Mid': {
             'way', 'middle', 'between'}, '5': {'cat', '1', '2'}, 'has_not': {
             'been', 'without', 'has'}}
+        cls.res_json_freqdict = {"cat": {"dog":1, "cheese":5},
+                                 "mouse": {"cat":5, "cheese":6}}
 
     @classmethod
     def tearDownClass(cls):
@@ -38,6 +40,7 @@ class Tests(unittest.TestCase):
         cls.res_2cols_upper = None
         cls.res_dict = None
         cls.res_dict_upper = None
+        cls.res_json_freqdict = None
 
     def test_objectsize(self):
         res = ldt.helpers.loading.load_resource(format="tsv_dict",
@@ -104,13 +107,18 @@ class Tests(unittest.TestCase):
         os.path.join(self.path, "2cols_list.json"), silent=True)
         self.assertEqual(res, self.res_dict)
 
-    def test_load_json(self):
+    def test_load_json_freqdict(self):
+        res = ldt.helpers.loading.load_resource(format="json_freqdict",
+                                                path =
+        os.path.join(self.path, "json_freqdict.json"), silent=True)
+        print(res)
+        self.assertEqual(res, self.res_json_freqdict)
+
+    def test_load_yaml(self):
         res = ldt.helpers.loading.load_resource(format="yaml",
                                                 path=
         os.path.join(self.path, "2cols_list.yaml"), silent=True)
         self.assertEqual(res, self.res_dict)
-
-
 
 if __name__ == '__main__':
     unittest.main()

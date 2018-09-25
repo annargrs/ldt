@@ -36,4 +36,4 @@ corpus_resources:
   Wiki201308:
     freqdict: Wiki201308.freqdict
     vocabulary: Wiki201308.vocab
-    cooccurrence: 3grams.json
+    cooccurrence: Wiki201308_3grams.json

@@ -22,6 +22,7 @@ import os
 from ldt.helpers.loading import load_language_file as load_language_file
 from ldt.helpers.resources import lookup_language_by_code as \
     lookup_language_by_code
+from ldt.relations.word import Word
 
 class DerivationalAntonymy(object):
     """Dictionary of language-specific derivational patterns that could be
@@ -40,19 +41,24 @@ class DerivationalAntonymy(object):
         self.resources = resources
 
 
-    def detect_antonymy(self, target, neighbor):
+    def are_related(self, target, neighbor):
         """
         The main method for detecting derivational antonyms.
 
         Args:
 
-            target, neighbor (ldt Word obj): the words to check for this
+            target, neighbor (ldt Word obj or str): the words to check for this
             relationship;
 
         Returns:
              (bool): True if derivational antonymy was detected.
 
         """
+
+        if isinstance(target, str):
+            target = Word(target)
+        if isinstance(neighbor, str):
+            neighbor = Word(neighbor)
 
         def detect_affixes(word1, word2, affix="Prefixes"):
             """Helper function for handling negative prefixes and affixes."""

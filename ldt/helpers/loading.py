@@ -69,6 +69,8 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
                 :type vocab: for one-word-per-line vocab file
                 :type json: a json dictionary
                 :type yaml: a yaml dictionary
+                :type json_freqdict: a json dictionary with frequency
+                    dictionaries as entries
 
     Returns:
         (set, dict): a set object for vocab files, a dictionary for
@@ -78,7 +80,7 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
     if format == "infer":
         format = path.split(".")[-1]
 
-    if format in ["freqdict", "tsv_dict", "json", "yaml"]:
+    if format in ["freqdict", "tsv_dict", "json", "yaml", "json_freqdict"]:
 
         res = {}
 
@@ -154,22 +156,21 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
                     if res["cu"] == "Old Church Slavonic":
                         silent=True
 
+        if format == "json_freqdict":
+            with open(path, "r", encoding="utf8") as f:
+                res = json.load(f)
+                return res
+
         if lowercasing:
 
             # test if the dict keys are lists or not
             random_key = random.choice(list(res))
-            if type(res[random_key]) != str:
+            if not isinstance(res[random_key], str):
 
                 new_res = {}
                 for k in res.keys():
                     l = str(k).lower()
-                    if format != "freqdict":
-                        if not l in new_res.keys():
-                            new_res[l] = set(str(w).lower() for w in res[k])
-                        else:
-                            for w in res[k]:
-                                new_res[l].add(str(w))
-                    else:
+                    if format == "freqdict":
                         #if lowercasing a frequency dictionary, add the
                         # frequencies for any merged words
                         if l in new_res:
@@ -177,6 +178,13 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
                             new_res[l] = total_frequency
                         else:
                             new_res[l] = res[k]
+
+                    elif format in ["json", "yaml", "csv_dict", "tsv_dict"]:
+                        if not l in new_res.keys():
+                            new_res[l] = set(str(w).lower() for w in res[k])
+                        else:
+                            for w in res[k]:
+                                new_res[l].add(str(w))
                 res = new_res
 
             else:

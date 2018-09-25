@@ -17,12 +17,18 @@ class Tests(unittest.TestCase):
         cls.test_dict = \
             ldt.relations.distribution.DistributionDict(language="english",
                                                         gdeps=True,
-                                                        cooccurrence=True)
-
+                                                        cooccurrence=True,
+                                                        cooccurrence_freq=False)
+        cls.test_dict_cooc = \
+            ldt.relations.distribution.DistributionDict(language="english",
+                                                        gdeps=True,
+                                                        cooccurrence=True,
+                                                        cooccurrence_freq=True)
     @classmethod
     def tearDownClass(cls):
         """Clearning up the test variables."""
         cls.test_dict = None
+        cls.test_dict_cooc = None
 
     def test_init(self):
         """Test initialization"""
@@ -48,7 +54,15 @@ class Tests(unittest.TestCase):
 
     def test_cooccurrence_wrap(self):
         """Test cooccurrence in the corpus (wrapper method)"""
-        self.assertTrue(self.test_dict.cooccur_in_corpus("fatuorum", "failed"))
+        self.assertEqual(self.test_dict.cooccur_in_corpus("pinnock",
+                                                          "national",
+                                                          freq=False), True)
+
+    def test_cooccurrence_wrap_num(self):
+        """Test cooccurrence in the corpus (wrapper method)"""
+        self.assertEqual(self.test_dict_cooc.cooccur_in_corpus("pinnock",
+                                                               "national",
+                                                               freq=True), 2)
 
     def test_gdeps_wrap(self):
         """Test cooccurrence in google dependency ngrams (wrapper method)"""
