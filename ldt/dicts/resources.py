@@ -17,14 +17,13 @@ import functools
 
 from abc import ABCMeta, abstractmethod
 
-from ldt.dicts.dictionary import Dictionary as Dictionary
-from ldt.helpers.exceptions import DictError as DictError
-from ldt.helpers.resources import load_stopwords as load_stopwords
-from ldt.helpers.resources import lookup_language_by_code as \
-    lookup_language_by_code
-from ldt.helpers.loading import load_resource as load_resource
-from ldt.helpers.formatting import get_spacing_variants as get_spacing_variants
-from ldt.load_config import config as config
+from ldt.dicts.dictionary import Dictionary
+from ldt.helpers.exceptions import DictError
+from ldt.helpers.resources import load_stopwords
+from ldt.helpers.resources import lookup_language_by_code
+from ldt.helpers.loading import load_resource
+from ldt.helpers.formatting import get_spacing_variants
+from ldt.load_config import config
 
 # class LexicographicDictionary(Dictionary, metaclass=ABCMeta):
 class ResourceDict(Dictionary):
@@ -99,13 +98,13 @@ class ResourceDict(Dictionary):
             print("No resource was found, please check the file path "
                   ""+self.path)
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def is_a_word(self, word):
         if word in self.data:
             return True
         return False
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def are_related(self, word1, word2, freq=False):
         """Determining if two words are related: a helper method for
         resources with lists of related words per word entry.
@@ -204,7 +203,7 @@ class NumberDictionary(ResourceDict):
                                              split_mwu=split_mwu, path=None,
                                              resource=resource)
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def is_a_word(self, word):
         """Returns True if the word is an ordinal or cardinal numeral,
         or if if contains an Arabic number.

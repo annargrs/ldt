@@ -62,6 +62,7 @@ from ldt.dicts.normalize import Normalization as Normalizer
 from ldt.dicts.derivation.meta import DerivationAnalyzer as \
     DerivationAnalyzer
 from ldt.dicts.semantics.metadictionary import MetaDictionary as MetaDictionary
+from ldt.load_config import config
 
 class Word(object):
     """Class that binds together all linguistic information about a word from
@@ -105,7 +106,7 @@ class Word(object):
 
 
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def analyze(self, word):
         self.info = {}
         self._normalize()

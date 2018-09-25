@@ -17,16 +17,15 @@ Todo:
 
 import functools
 
-from ldt.dicts.dictionary import Dictionary as Dictionary
-from ldt.dicts.normalize import Normalization as Normalizer
-from ldt.dicts.derivation.meta import DerivationAnalyzer as \
-    DerivationAnalyzer
-from ldt.dicts.semantics.metadictionary import MetaDictionary as MetaDictionary
+from ldt.dicts.dictionary import Dictionary
+from ldt.dicts.normalize import Normalization
+from ldt.dicts.derivation.meta import DerivationAnalyzer
+from ldt.dicts.semantics.metadictionary import MetaDictionary
 from ldt.relations.word import Word as Word
-from ldt.relations.ontology_path.ontodict import OntoDict as OntoDict
-from ldt.load_config import config as config
-from ldt.dicts.resources import AssociationDictionary as AssociationDictionary
-from ldt.relations.distribution import DistributionDict as DistributionDict
+from ldt.relations.ontology_path.ontodict import OntoDict
+from ldt.load_config import config
+from ldt.dicts.resources import AssociationDictionary
+from ldt.relations.distribution import DistributionDict
 
 class RelationsInPair(Dictionary):
     """This class implements analyzer for all possible relation types in a word
@@ -70,7 +69,7 @@ class RelationsInPair(Dictionary):
     def is_a_word(self, word):
         raise NotImplementedError
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def analyze(self, target, neighbor, silent=True):
         """The main function for analyzing the input strings and identifying
         any relations the two words may share.

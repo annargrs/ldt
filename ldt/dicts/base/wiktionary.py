@@ -19,12 +19,10 @@ import functools
 
 from wiktionaryparser import WiktionaryParser
 
-from ldt.helpers.resources import lookup_language_by_code as \
-    lookup_language_by_code
-from ldt.helpers.wiktionary_cache import load_wiktionary_cache as \
-    load_wiktionary_cache
-from ldt.dicts.dictionary import Dictionary as Dictionary
-from ldt.load_config import config as config
+from ldt.helpers.resources import lookup_language_by_code
+from ldt.helpers.wiktionary_cache import load_wiktionary_cache
+from ldt.dicts.dictionary import Dictionary
+from ldt.load_config import config
 
 
 class BaseWiktionary(Dictionary):
@@ -119,7 +117,7 @@ class BaseWiktionary(Dictionary):
                 return True
             return False
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def query(self, word):
         """A method to retrieve Wiktionary data online.
 

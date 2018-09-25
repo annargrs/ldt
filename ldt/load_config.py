@@ -53,6 +53,8 @@ def load_config(path=CONFIGPATH):
     options["path_to_cache"] = os.path.join(options["path_to_resources"],
                                             "cache")
     options["wiktionary_cache"] = False
+    if options["cache_size"] == "None":
+        options["cache_size"] = None
     return options
 
 #pylint: disable=invalid-name

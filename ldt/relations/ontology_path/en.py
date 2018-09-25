@@ -15,10 +15,11 @@ import timeout_decorator
 import functools
 
 from nltk.corpus import wordnet as wn
+from ldt.load_config import config
 
 
 @timeout_decorator.timeout(10, use_signals=False)
-@functools.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=config["cache_size"])
 def _get_wn_paths(word1, word2):
     """Getting the minimal path similarity between a pair of words in wordnet
     _ontodict.
@@ -53,7 +54,7 @@ def _get_wn_paths(word1, word2):
         shortest = 0
     return shortest
 
-@functools.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=config["cache_size"])
 def get_shortest_path(word1, word2):
     """Wrapper for `:func:_get_wn_paths` that enables the use of timeout
     decorator.

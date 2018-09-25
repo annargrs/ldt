@@ -21,22 +21,11 @@ import functools
 import json
 
 
-from ldt.helpers.resources import lookup_language_by_code as \
-    lookup_language_by_code
-from ldt.helpers.wiktionary_cache import load_wiktionary_cache as \
-    load_wiktionary_cache
-from ldt.dicts.semantics.lex_dictionary import LexicographicDictionary as \
-    LexicographicDictionary
+from ldt.helpers.resources import lookup_language_by_code
+from ldt.helpers.wiktionary_cache import load_wiktionary_cache
+from ldt.dicts.semantics.lex_dictionary import LexicographicDictionary
 from ldt.dicts.base.wiktionary import BaseWiktionary as BaseWiktionary
-# from ldt.helpers.formatting import remove_text_inside_brackets as \
-#     remove_text_inside_brackets
-# from ldt.helpers.formatting import strip_non_alphabetical_characters as \
-#     strip_non_alphabetical_characters
-# from ldt.config import lowercasing as config_lowercasing
-# from ldt.config import language as config_language
-# from ldt.config import split_mwu as config_split_mwu
-# from ldt.config import wiktionary_cache as config_wiktionary_cache
-from ldt.load_config import config as config
+from ldt.load_config import config
 
 
 class Wikisaurus(BaseWiktionary, LexicographicDictionary):
@@ -132,7 +121,7 @@ class Wikisaurus(BaseWiktionary, LexicographicDictionary):
                 return True
             return False
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def query(self, word):
         """Retrieving data from Wikisaurus API.
 

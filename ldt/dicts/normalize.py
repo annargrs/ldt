@@ -56,16 +56,16 @@ Todo:
 
 import functools
 
-from ldt.dicts.morphology.meta import MorphMetaDict as MorphMetaDict
-from ldt.dicts.resources import NumberDictionary as NumberDictionary
-from ldt.dicts.resources import NameDictionary as NameDictionary
-from ldt.dicts.resources import WebDictionary as WebDictionary
-from ldt.dicts.resources import FileDictionary as FileDictionary
+from ldt.dicts.morphology.meta import MorphMetaDict
+from ldt.dicts.resources import NumberDictionary
+from ldt.dicts.resources import NameDictionary
+from ldt.dicts.resources import WebDictionary
+from ldt.dicts.resources import FileDictionary
 from ldt.dicts.spellcheck.en.en import SpellcheckerEn as Spellchecker
-from ldt.dicts.derivation.custom.compounds import Compounds as Compounds
-from ldt.dicts.morphology.wordnet.en import MorphWordNet as MorphWordNet
+from ldt.dicts.derivation.custom.compounds import Compounds
+from ldt.dicts.morphology.wordnet.en import MorphWordNet
 
-from ldt.load_config import config as config
+from ldt.load_config import config
 
 
 
@@ -84,7 +84,7 @@ def contains_non_letters(word):
                 return True
     return False
 
-@functools.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=config["cache_size"])
 def denoise(word):
     """Remove non-alpha symbols, if any."""
     trash = []

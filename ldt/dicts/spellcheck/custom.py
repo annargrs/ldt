@@ -39,11 +39,10 @@ from difflib import SequenceMatcher
 
 import enchant
 
-from ldt.dicts.dictionary import Dictionary as Dictionary
-from ldt.load_config import config as config
-from ldt.helpers.resources import lookup_language_by_code as \
-    lookup_language_by_code
-from ldt.helpers.exceptions import LanguageError as LanguageError
+from ldt.dicts.dictionary import Dictionary
+from ldt.load_config import config
+from ldt.helpers.resources import lookup_language_by_code
+from ldt.helpers.exceptions import LanguageError
 
 class Spellchecker(Dictionary):
     """The base spellchecker class (pyenchant-based at the moment)."""
@@ -151,7 +150,7 @@ class Spellchecker(Dictionary):
         return self.target.check(word)
 
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def in_foreign_dicts(self, word):
         """Returns True if the word is found in the spellchecker resources
         for the specified foreign languages.

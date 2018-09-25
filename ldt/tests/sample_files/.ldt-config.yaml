@@ -18,6 +18,13 @@ babelnet_key: None
 # if True, a recent list of wiktionary entries will be downloaded to avoid queries for non-existing entries
 wiktionary_cache: False
 
+# many LDT operations are expensive to compute. This option sets a limit on
+# the size of cache that the library will use to store potentially
+# re-useable information such as web queries. This is useful in large-scale
+# experiments with multiple word embeddings, as many neighbor pairs may be the
+# same. The value of this parameter has to be an integer or None.
+cache_size: None
+
 # Extra language-specific resources
 
 language_resources:

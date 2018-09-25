@@ -18,12 +18,10 @@ import timeout_decorator
 from nltk.corpus import wordnet as wn
 
 
-from ldt.dicts.semantics.lex_dictionary import DictionaryWithDefinitions as \
-    DictionaryWithDefinitions
-from ldt.dicts.base.wordnet.en import BaseWordNet as BaseWordNet
-from ldt.helpers.formatting import remove_text_inside_brackets as \
-    remove_text_inside_brackets
-from ldt.load_config import config as config
+from ldt.dicts.semantics.lex_dictionary import DictionaryWithDefinitions
+from ldt.dicts.base.wordnet.en import BaseWordNet
+from ldt.helpers.formatting import remove_text_inside_brackets
+from ldt.load_config import config
 
 
 # class WordNet(DictionaryWithDefinitions, BaseWordNet):
@@ -87,7 +85,7 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
     #         return True
     #     return False
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def _get_all_synonyms(self, word):
         """A helper method for :func:`get_relation`
 
@@ -107,7 +105,7 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
 
         return list(set(res))
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def _get_antonyms(self, word):
         """A helper method for :func:`get_relation`
 
@@ -133,7 +131,7 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
         res = list(set(res))
         return res
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def _get_all_antonyms(self, word):
         """ A helper method for :func:`get_relation`
 
@@ -159,7 +157,7 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
         return res
 
     @timeout_decorator.timeout(10, use_signals=False)
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def _get_nyms(self, word, relation, synonyms=True, depth=1):
         """ Single interface to all WordNet relations computed with
         closure (i.e. except synonyms and antonyms).
@@ -216,7 +214,7 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
         return result
 
     # pylint: disable=arguments-differ
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def get_relation(self, word, relation, synonyms=True): #pylint:
         # disable=arguments-differ
         """ Single interface to all WordNet relations
@@ -324,7 +322,7 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
         return res
 
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def get_definitions(self, word, remove_notes=True):
         """A simple wrapper for NLTK's Princeton wordnet definitions.
 
