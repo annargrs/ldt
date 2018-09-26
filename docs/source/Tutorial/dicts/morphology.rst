@@ -111,7 +111,7 @@ In case of retrieving POS information the basic idea for
 the same as for the metadictionary class that combines lexicographic
 information across resources. Depending on your needs and usage quotas, it
 provides a way to stop at the first resource in which an entry is found, and
- to not query further. The hierarchy of dictionaries is set with the order parameter.
+to not query further. The hierarchy of dictionaries is set with the order parameter.
 
 >>> morph_metadict = ldt.dicts.morphology.MorphMetaDict(language="English", order=("wordnet", "wiktionary", "babelnet"), custom_base="wiktionary")
 

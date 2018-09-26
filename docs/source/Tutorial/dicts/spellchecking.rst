@@ -17,7 +17,7 @@ Note:
     Pyenchant developer announced that he's retiring from the project. It was last updated in February 2017. Moving to another spellchecker engine may be necessary in the future.
 
 A part of spellchecking functionality is provided by the
-:class:`~ldt.dicts.normalize.Normalization` class. See section :doc:`normalization`.
+:class:`~ldt.dicts.normalize.Normalization` class. See section :ref:`Normalization and classification of input strings`.
 
 -----------------------------------------------------------
 Detecting foreign words: language-independent functionality
@@ -26,7 +26,7 @@ Detecting foreign words: language-independent functionality
 Language-independent :class:`~ldt.dicts.spellcheck.custom.Spellchecker` class
 initializes with a "main" language and a list of languages to be considered
 "foreign". This is useful in case of corpora that may have a relatively high
- portion of words in those languages (e.g. Spanish in American English).
+portion of words in those languages (e.g. Spanish in American English).
 ``is_a_word("word")`` method returns True if the queried word is found in
 the spellechecker dictionary for the specified "main" language.
 
@@ -58,11 +58,9 @@ False
 English spellchecker settings
 -----------------------------
 
-The above methods should be inherited by the language-specific classes with
-appropriate defaults for those languages. For English, the default LDT
-"foreign languages" are Spanish and French.
+The above methods should be inherited by the language-specific classes with appropriate defaults for those languages. For English, the default LDT "foreign languages" are Spanish and French.
 
->>> spellchecker = spellchecker_en = ldt.dicts.spellcheck.SpellcheckerEn()
+>>> spellchecker_en = ldt.dicts.spellcheck.SpellcheckerEn()
 >>> spellchecker_en.is_a_word("cat")
 True
 >>> spellchecker_en.is_a_word("Katze")
@@ -72,7 +70,7 @@ True
 
 For English detection of foreign charsets is implemented not via
 :meth:`~ldt.dicts.spellcheck.custom.Spellchecker.filter_by_charset`, but via
- encoding to ascii, as this is faster.
+encoding to ascii, as this is faster.
 
 spellchecker_en.filter_by_charset("кошка")
 >>> False
@@ -80,7 +78,7 @@ spellchecker_en.filter_by_charset("кошка")
 Note:
 
     If a foreign charset is detected, the word is also reported as foreign by
-    :meth:`~ldt.dicts.spellcheck.custom.Spellchecker.in_foreign_dicts`:
+       :meth:`~ldt.dicts.spellcheck.custom.Spellchecker.in_foreign_dicts`:
 
     >>> spellchecker_en.in_foreign_dicts("猫")
     True
@@ -101,7 +99,7 @@ This functionality is provided by the
 :meth:`~ldt.dicts.spellcheck.en.en.SpellcheckerEn.spelling_nazi` method of
 ``SpellcheckerEn`` class. By default, only words longer than 4 characters
 are processed, as with longer words the likelihood of correct fix is higher.
- Only one correction is allowed.
+Only one correction is allowed.
 
 >>> spellchecker_en.spelling_nazi("pot")
 None

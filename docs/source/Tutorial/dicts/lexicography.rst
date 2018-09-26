@@ -117,7 +117,7 @@ Note:
    The Wiktionary cache list should NOT be used by itself to determine whether a word exists in a given language, because Wiktionaries for all languages generally aim to include words from all other languages.
 
 >>> wiki_en = ldt.dicts.semantics.Wiktionary(cache=False)
->>> wiki_en.get_relation("white", relation="synonyms"
+>>> wiki_en.get_relation("white", relation="synonyms")
 ['pale', 'fair']
 
 If no relations argument is specified, LDT retrieves all possible lexicographic information for the word.
