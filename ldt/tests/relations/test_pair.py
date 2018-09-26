@@ -31,6 +31,17 @@ class Tests(unittest.TestCase):
         """Clearning up the test variables."""
         cls.test_dict = None
 
+    @ignore_warnings
+    def test_paths(self):
+        """Test hashtag detection."""
+        res = self.test_dict.analyze("working", "class")
+        self.assertEqual(res["ShortestPath"], 0.0625)
+
+    @ignore_warnings
+    def test_associations(self):
+        """Test hashtag detection."""
+        res = self.test_dict.analyze("falcons", "eagle")
+        self.assertEqual(res["Associations"], True)
 
     @ignore_warnings
     def test_numbers(self):
@@ -63,7 +74,6 @@ class Tests(unittest.TestCase):
     def test_antonyms(self):
         """Test hashtag detection."""
         res = self.test_dict.analyze("beautiful", "ugly")
-        print(res)
         worked = "SharedPOS" in res and "Antonyms" in res
         self.assertTrue(worked)
 

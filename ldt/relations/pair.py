@@ -3,11 +3,17 @@
 words.
 
 Examples:
-    >>> test_dict = ldt.relations.RelationsInPair()
-    >>> test_dict.analyze("black", "white")
-    ['SharedPOS', 'SharedMorphForm', 'Antonyms']
-    >>> test_dict.analyze("happy", "happily")
-    ['Synonyms', 'SharedMorphForm', 'SharedDerivation']
+    >>> relation_analyzer = ldt.relations.RelationsInPair()
+    >>> relation_analyzer.analyze("black", "white")
+    {'Hyponyms': True,
+     'SharedMorphForm': True,
+     'SharedPOS': True,
+     'Synonyms': True,
+     'Antonyms': True,
+     'ShortestPath': 0.058823529411764705,
+     'Associations': True,
+     'TargetFrequency': 491760,
+     'NeighborFrequency': 509267}
 
 
 Todo:
@@ -29,23 +35,56 @@ from ldt.relations.distribution import DistributionDict
 
 class RelationsInPair(Dictionary):
     """This class implements analyzer for all possible relation types in a word
-    pair."""
+    pair.
+
+    Args:
+        language (str): the language of the dictionaries
+        lowercasing (bool): whether output from all resources should be
+            lowercased
+        derivation_dict (ldt dictionary object): see
+            :class:`~ldt.dicts.derivation.meta.DerivationAnalyzer`
+        normalizer (ldt dictionary object): see
+            :class:`ldt.dicts.normalize.Normalization`
+        lex_dict (ldt dictionary object): see
+            :class:`ldt.dicts.semantics.metadictionary.MetaDictionary`
+        ontodict (ldt dictionary object): see
+            :class:`ldt.relations.ontology_path.ontodict.OntoDict`
+        association_dict (ldt dictionary object): see
+            :class:`ldt.dicts.resources.AssociationDictionary`
+        distr_dict (ldt dictionary object): see
+            :class:`ldt.relations.distribution.DistributionDict`
+        gdeps (bool): in case distr_dict is initialized, this is the
+            switch for using google dependency cooccurrence data (
+            memory-intensive)
+        cooccurrence (bool): in case distr_dict is initialized, this is the
+            switch for using corpus cooccurrence data (memory-intensive)
+        cooccurrence_freq (bool): if True, cooccurrence counts are returned
+            rather than booleans (even more memory-intensive)
+
+
+    """
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"],
                  derivation_dict=None, normalizer=None,
-                 lex_dict=None, distr_dict=None, gdeps=False,
-                 cooccurrence=False):
+                 lex_dict=None, ontodict=None, association_dict=None,
+                 distr_dict=None, gdeps=False,
+                 cooccurrence=False, cooccurrence_freq=False):
 
         super(RelationsInPair, self).__init__(language=language,
                                               lowercasing=lowercasing)
+        if not ontodict:
+            self.OntoDict = OntoDict(language=language)
+        else:
+            self.OntoDict = OntoDict
 
-        self.OntoDict = OntoDict(language=language)
-        self.AssociationDictionary = AssociationDictionary(language=language)
+        if not association_dict:
+            self.AssociationDictionary = AssociationDictionary(language=language)
+        else:
+            self.AssociationDictionary = association_dict
 
         if not normalizer:
-            self._normalizer = Normalizer(language=self.language,
-                                          order=("wordnet", "custom"),
-                                          lowercasing=True)
+            self._normalizer = Normalization(language=self.language, order=(
+                "wordnet", "wiktionary"), custom_base="wiktionary")
         else:
             self._normalizer = normalizer
 
@@ -64,7 +103,10 @@ class RelationsInPair(Dictionary):
         if not distr_dict:
             self._distr_dict = DistributionDict(language=language,
                                                 gdeps=gdeps,
-                                                cooccurrence=cooccurrence)
+                                                cooccurrence=cooccurrence,
+                                                cooccurrence_freq=cooccurrence_freq)
+        self._gdeps = gdeps
+        self._cooccurrence = cooccurrence
 
     def is_a_word(self, word):
         raise NotImplementedError
@@ -74,7 +116,7 @@ class RelationsInPair(Dictionary):
         """The main function for analyzing the input strings and identifying
         any relations the two words may share.
 
-        Args:
+        Args:file:///mnt/Data/Cloud/pLib/Lab/ldt/corpus_resources/Wiki201308_3grams.json
             target (str): the target word to analyze.
             neighbor (str): the neighbor word to analyze:
             silent (bool): if False, the information retrieved for both words
@@ -82,6 +124,10 @@ class RelationsInPair(Dictionary):
 
         Returns:
               (list of str): what the two words have in common.
+
+        Todo:
+            Currently associations are established for all the lemmas. That
+            could be over-estimating it.
         """
 
         target = Word(target, self._derivation_dict, self._normalizer,
@@ -95,21 +141,33 @@ class RelationsInPair(Dictionary):
         res = {}
         for rel in rels:
             res[rel] = True
-        shortest_path = self.OntoDict.get_shortest_path(target.info[
-                                                       "OriginalForm"],
-                                                   neighbor.info[
-                                                       "OriginalForm"])
-        res["ShortestPath"] = shortest_path
-        if self.AssociationDictionary.are_related(target.info["OriginalForm"],
-                                                  neighbor.info["OriginalForm"]):
-            res["Associations"] = True
-        if not self._distr_dict.cooccur_in_corpus(target.info[
-                                                      "OriginalForm"],
-                                                  neighbor.info["OriginalForm"]):
-            res["NonCooccurring"] = True
-        if self._distr_dict.cooccur_in_gdeps(target.info["OriginalForm"],
-                                             neighbor.info["OriginalForm"]):
-            res["GDeps"] = True
+
+        paths = []
+        for target_lemma in target.info["Lemmas"]:
+            for neighbor_lemma in neighbor.info["Lemmas"]:
+                    paths.append(self.OntoDict.get_shortest_path(
+                        target_lemma, neighbor_lemma))
+        if paths:
+            res["ShortestPath"] = min(paths)
+
+        for target_lemma in target.info["Lemmas"]:
+            for neighbor_lemma in neighbor.info["Lemmas"]:
+                if self.AssociationDictionary.are_related(target_lemma,
+                                                          neighbor_lemma):
+                    res["Associations"] = True
+                    break
+
+        if self._cooccurrence:
+            if not self._distr_dict.cooccur_in_corpus(target.info[
+                                                          "OriginalForm"],
+                                                      neighbor.info["OriginalForm"]):
+                res["NonCooccurring"] = True
+
+        if self._gdeps:
+            if self._distr_dict.cooccur_in_gdeps(target.info["OriginalForm"],
+                                                 neighbor.info["OriginalForm"]):
+                res["GDeps"] = True
+
         res["TargetFrequency"] = self._distr_dict.frequency_in_corpus(
             target.info["OriginalForm"])
         res["NeighborFrequency"] = self._distr_dict.frequency_in_corpus(
@@ -186,3 +244,7 @@ def are_related_as(target, neighbor):
                         res.append(rel)
     return list(set(res))
 
+
+if __name__ == '__main__':
+    relation_analyzer = RelationsInPair()
+    print(relation_analyzer.analyze("cat", "dog"))

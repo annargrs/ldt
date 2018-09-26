@@ -9,7 +9,7 @@ The infrastructure for adding other languages is already mostly in place.
 
 If you have questions/comments about our experiments: `get in touch <http://www.cs.uml.edu/~arogers/>`_.
 
-If you built a different model on our corpus, and would like to publish your results on the leaderboard:
+If you built a different model on our corpus, and would like to publish your results on the `leaderboard <http://ldtoolkit.space/leaderboard/>`_:
 `get in touch <http://www.cs.uml.edu/~arogers/>`_.
 
 If you experimented on another corpus and would like to make it available in LDT:

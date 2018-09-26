@@ -241,19 +241,22 @@ class Word(object):
                 else:
                     print(i, ": ", dictionary[i])
 
-        print("\n======MORPHOLOGICAL INFO======")
+        print("\n\n====== "+self.info["OriginalForm"].upper()+" ======")
+
+        print("\n====== MORPHOLOGICAL INFO ======")
         for i in ["OriginalForm", "POS", "IsLemma", "Lemmas"]:
             print_rel(i, self.info)
-        print("\n======DERIVATIONAL INFO======")
+        print("\n====== DERIVATIONAL INFO ======")
         for i in ["Stems", "Suffixes", "Prefixes", "OtherDerivation",
                   "RelatedWords"]:
             print_rel(i, self.info)
-        print("\n======SEMANTIC INFO======")
+        print("\n====== SEMANTIC INFO ======")
         for i in ["Synonyms", "Antonyms", "Meronyms", "Hyponyms",
                   "Hypernyms", "Other"]:
             print_rel(i, self.info)
-        print("\n======EXTRA WORD CLASSES======")
+        print("\n====== EXTRA WORD CLASSES ======")
         for i in ["ProperNouns", "Noise", "Numbers", "URLs", "Hashtags", "Filenames", \
     "ForeignWords", "Misspellings", "Missing"]:
             print_rel(i, self.info)
+        print("\n")
 

@@ -15,6 +15,7 @@ The overall algorithm for initial processing of input words is as follows:
 
 Section :ref:`Collecting all linguistic information about a word` and section :ref:`Detecting relations in pairs of words` describe how LDT aggregates information from various linguistic resources to achieve automatic annotation of all possible relations in word pairs. Section :ref:`Linguistic resources in LDT` of the tutorial describes the various linguistic resources that you can use and configure in this process.
 
+See :module:`ldt.experiments.demo` for a demo of full LDT workflow in experiments with embeddings.
 
 ---------------------------------------------------------------------
 I don't care about word embeddings, just show me the new dictionaries
