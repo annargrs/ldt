@@ -1,8 +1,9 @@
 import unittest
 
 import ldt
+from ldt.dicts.semantics.lex_dictionary import LexicographicDictionary
 
-class MockDictionary(ldt.dicts.semantics.LexicographicDictionary):
+class MockDictionary(LexicographicDictionary):
 
     def is_a_word(self, word):
         pass
@@ -49,9 +50,8 @@ class Tests(unittest.TestCase):
     def test_post_processing(self):
         test = MockDictionary()
         test.lowercasing = True
-        test.split_mwu = True
-        res = test.post_process(["Good night"])
-        self.assertIn("good_night", res)
+        res = test.post_process(["Good"])
+        self.assertIn("good", res)
 
 if __name__ == '__main__':
     unittest.main()

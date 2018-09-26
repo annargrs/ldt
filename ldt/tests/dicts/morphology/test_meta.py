@@ -5,13 +5,7 @@ import os
 import time
 
 import ldt
-from ldt.helpers.ignore import ignore_warnings as ignore_warnings
-
-test_dict_fr = ldt.dicts.morphology.meta.MorphMetaDict(language="French",
-                                                       cache=False)
-
-test_dict_en = ldt.dicts.morphology.meta.MorphMetaDict(language="English",
-                                                       cache=False)
+from ldt.helpers.ignore import ignore_warnings
 
 class Tests(unittest.TestCase):
     '''
@@ -19,52 +13,69 @@ class Tests(unittest.TestCase):
     combining WordNet and Wiktionary data.
     '''
 
+    @classmethod
+    @ignore_warnings
+    def setUpClass(cls):
+        """Setting up the test variables."""
+        cls.test_dict_fr = ldt.dicts.morphology.meta.MorphMetaDict(
+            language="French", cache=False)
+        cls.test_dict_en = ldt.dicts.morphology.meta.MorphMetaDict(
+            language="English", cache=False, custom_base="wiktionary")
+
+
+    @classmethod
+    def tearDownClass(cls):
+        """Clearning up the test variables."""
+        cls.test_dict_fr = None
+        cls.test_base_en = None
+
     @ignore_warnings
     def test_metadictionary_initialization(self):
-        self.assertEqual(test_dict_fr.wiktionary.language, "fr")
+        self.assertEqual(self.test_dict_fr.wiktionary.language, "fr")
 
     @ignore_warnings
     def test_metadictionary_initialization_wn(self):
         with self.assertRaises(AttributeError):
-            test_dict_fr.wn.language
+            self.test_dict_fr.wn.language
 
     @ignore_warnings
     def test_metadictionary_wn(self):
-        self.assertEqual(test_dict_en.wordnet._language, "en")
+        self.assertEqual(self.test_dict_en.wordnet._language, "en")
 
     @ignore_warnings
     def test_metadictionary_order(self):
-        self.assertEqual(test_dict_en._order, ["wordnet", "wiktionary"])
+        self.assertEqual(self.test_dict_en._order[0], "wordnet")
 
     @ignore_warnings
     def test_metadictionary_minimal(self):
-        self.assertEqual(test_dict_en.is_a_word("cat", minimal=True), ["wordnet"])
+        self.assertEqual(self.test_dict_en.is_a_word("cat", minimal=True),
+                         ["wordnet"])
 
     @ignore_warnings
     def test_metadictionary_minimal(self):
-        self.assertEqual(test_dict_en.is_a_word("cat", minimal=True), ["wordnet"])
+        self.assertEqual(self.test_dict_en.is_a_word("cat", minimal=True),
+                         ["wordnet"])
 
     @ignore_warnings
     def test_metadictionary_get_pos(self):
-        test_dict = ldt.dicts.morphology.meta.MorphMetaDict(order=["wordnet",
-                                                            "custom"])
+        test_dict = ldt.dicts.morphology.meta.MorphMetaDict(order=[
+            "wordnet"], custom_base="wordnet")
         res = test_dict.get_pos("nouned")
         self.assertEqual(res, ["verb"])
 
     @ignore_warnings
     def test_metadictionary_lemmatize(self):
-        test_dict = ldt.dicts.morphology.meta.MorphMetaDict(order=["wordnet",
-                                                            "custom"])
+        test_dict = ldt.dicts.morphology.meta.MorphMetaDict(order=[
+            "wordnet"], custom_base="wordnet")
         res = test_dict.lemmatize("nouned")
         self.assertEqual(res, ["noun"])
 
     @ignore_warnings
     def test_metadictionary_lemmatize(self):
         test_dict = ldt.dicts.morphology.meta.MorphMetaDict(order=["wordnet",
-                                                                   "wiktionary",
-                                                                   "custom"])
-        res = test_dict.lemmatize("abba")
-        self.assertEqual(res, ["abba"])
+                                                                   "wiktionary"], custom_base="wiktionary")
+        res = test_dict.lemmatize("GPUs")
+        self.assertEqual(res, ["GPU"])
 
     #
     # @ignore_warnings

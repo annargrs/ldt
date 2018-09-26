@@ -21,16 +21,17 @@ Package requirements:
 NLTK has many resources, of which three are used by LDT: wordnet, stopwords, lemmatizer.
 You can install them individually from within Python shell:
 
-```python
-import nltk
-nltk.download("wordnet")
-```
+.. code-block:: python
+
+   import nltk
+   nltk.download("wordnet")
 
 or from command line:
 
-```
->>> python -m nltk.downloader wordnet
-```
+.. code-block:: python
+
+   python -m nltk.downloader wordnet
+
 
 For spellchecker engines, LDT currently relies on the `pyenchant <https://github.com/rfk/pyenchant>`_ library, which
 provides an interface to the system spellcheckers such aspell, hunspell etc. Aspell worked the best in our tests,

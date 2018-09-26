@@ -5,12 +5,12 @@ vocabulary sample.
 """
 
 import os
-import vsmlib
+import vecto.embeddings
 import pandas as pd
 
 import ldt
-from ldt.load_config import config as config
-from ldt.relations.pair import RelationsInPair as RelationsInPair
+from ldt.load_config import config
+
 
 def ldt_demo(top_n):
 
@@ -19,14 +19,15 @@ def ldt_demo(top_n):
     out_path = os.path.join(sample_path, "demo_results.tsv")
     sample_vocab = ["cat", "dog", "walk", "buy", "pretty", "new", "often",
                     "rare"]
-    embeddings = vsmlib.model.load_from_dir(sample_path)
+    embeddings = vecto.embeddings.load_from_dir(sample_path)
+    embeddings.normalize()
     top_n = 10 #number of neighours to retrieve
 
     # setting up LDT resources
     normalizer = ldt.dicts.normalize.Normalization(language="English",order=(
         "wordnet", "custom"), lowercasing=True)
     DerivationAnalyzer = ldt.dicts.derivation.meta.DerivationAnalyzer()
-    LexDict = ldt.dicts.metadictionary.MetaDictionary()
+    LexDict = ldt.dicts.semantics.metadictionary.MetaDictionary()
 
     analyzer = ldt.relations.pair.RelationsInPair(normalizer=normalizer,
                                                    derivation_dict =

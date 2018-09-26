@@ -21,21 +21,11 @@ import functools
 import json
 
 
-from ldt.helpers.resources import lookup_language as lookup_language
-from ldt.helpers.wiktionary_cache import load_wiktionary_cache as \
-    load_wiktionary_cache
-from ldt.dicts.semantics.lex_dictionary import LexicographicDictionary as \
-    LexicographicDictionary
-from ldt.dicts.base.wiktionary import BaseWiktionary as BaseWiktionary
-# from ldt.helpers.formatting import remove_text_inside_brackets as \
-#     remove_text_inside_brackets
-# from ldt.helpers.formatting import strip_non_alphabetical_characters as \
-#     strip_non_alphabetical_characters
-# from ldt.config import lowercasing as config_lowercasing
-# from ldt.config import language as config_language
-# from ldt.config import split_mwu as config_split_mwu
-# from ldt.config import wiktionary_cache as config_wiktionary_cache
-from ldt.load_config import config as config
+from ldt.helpers.resources import lookup_language_by_code
+from ldt.helpers.wiktionary_cache import load_wiktionary_cache
+from ldt.dicts.semantics.lex_dictionary import LexicographicDictionary
+from ldt.dicts.base.wiktionary import BaseWiktionary
+from ldt.load_config import config
 
 
 class Wikisaurus(BaseWiktionary, LexicographicDictionary):
@@ -61,8 +51,7 @@ class Wikisaurus(BaseWiktionary, LexicographicDictionary):
     """
     def __init__(self, cache=config["wiktionary_cache"],
                  language=config["default_language"],
-                 lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"]):
+                 lowercasing=config["lowercasing"]):
         """ Initializing the Wikisaurus class.
 
         Unlike the basic Dictionary class, Wikisaurus checks the language
@@ -72,32 +61,11 @@ class Wikisaurus(BaseWiktionary, LexicographicDictionary):
         Args:
             language (str): the language of the dictionary
             lowercasing (bool): True if all data should be lowercased
-            split_mwu (bool): True if in addition to underscored spellings of
-            multi-word expressions their dashed and spaced versions should also
-            be produced (e.g. 'good night', 'good_night', "good-night")
 
         """
-        super(Wikisaurus, self).__init__(cache=cache, language=language,
-                                         split_mwu=split_mwu)
-    #     super(Wikisaurus, self).__init__()
-    #     if len(language) > 2:
-    #         language = lookup_language(language, reverse=True)
-    #     self._language = language
-    #     if not wiktionary_cache:
-    #         self.cache = None
-    #     else:
-    #         self.load_cache()
-    #     self.supported_relations = ("synonyms", "antonyms", "hyponyms",
-    #                                 "hypernyms", "meronyms", "holonyms",
-    #                                 "troponyms", "coordinate terms", "other")
-    #
-    #
-    # def _set_language(self, language):
-    #     """This method ensures the language arg is a 2-letter code."""
-    #     if len(language) > 2:
-    #         language = lookup_language(language, reverse=True)
-    #     self._language = language
-    #
+        super(Wikisaurus, self).__init__(cache=cache, language=language)
+
+
     def load_cache(self):
         """Loading the cached list of titles of existing Wikisaurus pages.
         If it doesn't exist, this list is created in the ldt resources directory
@@ -131,7 +99,7 @@ class Wikisaurus(BaseWiktionary, LexicographicDictionary):
                 return True
             return False
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def query(self, word):
         """Retrieving data from Wikisaurus API.
 
@@ -188,7 +156,8 @@ class Wikisaurus(BaseWiktionary, LexicographicDictionary):
                "Various":[], "Related terns":[], "Derived terms":[],
                "See also":[]}
 
-        wikisaurus_language = lookup_language(self.language).capitalize()
+        wikisaurus_language = lookup_language_by_code(
+            self.language).capitalize()
 
         for rel in wikidata:
             if wikisaurus_language in rel:
@@ -227,7 +196,7 @@ class Wikisaurus(BaseWiktionary, LexicographicDictionary):
             #     wikidata[relation] = []
         return wikidata
 
-    def get_relations(self, word, relations, reduce=False):
+    def get_relations(self, word, relations="all", reduce=False):
         """Retrieving relations from Wikisaurus entries
 
         Args:

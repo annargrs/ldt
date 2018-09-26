@@ -18,12 +18,10 @@ import timeout_decorator
 from nltk.corpus import wordnet as wn
 
 
-from ldt.dicts.semantics.lex_dictionary import DictionaryWithDefinitions as \
-    DictionaryWithDefinitions
-from ldt.dicts.base.wordnet.en import BaseWordNet as BaseWordNet
-from ldt.helpers.formatting import remove_text_inside_brackets as \
-    remove_text_inside_brackets
-from ldt.load_config import config as config
+from ldt.dicts.semantics.lex_dictionary import DictionaryWithDefinitions
+from ldt.dicts.base.wordnet.en import BaseWordNet
+from ldt.helpers.formatting import remove_text_inside_brackets
+from ldt.load_config import config
 
 
 # class WordNet(DictionaryWithDefinitions, BaseWordNet):
@@ -39,55 +37,22 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
 
     """
 
-    def __init__(self, lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"]):
+    def __init__(self, lowercasing=config["lowercasing"]):
         """ Initializing the WordNet class.
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored spellings of
-            multi-word expressions their dashed and spaced versions should also
-            be produced (e.g. 'good night', 'good_night', "good-night")
 
         """
         super(WordNet, self).__init__(
-            lowercasing=lowercasing, split_mwu=split_mwu)
+            lowercasing=lowercasing)
 
-        # DictionaryWithDefinitions.__init__(lowercasing, split_mwu)
-        # BaseWordNet.__init__(lowercasing, split_mwu)
-        # BaseWordNet.__init__(self)
-        # DictionaryWithDefinitions.__init__(self)
-        # super().__init__()
-
-        # self._language = "en"
         self.supported_relations = ("synonyms", "antonyms", "hyponyms",
                                     "hypernyms", "part_meronyms",
                                     "member_meronyms", "substance_meronyms",
                                     "meronyms")
 
-    # def _set_language(self, language):
-    #     """This ensures the language is suppported."""
-    #     if language not in ["English", "english", "en"]:
-    #         raise LanguageError("Only English WordNet is supported at the "
-    #                             "moment.")
-    #     self._language = language
-    #
-    # def is_a_word(self, word):
-    #     """ Determines whether a WordNet entry exists for this word.
-    #
-    #     Args:
-    #         word (str): the input word to look up.
-    #
-    #     Returns:
-    #         (bool): *True* if the word entry was found.
-    #
-    #     """
-    #
-    #     if wn.synsets(word):
-    #         return True
-    #     return False
-
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def _get_all_synonyms(self, word):
         """A helper method for :func:`get_relation`
 
@@ -107,7 +72,7 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
 
         return list(set(res))
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def _get_antonyms(self, word):
         """A helper method for :func:`get_relation`
 
@@ -133,7 +98,7 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
         res = list(set(res))
         return res
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def _get_all_antonyms(self, word):
         """ A helper method for :func:`get_relation`
 
@@ -159,7 +124,7 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
         return res
 
     @timeout_decorator.timeout(10, use_signals=False)
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def _get_nyms(self, word, relation, synonyms=True, depth=1):
         """ Single interface to all WordNet relations computed with
         closure (i.e. except synonyms and antonyms).
@@ -216,7 +181,7 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
         return result
 
     # pylint: disable=arguments-differ
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def get_relation(self, word, relation, synonyms=True): #pylint:
         # disable=arguments-differ
         """ Single interface to all WordNet relations
@@ -248,9 +213,6 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
             list: a list of words related to the target word in the specified
             way.
 
-        Todo:
-            * test split_mwu
-
         """
         if not self.is_a_word(word):
             return None
@@ -278,7 +240,7 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
         return sorted(res)
 
     # pylint: disable=arguments-differ
-    def get_relations(self, word, relations="main", reduce=False,
+    def get_relations(self, word, relations="all", reduce=False,
                       synonyms=True):
 
         """ Aggregating all wWrdNet relations found for a word in a single
@@ -324,7 +286,7 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
         return res
 
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def get_definitions(self, word, remove_notes=True):
         """A simple wrapper for NLTK's Princeton wordnet definitions.
 

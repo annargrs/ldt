@@ -22,15 +22,12 @@ Note:
 
 """
 
-from ldt.dicts.dictionary import Dictionary as Dictionary
-from ldt.load_config import config as config
-from ldt.dicts.derivation.wiktionary import DerivationWiktionary as \
-    DerivationWiktionary
-from ldt.dicts.derivation.wordnet.en import DerivationWordNet as \
-    DerivationWordNet
-from ldt.dicts.derivation.custom.en.en import EnglishDerivation as \
-    EnglishDerivation
-from ldt.helpers.resources import update_dict as update_dict
+from ldt.dicts.dictionary import Dictionary
+from ldt.load_config import config
+from ldt.dicts.derivation.wiktionary import DerivationWiktionary
+from ldt.dicts.derivation.wordnet.en import DerivationWordNet
+from ldt.dicts.derivation.custom.en.en import EnglishDerivation
+from ldt.helpers.resources import update_dict
 
 class DerivationAnalyzer(Dictionary):
     """DerivationAnalyzer class combines to all derivation analysis

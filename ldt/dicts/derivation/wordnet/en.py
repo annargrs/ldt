@@ -6,8 +6,8 @@
 
 from nltk.corpus import wordnet as wn
 
-from ldt.dicts.base.wordnet.en import BaseWordNet as BaseWordNet
-from ldt.load_config import config as config
+from ldt.dicts.base.wordnet.en import BaseWordNet
+from ldt.load_config import config
 
 
 class DerivationWordNet(BaseWordNet):

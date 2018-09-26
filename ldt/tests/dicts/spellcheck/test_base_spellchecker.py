@@ -28,11 +28,11 @@ class Tests(unittest.TestCase):
         self.assertTrue(test_dict.is_a_word("chateau"))
 
     def test_dict_with_charset(self):
-        self.assertFalse(test_dict._filter_by_charset("ça", include=["latin",
+        self.assertFalse(test_dict.filter_by_charset("ça", include=["latin",
                                                                "with"]))
 
     def test_dict_latin(self):
-        self.assertFalse(test_dict._filter_by_charset("кот", include=["latin"]))
+        self.assertFalse(test_dict.filter_by_charset("кот", include=["latin"]))
 
     def test_dict_suggest(self):
         self.assertIn("with", test_dict.suggest("iwth"))

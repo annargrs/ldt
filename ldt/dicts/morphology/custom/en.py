@@ -14,11 +14,10 @@
 import inflect
 import functools
 
-from ldt.dicts.morphology.morph_dictionary import MorphDictionary as \
-    MorphDictionary
-from ldt.dicts.base.custom.en import BaseCustomDict as BaseCustomDict
-from ldt.dicts.base.wordnet.en import BaseWordNet as BaseWordNet
-from ldt.load_config import config as config
+from ldt.dicts.morphology.morph_dictionary import MorphDictionary
+from ldt.dicts.base.custom.en import BaseCustomDict
+from ldt.dicts.base.wordnet.en import BaseWordNet
+from ldt.load_config import config
 
 
 class MorphCustomDict(MorphDictionary, BaseCustomDict):
@@ -46,13 +45,13 @@ class MorphCustomDict(MorphDictionary, BaseCustomDict):
     def get_form(self, word):
         pass
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def is_a_word(self, word):
         if self._lemmatize(word):
             return True
         return False
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def _lemmatize(self, word):
         """ A crude rule-based fallback for (frequent) cases where WordNet
         lemmatizer fails.

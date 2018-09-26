@@ -1,9 +1,9 @@
 ruamel.yaml
 pyenchant
-wiktionaryparser
+wiktionaryparser==0.0.7
 hurry.filesize
 timeout-decorator
 inflect
 nltk
-vsmlib
+vecto
 pandas

@@ -39,10 +39,10 @@ from difflib import SequenceMatcher
 
 import enchant
 
-from ldt.dicts.dictionary import Dictionary as Dictionary
-from ldt.load_config import config as config
-from ldt.helpers.resources import lookup_language as lookup_language
-from ldt.helpers.exceptions import LanguageError as LanguageError
+from ldt.dicts.dictionary import Dictionary
+from ldt.load_config import config
+from ldt.helpers.resources import lookup_language_by_code
+from ldt.helpers.exceptions import LanguageError
 
 class Spellchecker(Dictionary):
     """The base spellchecker class (pyenchant-based at the moment)."""
@@ -150,9 +150,9 @@ class Spellchecker(Dictionary):
         return self.target.check(word)
 
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def in_foreign_dicts(self, word):
-        """Returns True if the word is found in the spellchecker resoures
+        """Returns True if the word is found in the spellchecker resources
         for the specified foreign languages.
 
         Example:
@@ -173,7 +173,7 @@ class Spellchecker(Dictionary):
         return False
 
     # pylint: disable=no-self-use
-    def _filter_by_charset(self, word, include=["latin", "digit"],
+    def filter_by_charset(self, word, include=["latin", "digit"],
                           exclude=["with"]):
         """Simple filter by character type: returns False for words with
         letters from any Unicode charset other than the the listed.
@@ -317,5 +317,5 @@ def check_language(language):
     """
 
     if len(language) > 2 and language[2] != "_":
-        language = lookup_language(language, reverse=True)
+        language = lookup_language_by_code(language, reverse=True)
     return language

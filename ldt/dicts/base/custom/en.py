@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 """ This module provides base interface for the LDT custom base dictionary.
 
-    Currently only English is supported.
+Currently only English is supported.
 
-     - Raising DictError on setting the language other than English
-     - Adding a Dictionary argument for is_a_word method.
+ - Raising DictError on setting the language other than English
+ - Adding a Dictionary argument for is_a_word method.
 
-    Todo:
+Todo:
 
-        - Handling other languages on initialization
+ - Handling other languages on initialization
 
 """
 
 
-from ldt.dicts.dictionary import Dictionary as Dictionary
-from ldt.helpers.exceptions import LanguageError as LanguageError
+from ldt.dicts.dictionary import Dictionary
+from ldt.helpers.exceptions import LanguageError
 
 class BaseCustomDict(Dictionary):
     """The class providing the basic LDT dictionary class that implements

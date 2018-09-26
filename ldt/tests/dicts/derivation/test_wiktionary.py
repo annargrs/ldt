@@ -4,7 +4,7 @@ import unittest
 import time
 import ldt
 
-from ldt.helpers.ignore import ignore_warnings as ignore_warnings
+from ldt.helpers.ignore import ignore_warnings
 
 class Tests(unittest.TestCase):
     """
@@ -37,13 +37,13 @@ class Tests(unittest.TestCase):
         worked = "brotherrede" not in res[0] and "brother" in res[0]
         self.assertTrue(worked)
 
-    # @ignore_warnings
-    # def test_related_words(self):
-    #     test_dict = ldt.dicts.derivation.wiktionary.DerivationWiktionary(
-    #         cache=False, language="english")
-    #     time.sleep(0.5)
-    #     res = test_dict.get_related_words("kind")
-    #     self.assertIn("kindliness", res)
+    @ignore_warnings
+    def test_related_words(self):
+        test_dict = ldt.dicts.derivation.wiktionary.DerivationWiktionary(
+            cache=False, language="english")
+        time.sleep(0.5)
+        res = test_dict.get_related_words("kind")
+        self.assertIn("kindliness", res)
         # res = test_dict.get_related_words("wizard")
         # self.assertIn("wizardess", res)
 

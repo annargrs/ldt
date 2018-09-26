@@ -19,9 +19,8 @@ Todo:
 
 from abc import ABCMeta, abstractmethod
 
-from ldt.dicts.dictionary import Dictionary as Dictionary
-#from ldt.config import path_to_resources as config_path_to_resources
-from ldt.load_config import config as config
+from ldt.dicts.dictionary import Dictionary
+from ldt.load_config import config
 
 class MorphDictionary(Dictionary, metaclass=ABCMeta):
     """A super-class for resources with relations functionality
@@ -33,10 +32,6 @@ class MorphDictionary(Dictionary, metaclass=ABCMeta):
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored
-                spellings of multi-word expressions their dashed and spaced
-                versions should also be produced (e.g. 'good night',
-                'good_night', "good-night")
 
         """
 

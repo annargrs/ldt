@@ -7,7 +7,7 @@
 .. include:: readme.rst
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    Tutorial/index
    changelog

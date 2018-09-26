@@ -22,21 +22,14 @@ Todo:
 """
 
 import abc
-#from abc import ABCMeta, abstractmethod
 from nltk.tokenize import word_tokenize
 
-#from ldt.config import path_to_resources, lowercasing, language, split_mwu
-from ldt.helpers.exceptions import DictError as DictError
-from ldt.helpers.resources import load_stopwords as load_stopwords
-from ldt.helpers.resources import lookup_language as lookup_language
-from ldt.helpers.formatting import get_spacing_variants as get_spacing_variants
-from ldt.helpers.formatting import remove_text_inside_brackets as \
-    remove_text_inside_brackets
-#from ldt.config import path_to_resources as config_path_to_resources
-# from ldt.config import lowercasing as config_lowercasing
-# from ldt.config import language as config_language
-# from ldt.config import split_mwu as config_split_mwu
-from ldt.load_config import config as config
+from ldt.helpers.exceptions import DictError
+from ldt.helpers.resources import load_stopwords
+from ldt.helpers.resources import lookup_language_by_code as lookup_language
+from ldt.helpers.formatting import get_spacing_variants
+from ldt.helpers.formatting import remove_text_inside_brackets
+from ldt.load_config import config
 
 class Dictionary(metaclass=abc.ABCMeta):
     """The base LDT dictionary class.
@@ -51,16 +44,12 @@ class Dictionary(metaclass=abc.ABCMeta):
     """
 
     def __init__(self, language=config["default_language"],
-                 lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"]):
+                 lowercasing=config["lowercasing"]):
         """ Initializing the generic dictionary class
 
         Args:
             language (str): the language of the dictionary
             lowercasing (bool): True if all data should be lowercased
-            split_mwu (bool): True if in addition to underscored spellings of
-                multi-word-expressions their dashed and spaced versions should
-                also be produced (e.g. 'good night', 'good_night', "good-night")
             main_relations (tuple): the relations that are currently defined
                 in all LDT resources
 
@@ -68,7 +57,6 @@ class Dictionary(metaclass=abc.ABCMeta):
 
         self._language = language
         self.lowercasing = lowercasing
-        self.split_mwu = split_mwu
 
     @property
     def language(self):

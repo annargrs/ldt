@@ -2,10 +2,7 @@ import unittest
 
 import ldt
 import time
-from ldt.helpers.ignore import ignore_warnings as ignore_warnings
-
-test_dict = ldt.dicts.morphology.wiktionary.MorphWiktionary(cache=False,
-                                                            language="english")
+from ldt.helpers.ignore import ignore_warnings
 
 class Tests(unittest.TestCase):
     """
@@ -13,20 +10,34 @@ class Tests(unittest.TestCase):
     lemmatization and retrieval of possible POS tags for a query word.
 
     """
+
+    @classmethod
+    @ignore_warnings
+    def setUpClass(cls):
+        """Setting up the test variables."""
+        cls.test_dict = ldt.dicts.morphology.wiktionary.MorphWiktionary(
+            cache=False, language="english")
+
+
+    @classmethod
+    def tearDownClass(cls):
+        """Clearning up the test variables."""
+        cls.test_dict = None
+
     @ignore_warnings
     def test_dict_initialization(self):
-        self.assertEqual(test_dict.language, "en")
+        self.assertEqual(self.test_dict.language, "en")
 
     @ignore_warnings
     def test_pos_dict(self):
         time.sleep(0.5)
-        res = test_dict.get_pos("cat")
+        res = self.test_dict.get_pos("cat")
         self.assertGreaterEqual(res["noun"], 8)
 
     @ignore_warnings
     def test_pos_list(self):
         time.sleep(0.5)
-        res = test_dict.get_pos("cat", formatting="list")
+        res = self.test_dict.get_pos("cat", formatting="list")
         worked = len(res) >= 2 and "noun" in res
         self.assertTrue(worked)
 

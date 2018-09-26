@@ -8,19 +8,27 @@ Princeton WordNet.
      - Retrieving morphological form of an entry;
      - Retrieving possible lemmas of a word.
 
+Note:
+
+  This class relies on a pre-build list of WordNet lemmas (``en.vocab``),
+  since it is not accessible directly in NLTK and re-building it every time
+  is too slow. It will need updating in future releases.
+
     Todo:
         * a wordnet metaclass that would call language-specific wordnets
         * "governess" gets lemmatized as "govern"
 
 """
 
+import os
+
 from nltk.corpus import wordnet as wn
 from nltk.stem.wordnet import WordNetLemmatizer
 
-from ldt.dicts.base.wordnet.en import BaseWordNet as BaseWordNet
-from ldt.dicts.morphology.morph_dictionary import MorphDictionary as \
-    MorphDictionary
-from ldt.load_config import config as config
+from ldt.dicts.base.wordnet.en import BaseWordNet
+from ldt.dicts.morphology.morph_dictionary import MorphDictionary
+from ldt.load_config import config
+from ldt.helpers.loading import load_resource
 
 
 class MorphWordNet(MorphDictionary, BaseWordNet):
@@ -39,6 +47,17 @@ class MorphWordNet(MorphDictionary, BaseWordNet):
 
         super(MorphWordNet, self).__init__(language=language,
                                            lowercasing=lowercasing)
+
+        # loading a pre-built list of wordnet lemmas. building it anew on
+        # initialization of dictionary is too slow.
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        lemmas_path = os.path.join(dir_path, "en.vocab")
+        lemmas = load_resource(lemmas_path)
+        self.lemmas = lemmas
+        # all_wn_lemmas = []
+        # for synset in wn.all_synsets():
+        #     all_wn_lemmas += synset.lemma_names()
+        # self.lemmas = set(all_wn_lemmas)
 
     def get_pos(self, word, formatting="dict"):
         """Stub for the method of all subclasses of MorphDictionary that
@@ -104,6 +123,8 @@ class MorphWordNet(MorphDictionary, BaseWordNet):
         """
         word = self._lowercase(word)
         res = []
+        if word in self.lemmas:
+            res.append(word)
         if word[-1] in ["e", "t", "n", "d", "w", "g", "k", "l", "s", "y",
                         "m", "n"]:
             verb = WordNetLemmatizer().lemmatize(word, 'v')

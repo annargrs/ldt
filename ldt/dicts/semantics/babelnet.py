@@ -26,21 +26,9 @@
 
 """
 
-# import urllib
-# import urllib.request
-# import json
-# import gzip
-# import functools
-from ldt.dicts.semantics.lex_dictionary import LexicographicDictionary as \
-    LexicographicDictionary
-from ldt.dicts.base.babelnet import BaseBabelNet as BaseBabelNet
-# from ldt.helpers.resources import lookup_language as lookup_language
-# from ldt.config import lowercasing as config_lowercasing
-# from ldt.config import language as config_language
-# from ldt.config import split_mwu as config_split_mwu
-from ldt.load_config import config as config
-# from ldt.helpers.exceptions import AuthorizationError as AuthorizationError
-# from ldt.helpers.exceptions import DictError as DictError
+from ldt.dicts.semantics.lex_dictionary import LexicographicDictionary
+from ldt.dicts.base.babelnet import BaseBabelNet
+from ldt.load_config import config
 
 class BabelNet(BaseBabelNet, LexicographicDictionary):
     """The class providing BabelNet interface for semantic relations.
@@ -57,7 +45,6 @@ class BabelNet(BaseBabelNet, LexicographicDictionary):
     # pylint: disable=unused-argument
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"],
                  babelnet_key=config["babelnet_key"]):
         """ Initializing the BabelNet class.
 
@@ -69,9 +56,6 @@ class BabelNet(BaseBabelNet, LexicographicDictionary):
             language (str): the language of the dictionary (automatically
             formatted to uppercase 2-letter code)
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored spellings of
-            multi-word expressions their dashed and spaced versions should also
-            be produced (e.g. 'good night', 'good_night', "good-night")
             queries (int): the number of queries to BabelNet performed in
             this session
             babelnet_key (str): the BabelNet user key (registration at
@@ -80,11 +64,10 @@ class BabelNet(BaseBabelNet, LexicographicDictionary):
         """
         super(BabelNet, self).__init__(language=language,
                                        lowercasing=lowercasing,
-                                       split_mwu=split_mwu,
                                        babelnet_key=babelnet_key)
         # self.queries = 0
         # if len(language) > 2:
-        #     language = lookup_language(language, reverse=True)
+        #     language = lookup_language_by_code(language, reverse=True)
         # self._language = language.upper()
         # if config_babelnet_key:
         #     self.babelnet_key = config_babelnet_key
@@ -98,7 +81,7 @@ class BabelNet(BaseBabelNet, LexicographicDictionary):
     # def _set_language(self, language):
     #     """This method ensures the language arg is a 2-letter code."""
     #     if len(language) > 2:
-    #         language = lookup_language(language, reverse=True)
+    #         language = lookup_language_by_code(language, reverse=True)
     #     self._language = language.upper()
 
 

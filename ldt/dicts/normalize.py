@@ -10,8 +10,8 @@
 
 Examples:
     >>> test_dict = ldt.dicts.normalize.Normalization(language="English",
-                                              order=("wordnet", "custom"),
-                                              lowercasing=True)
+                                              order=("wordnet", "wiktionary"),
+                                              custom_base="wiktionary")
     >>> test_dict.normalize("grammar")
     {'found_in': ['wordnet'], 'lemmas': ['grammar'], 'word_categories': [
     'Lexicon'], 'pos': ['noun']}
@@ -56,16 +56,16 @@ Todo:
 
 import functools
 
-from ldt.dicts.morphology.meta import MorphMetaDict as MorphMetaDict
-from ldt.dicts.resources import NumberDictionary as NumberDictionary
-from ldt.dicts.resources import NameDictionary as NameDictionary
-from ldt.dicts.resources import WebDictionary as WebDictionary
-from ldt.dicts.resources import FileDictionary as FileDictionary
+from ldt.dicts.morphology.meta import MorphMetaDict
+from ldt.dicts.resources import NumberDictionary
+from ldt.dicts.resources import NameDictionary
+from ldt.dicts.resources import WebDictionary
+from ldt.dicts.resources import FileDictionary
 from ldt.dicts.spellcheck.en.en import SpellcheckerEn as Spellchecker
-from ldt.dicts.derivation.custom.compounds import Compounds as Compounds
-from ldt.dicts.morphology.wordnet.en import MorphWordNet as MorphWordNet
+from ldt.dicts.derivation.custom.compounds import Compounds
+from ldt.dicts.morphology.wordnet.en import MorphWordNet
 
-from ldt.load_config import config as config
+from ldt.load_config import config
 
 
 
@@ -84,7 +84,7 @@ def contains_non_letters(word):
                 return True
     return False
 
-@functools.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=config["cache_size"])
 def denoise(word):
     """Remove non-alpha symbols, if any."""
     trash = []
@@ -124,8 +124,8 @@ class Normalization(MorphMetaDict):
 
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"], order=("wordnet",
-                                                           "wiktionary",
-                                                           "custom")):
+                                                           "wiktionary"),
+                 custom_base="wiktionary"):
         """ Initializing the _normalizer class.
 
         Args:
@@ -271,12 +271,12 @@ class Normalization(MorphMetaDict):
             res["word_categories"].append("Lexicon")
             res["pos"] = self.get_pos(word, minimal=True)
         if self.namedict.is_a_word(word):
-            res["word_categories"].append("Names")
+            res["word_categories"].append("ProperNouns")
             res["lemmas"] = [word]
             res["pos"] = ["noun"]
         if not res["word_categories"]:
             if self.spelldict.is_foreign(word):
-                res["word_categories"].append("Foreign")
+                res["word_categories"].append("ForeignWords")
 
         if not res["word_categories"]:
             misspelled = self.spelldict.spelling_nazi(word)
@@ -371,17 +371,14 @@ class Normalization(MorphMetaDict):
             (dict): word category labels and found lemmas, if any.
         """
         word = str(word)
-
         if not contains_a_letter(word):
         # the word contains nothing to analyze
             res = self._noise(word)
             if res:
                 return res
-
         res = self._dash(word)
         if res:
             return res
-
 
         if contains_non_letters(word):
             # URLs, filenames, numbers etc
@@ -392,7 +389,6 @@ class Normalization(MorphMetaDict):
         # the word is correctly spelled and is in dict, is a name or a
         # foreign word
         else:
-
             res = self._word(word)
             if res["word_categories"]:
                 return res
@@ -402,7 +398,10 @@ class Normalization(MorphMetaDict):
                     return res
 
         # # the word has to be modified
-        if not res:
-            res = self._fix(word)
+        res = self._fix(word)
+        if res:
             if res["lemmas"]:
                 return res
+        # give up
+        else:
+            return {"word_categories": "Missing"}

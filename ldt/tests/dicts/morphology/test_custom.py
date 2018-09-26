@@ -4,10 +4,7 @@ import time
 
 import ldt
 
-from ldt.helpers.ignore import ignore_warnings as ignore_warnings
-
-test_dict = ldt.dicts.morphology.custom.en.MorphCustomDict()
-test_base_dict = ldt.dicts.base.wordnet.en.BaseWordNet()
+from ldt.helpers.ignore import ignore_warnings
 
 class Tests(unittest.TestCase):
     """
@@ -16,55 +13,69 @@ class Tests(unittest.TestCase):
 
     """
 
+    @classmethod
+    @ignore_warnings
+    def setUpClass(cls):
+        """Setting up the test variables."""
+        cls.test_dict = ldt.dicts.morphology.custom.en.MorphCustomDict()
+        cls.test_base_dict = ldt.dicts.base.wordnet.en.BaseWordNet()
+
+
+    @classmethod
+    def tearDownClass(cls):
+        """Clearning up the test variables."""
+        cls.test_dict = None
+        cls.test_base_dict = None
+
     @ignore_warnings
     def test_dict_initialization(self):
-        self.assertEqual(test_dict.language, "en")
+        self.assertEqual(self.test_dict.language, "en")
 
     @ignore_warnings
     def test_full_info(self):
-        res = test_dict._lemmatize("poshest")
+        res = self.test_dict._lemmatize("poshest")
         worked = {'adjective': ['posh']}
         self.assertEqual(res, worked)
 
     @ignore_warnings
     def test_is_a_word_false(self):
-        res = test_dict.is_a_word("catness")
+        res = self.test_dict.is_a_word("catness")
         self.assertFalse(res)
 
     @ignore_warnings
     def test_is_a_word_true(self):
-        res = test_dict.is_a_word("kindnesses")
+        res = self.test_dict.is_a_word("kindnesses")
         self.assertTrue(res)
 
     @ignore_warnings
     def test_comparative(self):
-        res = test_dict.lemmatize("posher")
+        res = self.test_dict.lemmatize("posher")
         self.assertEqual(res, ["posh"])
 
     @ignore_warnings
     def test_superlative(self):
-        res = test_dict.lemmatize("poshest")
+        res = self.test_dict.lemmatize("poshest")
         self.assertEqual(res, ["posh"])
 
     @ignore_warnings
     def test_plural(self):
-        res = test_dict.lemmatize("kindnesses")
+        res = self.test_dict.lemmatize("kindnesses")
         self.assertEqual(res, ["kindness"])
 
     @ignore_warnings
     def test_past(self):
-        res = test_dict.get_pos("verbed")
+        res = self.test_dict.get_pos("verbed")
         self.assertEqual(res, ["verb"])
 
     @ignore_warnings
     def test_3rdPdSg(self):
-        res = test_dict.lemmatize("sickens")
+        res = self.test_dict.lemmatize("sickens")
         self.assertEqual(res, ["sicken"])
 
     @ignore_warnings
     def test_gerund(self):
-        res1 = test_dict.lemmatize("whopping")
-        res2 = test_dict.lemmatize("floundering")
+        res1 = self.test_dict.lemmatize("whopping")
+        res2 = self.test_dict.lemmatize("floundering")
         worked = res1 == ["whop"] and res2 == ["flounder"]
         self.assertTrue(worked)
 

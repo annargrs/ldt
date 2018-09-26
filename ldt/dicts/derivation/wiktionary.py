@@ -11,11 +11,10 @@ Wiktionary.
 from difflib import SequenceMatcher
 import functools
 
-from ldt.helpers.formatting import strip_non_alphabetical_characters as \
-    strip_non_alphabetical_characters
-from ldt.dicts.base.wiktionary import BaseWiktionary as BaseWiktionary
-from ldt.dicts.semantics.wiktionary import Wiktionary as Wiktionary
-from ldt.load_config import config as config
+from ldt.helpers.formatting import strip_non_alphabetical_characters
+from ldt.dicts.base.wiktionary import BaseWiktionary
+from ldt.dicts.semantics.wiktionary import Wiktionary
+from ldt.load_config import config
 
 class DerivationWiktionary(BaseWiktionary):
     """This class implements querying morphological information from
@@ -57,7 +56,7 @@ class DerivationWiktionary(BaseWiktionary):
             return etymologies
 
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def get_etymologies(self, word, exclude_old_sources=None):
         """Rule-based parsing of Wiktionary etymologies.
 
@@ -134,7 +133,7 @@ class DerivationWiktionary(BaseWiktionary):
         """
         if not dictionary:
             dictionary = Wiktionary(language=self.language, cache=self.cache)
-        related_terms = dictionary.get_relation(word, "derived terms")
+        related_terms = dictionary.get_relation(word, relation="derived terms")
         return related_terms
 
 # todo derivational families through the sem dict methods

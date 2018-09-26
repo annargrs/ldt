@@ -2,38 +2,89 @@
 """This module provides functionality for detecting relations in a pair of
 words.
 
-Example:
-    >>> test_dict = ldt.relations.RelationsInPair()
-    >>> test_dict.analyze("black", "white")
-    ['SharedPOS', 'SharedMorphForm', 'Antonyms']
-    >>> test_dict.analyze("happy", "happily")
-    ['Synonyms', 'SharedMorphForm', 'SharedDerivation']
+Examples:
+    >>> relation_analyzer = ldt.relations.RelationsInPair()
+    >>> relation_analyzer.analyze("black", "white")
+    {'Hyponyms': True,
+     'SharedMorphForm': True,
+     'SharedPOS': True,
+     'Synonyms': True,
+     'Antonyms': True,
+     'ShortestPath': 0.058823529411764705,
+     'Associations': True,
+     'TargetFrequency': 491760,
+     'NeighborFrequency': 509267}
 
 
 Todo:
-    morph form detection (cat, cats)
+   - morph form detection (cat, cats)
 
 """
 
 import functools
 
+from ldt.dicts.dictionary import Dictionary
+from ldt.dicts.normalize import Normalization
+from ldt.dicts.derivation.meta import DerivationAnalyzer
+from ldt.dicts.semantics.metadictionary import MetaDictionary
+from ldt.relations.word import Word
+from ldt.relations.ontology_path.ontodict import OntoDict
+from ldt.load_config import config
+from ldt.dicts.resources import AssociationDictionary
+from ldt.relations.distribution import DistributionDict
 
-from ldt.relations.word import Word as Word
-from ldt.dicts.normalize import Normalization as Normalizer
-from ldt.dicts.derivation.meta import DerivationAnalyzer as \
-    DerivationAnalyzer
-from ldt.dicts.metadictionary import MetaDictionary as MetaDictionary
-from ldt.relations.word import Word as Word
-
-class RelationsInPair(object):
+class RelationsInPair(Dictionary):
     """This class implements analyzer for all possible relation types in a word
-    pair."""
-    def __init__(self, derivation_dict=None, normalizer=None, lex_dict=None):
+    pair.
+
+    Args:
+        language (str): the language of the dictionaries
+        lowercasing (bool): whether output from all resources should be
+            lowercased
+        derivation_dict (ldt dictionary object): see
+            :class:`~ldt.dicts.derivation.meta.DerivationAnalyzer`
+        normalizer (ldt dictionary object): see
+            :class:`ldt.dicts.normalize.Normalization`
+        lex_dict (ldt dictionary object): see
+            :class:`ldt.dicts.semantics.metadictionary.MetaDictionary`
+        ontodict (ldt dictionary object): see
+            :class:`ldt.relations.ontology_path.ontodict.OntoDict`
+        association_dict (ldt dictionary object): see
+            :class:`ldt.dicts.resources.AssociationDictionary`
+        distr_dict (ldt dictionary object): see
+            :class:`ldt.relations.distribution.DistributionDict`
+        gdeps (bool): in case distr_dict is initialized, this is the
+            switch for using google dependency cooccurrence data (
+            memory-intensive)
+        cooccurrence (bool): in case distr_dict is initialized, this is the
+            switch for using corpus cooccurrence data (memory-intensive)
+        cooccurrence_freq (bool): if True, cooccurrence counts are returned
+            rather than booleans (even more memory-intensive)
+
+
+    """
+    def __init__(self, language=config["default_language"],
+                 lowercasing=config["lowercasing"],
+                 derivation_dict=None, normalizer=None,
+                 lex_dict=None, ontodict=None, association_dict=None,
+                 distr_dict=None, gdeps=False,
+                 cooccurrence=False, cooccurrence_freq=False):
+
+        super(RelationsInPair, self).__init__(language=language,
+                                              lowercasing=lowercasing)
+        if not ontodict:
+            self.OntoDict = OntoDict(language=language)
+        else:
+            self.OntoDict = OntoDict
+
+        if not association_dict:
+            self.AssociationDictionary = AssociationDictionary(language=language)
+        else:
+            self.AssociationDictionary = association_dict
 
         if not normalizer:
-            self._normalizer = Normalizer(language="English",
-                                          order=("wordnet", "custom"),
-                                          lowercasing=True)
+            self._normalizer = Normalization(language=self.language, order=(
+                "wordnet", "wiktionary"), custom_base="wiktionary")
         else:
             self._normalizer = normalizer
 
@@ -49,12 +100,23 @@ class RelationsInPair(object):
         else:
             self._lex_dict = lex_dict
 
-    @functools.lru_cache(maxsize=None)
+        if not distr_dict:
+            self._distr_dict = DistributionDict(language=language,
+                                                gdeps=gdeps,
+                                                cooccurrence=cooccurrence,
+                                                cooccurrence_freq=cooccurrence_freq)
+        self._gdeps = gdeps
+        self._cooccurrence = cooccurrence
+
+    def is_a_word(self, word):
+        raise NotImplementedError
+
+    @functools.lru_cache(maxsize=config["cache_size"])
     def analyze(self, target, neighbor, silent=True):
         """The main function for analyzing the input strings and identifying
         any relations the two words may share.
 
-        Args:
+        Args:file:///mnt/Data/Cloud/pLib/Lab/ldt/corpus_resources/Wiki201308_3grams.json
             target (str): the target word to analyze.
             neighbor (str): the neighbor word to analyze:
             silent (bool): if False, the information retrieved for both words
@@ -62,6 +124,10 @@ class RelationsInPair(object):
 
         Returns:
               (list of str): what the two words have in common.
+
+        Todo:
+            Currently associations are established for all the lemmas. That
+            could be over-estimating it.
         """
 
         target = Word(target, self._derivation_dict, self._normalizer,
@@ -69,9 +135,43 @@ class RelationsInPair(object):
         neighbor = Word(neighbor, self._derivation_dict, self._normalizer,
                         self._lex_dict)
         if not silent:
-            print(target.all_info())
-            print(neighbor.all_info())
-        res = _binary_rels(target, neighbor)
+            print(target.pp_info())
+            print(neighbor.pp_info())
+        rels = _binary_rels(target, neighbor)
+        res = {}
+        for rel in rels:
+            res[rel] = True
+
+        paths = []
+        for target_lemma in target.info["Lemmas"]:
+            for neighbor_lemma in neighbor.info["Lemmas"]:
+                    paths.append(self.OntoDict.get_shortest_path(
+                        target_lemma, neighbor_lemma))
+        if paths:
+            res["ShortestPath"] = min(paths)
+
+        for target_lemma in target.info["Lemmas"]:
+            for neighbor_lemma in neighbor.info["Lemmas"]:
+                if self.AssociationDictionary.are_related(target_lemma,
+                                                          neighbor_lemma):
+                    res["Associations"] = True
+                    break
+
+        if self._cooccurrence:
+            if not self._distr_dict.cooccur_in_corpus(target.info[
+                                                          "OriginalForm"],
+                                                      neighbor.info["OriginalForm"]):
+                res["NonCooccurring"] = True
+
+        if self._gdeps:
+            if self._distr_dict.cooccur_in_gdeps(target.info["OriginalForm"],
+                                                 neighbor.info["OriginalForm"]):
+                res["GDeps"] = True
+
+        res["TargetFrequency"] = self._distr_dict.frequency_in_corpus(
+            target.info["OriginalForm"])
+        res["NeighborFrequency"] = self._distr_dict.frequency_in_corpus(
+            neighbor.info["OriginalForm"])
         return res
 
 def _binary_rels(target, neighbor):
@@ -143,3 +243,8 @@ def are_related_as(target, neighbor):
                     if word in neighbor.info[rel]:
                         res.append(rel)
     return list(set(res))
+
+
+if __name__ == '__main__':
+    relation_analyzer = RelationsInPair()
+    print(relation_analyzer.analyze("cat", "dog"))

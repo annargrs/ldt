@@ -11,10 +11,9 @@ import os
 import warnings
 import sys
 import shutil
-# import nltk
 import ruamel.yaml as yaml
 
-from ldt.helpers.exceptions import ResourceError as ResourceError
+from ldt.helpers.exceptions import ResourceError
 
 warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
 
@@ -37,7 +36,7 @@ else:
 def load_config(path=CONFIGPATH):
     """Loading config file from either the user home directory or the test
     directory"""
-
+    print("Loading configuration file:", path)
     if not os.path.isfile(path):
         raise ResourceError("Configuration yaml file was not found at "+path)
 
@@ -53,6 +52,8 @@ def load_config(path=CONFIGPATH):
     options["path_to_cache"] = os.path.join(options["path_to_resources"],
                                             "cache")
     options["wiktionary_cache"] = False
+    if options["cache_size"] == "None":
+        options["cache_size"] = None
     return options
 
 #pylint: disable=invalid-name

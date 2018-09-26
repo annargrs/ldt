@@ -6,18 +6,16 @@ Wiktionary.
 
 """
 
-from ldt.dicts.base.wiktionary import BaseWiktionary as BaseWiktionary
-from ldt.dicts.morphology.morph_dictionary import MorphDictionary as \
-    MorphDictionary
-from ldt.load_config import config as config
+from ldt.dicts.base.wiktionary import BaseWiktionary
+from ldt.dicts.morphology.morph_dictionary import MorphDictionary
+from ldt.load_config import config
 
 class MorphWiktionary(MorphDictionary, BaseWiktionary):
     """This class implements querying morphological information from
     Wiktionary. At the moment, only POS tags can be obtained."""
 
     def __init__(self, cache=config["wiktionary_cache"], language=config[
-        "default_language"], lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"]):
+        "default_language"], lowercasing=config["lowercasing"]):
         """ Initializing the base class.
 
         Args:
@@ -27,8 +25,7 @@ class MorphWiktionary(MorphDictionary, BaseWiktionary):
         """
 
         super(MorphWiktionary, self).__init__(cache=cache, language=language,
-                                              lowercasing=lowercasing,
-                                              split_mwu=split_mwu)
+                                              lowercasing=lowercasing)
 
     def get_pos(self, word, formatting="dict"):
         """Retrieving parts of speech for a given word.
@@ -67,8 +64,8 @@ class MorphWiktionary(MorphDictionary, BaseWiktionary):
         return res
 
     def lemmatize(self, word):
-        """Wiktionary currently does not support lookup in non-lemmatized
-        forms. If a word is found, LDT assumes that it is a lemma.
+        """Wiktionary does not support lookup in non-lemmatized forms. If a
+        word is found, LDT assumes that it is a lemma.
 
         Args:
             word (str): the word to be looked up

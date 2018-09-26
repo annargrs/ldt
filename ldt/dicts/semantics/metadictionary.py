@@ -14,17 +14,13 @@ Todo:
 
 from ldt.helpers.exceptions import AuthorizationError
 
-from ldt.dicts.dictionary import Dictionary as Dictionary
+from ldt.dicts.dictionary import Dictionary
 from ldt.dicts.semantics.wikisaurus import Wikisaurus
 from ldt.dicts.semantics.wiktionary import Wiktionary
 from ldt.dicts.semantics.wordnet.en import WordNet
 from ldt.dicts.semantics.babelnet import BabelNet
 
-# from ldt.config import lowercasing as config_lowercasing
-# from ldt.config import language as config_language
-# from ldt.config import split_mwu as config_split_mwu
-# from ldt.config import wiktionary_cache as config_wiktionary_cache
-from ldt.load_config import config as config
+from ldt.load_config import config
 
 class MetaDictionary(Dictionary):
     """Class implementing a collection of dictionaries which are queried in
@@ -60,7 +56,6 @@ class MetaDictionary(Dictionary):
                               "babelnet"),
                  language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"],
                  cache=config["wiktionary_cache"],
                  babelnet_key=config["babelnet_key"]):
 
@@ -73,14 +68,12 @@ class MetaDictionary(Dictionary):
             if dictionary == "wiktionary":
                 self.wiktionary = Wiktionary(language=language,
                                              lowercasing=lowercasing,
-                                             split_mwu=split_mwu,
                                              cache=cache)
                 self._dicts[dictionary] = self.wiktionary
                 self._order.append(dictionary)
             if dictionary == "wikisaurus":
                 self.wikisaurus = Wikisaurus(language=language,
                                              lowercasing=lowercasing,
-                                             split_mwu=split_mwu,
                                              cache=cache)
                 self._dicts[dictionary] = self.wikisaurus
                 self._order.append(dictionary)
@@ -88,14 +81,13 @@ class MetaDictionary(Dictionary):
                 try:
                     self.babelnet = BabelNet(language=language,
                                              lowercasing=lowercasing,
-                                             split_mwu=split_mwu,
                                              babelnet_key=babelnet_key)
                     self._dicts[dictionary] = self.babelnet
                     self._order.append(dictionary)
                 except AuthorizationError:
                     pass
             if dictionary == "wordnet" and language.lower() in ["en", "english"]:
-                self.wordnet = WordNet(lowercasing, split_mwu)
+                self.wordnet = WordNet(lowercasing)
                 self._dicts[dictionary] = self.wordnet
                 self._order.append(dictionary)
 

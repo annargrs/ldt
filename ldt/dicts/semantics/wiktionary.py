@@ -12,25 +12,11 @@
 
 import functools
 
-# from nltk.tokenize import word_tokenize
-# from wiktionaryparser import WiktionaryParser
-
-# from ldt.helpers.resources import lookup_language as lookup_language
-# from ldt.helpers.wiktionary_cache import load_wiktionary_cache as \
-#     load_wiktionary_cache
-from ldt.dicts.semantics.lex_dictionary import LexicographicDictionary as \
-    LexicographicDictionary
-from ldt.dicts.base.wiktionary import BaseWiktionary as BaseWiktionary
-from ldt.helpers.formatting import remove_text_inside_brackets as \
-    remove_text_inside_brackets
-from ldt.helpers.formatting import strip_non_alphabetical_characters as \
-    strip_non_alphabetical_characters
-# from ldt.config import path_to_resources as config_path_to_resources
-# from ldt.config import lowercasing as config_lowercasing
-# from ldt.config import language as config_language
-# from ldt.config import split_mwu as config_split_mwu
-# from ldt.config import wiktionary_cache as config_wiktionary_cache
-from ldt.load_config import config as config
+from ldt.dicts.semantics.lex_dictionary import LexicographicDictionary
+from ldt.dicts.base.wiktionary import BaseWiktionary
+from ldt.helpers.formatting import remove_text_inside_brackets
+from ldt.helpers.formatting import strip_non_alphabetical_characters
+from ldt.load_config import config
 
 
 class Wiktionary(BaseWiktionary, LexicographicDictionary):
@@ -51,8 +37,7 @@ class Wiktionary(BaseWiktionary, LexicographicDictionary):
     """
     def __init__(self, cache=config["wiktionary_cache"],
                  language=config["default_language"],
-                 lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"]):
+                 lowercasing=config["lowercasing"]):
         """ Initializing the Wiktionary class.
 
         Unlike the basic Dictionary class, Wiktionary checks the language
@@ -64,32 +49,20 @@ class Wiktionary(BaseWiktionary, LexicographicDictionary):
             language should be cached to speed up queries
             language (str): the language of the dictionary
             lowercasing (bool): True if all data should be lowercased
-            split_mwu (bool): True if in addition to underscored spellings of
-            multi-word expressions their dashed and spaced versions should also
-            be produced (e.g. 'good night', 'good_night', "good-night")
 
         """
 
         super(Wiktionary, self).__init__(cache=cache, language=language,
-                                         lowercasing=lowercasing,
-                                         split_mwu=split_mwu)
-        # super().__init__(wiktionary_cache, language, split_mwu)
-        # super(Wiktionary, self).__init__()
-        # if len(language) > 2:
-        #     language = lookup_language(language, reverse=True)
-        # self._language = language
-        # if not wiktionary_cache:
-        #     self.cache = None
-        # else:
-        #     self.load_cache()
+                                         lowercasing=lowercasing)
+
         self.supported_relations = ("synonyms", "antonyms", "hyponyms",
                                     "hypernyms", "meronyms", "holonyms",
                                     "troponyms", "coordinate terms", "other",
                                     "derived terms")
 
 
-    @functools.lru_cache(maxsize=None)
-    def get_relations(self, word, relations=None,
+    @functools.lru_cache(maxsize=config["cache_size"])
+    def get_relations(self, word, relations="all",
                       reduce=False): #pylint: disable=arguments-differ
 
         """Parsing lexicographic relations in Wiktionary.
@@ -147,12 +120,7 @@ class Wiktionary(BaseWiktionary, LexicographicDictionary):
 
                         else:
                             mwu = mwu.strip()
-                            # if self.split_mwu:
-                            #     cleaned += get_spacing_variants(mwu)
-                            # else:
                             cleaned.append(mwu)
-                # if self.lowercasing:
-                #     cleaned = [w.lower() for w in cleaned]
                 cleaned = list(set(cleaned))
                 cleaned = sorted(cleaned)
                 dicts[i] = []

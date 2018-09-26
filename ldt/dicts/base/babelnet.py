@@ -16,8 +16,10 @@
      - retrieving BabelNet nodes and edges;
 
     Todo:
-        cache that would save between sessions
-        authorization error for babelnet on invalid key
+
+     - cache saved between sessions;
+     - authorization error for babelnet on invalid key;
+     - querying offline dump of BabelNet.
 
 """
 
@@ -26,14 +28,10 @@ import urllib.request
 import json
 import gzip
 import functools
-from ldt.dicts.dictionary import Dictionary as Dictionary
-from ldt.helpers.resources import lookup_language as lookup_language
-# from ldt.config import lowercasing as config_lowercasing
-# from ldt.config import language as config_language
-# from ldt.config import split_mwu as config_split_mwu
-from ldt.load_config import config as config
-from ldt.helpers.exceptions import AuthorizationError as AuthorizationError
-# from ldt.helpers.exceptions import DictError as DictError
+from ldt.dicts.dictionary import Dictionary
+from ldt.helpers.resources import lookup_language_by_code
+from ldt.load_config import config
+from ldt.helpers.exceptions import AuthorizationError
 
 class BaseBabelNet(Dictionary):
     """The class providing the base BabelNet interface.
@@ -65,7 +63,7 @@ class BaseBabelNet(Dictionary):
         super(BaseBabelNet, self).__init__()
         self.queries = 0
         if len(self.language) > 2:
-            self.language = lookup_language(self.language, reverse=True)
+            self.language = lookup_language_by_code(self.language, reverse=True)
         self._language = self.language.upper()
         if babelnet_key:
             if babelnet_key != "None":
@@ -78,7 +76,7 @@ class BaseBabelNet(Dictionary):
     def _set_language(self, language):
         """This method ensures the language arg is a 2-letter code."""
         if len(language) > 2:
-            language = lookup_language(language, reverse=True)
+            language = lookup_language_by_code(language, reverse=True)
         self._language = language.upper()
 
 
@@ -104,7 +102,7 @@ class BaseBabelNet(Dictionary):
             return True
         return False
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def query(self, url):
         """Helper method for querying BabelNet
 
@@ -131,7 +129,7 @@ class BaseBabelNet(Dictionary):
             data = json.loads(gz_data)
             return data
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def get_ids(self, word, full=False):
         """Returns the list of BabelNet IDS for a given word
 
@@ -155,7 +153,7 @@ class BaseBabelNet(Dictionary):
             res.append(result["id"])
         return res
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def get_lemmas(self, babelnet_id):
         """ Getting lemmas associated with a babelnet_id.
 
@@ -187,7 +185,7 @@ class BaseBabelNet(Dictionary):
         res = self.post_process(res)
         return res
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def get_edges(self, babelnet_id):
         """ Getting babelnet_ids related to the given babelnet_id.
 

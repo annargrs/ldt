@@ -6,10 +6,9 @@ BabelNet.
 
 """
 
-from ldt.dicts.base.babelnet import BaseBabelNet as BaseBabelNet
-from ldt.dicts.morphology.morph_dictionary import MorphDictionary as \
-    MorphDictionary
-from ldt.load_config import config as config
+from ldt.dicts.base.babelnet import BaseBabelNet
+from ldt.dicts.morphology.morph_dictionary import MorphDictionary
+from ldt.load_config import config
 
 class MorphBabelNet(MorphDictionary, BaseBabelNet):
     """This class implements querying morphological information from
@@ -60,6 +59,16 @@ class MorphBabelNet(MorphDictionary, BaseBabelNet):
             else:
                 res[entry["pos"]] += 1
         res = {k.lower(): v for k, v in res.items()}
+
+        replacements = {"adv":"adverb", "adj":"adjective", "conj":
+            "conjunction", "prep": "preposition", "det": "determiner",
+                        "pron": "pronoun", "sym": "symbol", "intj":
+                            "interjection", "num": "numeral"}
+
+        if res:
+            for i in res:
+                if i in replacements:
+                    res[replacements[i]] = res.pop(i)
 
         if format == "list":
             res = list(res.keys())

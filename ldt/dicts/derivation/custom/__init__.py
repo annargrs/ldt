@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-from .en import *
+from .en import EnglishDerivation

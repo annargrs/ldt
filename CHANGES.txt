@@ -7,3 +7,11 @@ v 0.1.0, 2018-08-15 -- Initial release.
 * Parsing Wiktionary etymologies
 * Custom compound splitting routines with filtering by subword length;
 * 4 custom patterns for fixing frequent spelling mistakes.
+
+v 0.2.0, 2018-09-24.
+
+* Tutorial;
+* 19 LD variables, including ontology paths;
+* detection of antonymy with language-specific derivational patterns;
+* bug fixes.
+

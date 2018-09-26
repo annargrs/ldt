@@ -17,13 +17,13 @@ import functools
 
 from abc import ABCMeta, abstractmethod
 
-from ldt.dicts.dictionary import Dictionary as Dictionary
-from ldt.helpers.exceptions import DictError as DictError
-from ldt.helpers.resources import load_stopwords as load_stopwords
-from ldt.helpers.resources import lookup_language as lookup_language
-from ldt.helpers.loading import load_resource as load_resource
-from ldt.helpers.formatting import get_spacing_variants as get_spacing_variants
-from ldt.load_config import config as config
+from ldt.dicts.dictionary import Dictionary
+from ldt.helpers.exceptions import DictError
+from ldt.helpers.resources import load_stopwords
+from ldt.helpers.resources import lookup_language_by_code
+from ldt.helpers.loading import load_resource
+from ldt.helpers.formatting import get_spacing_variants
+from ldt.load_config import config
 
 # class LexicographicDictionary(Dictionary, metaclass=ABCMeta):
 class ResourceDict(Dictionary):
@@ -33,15 +33,11 @@ class ResourceDict(Dictionary):
     def __init__(self, path=None, resource="names",
                  language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"]):
+                 corpus=config["corpus"], freq=False):
         """ Initializing the vocab lookup class.
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored
-                spellings of multi-word expressions their dashed and spaced
-                versions should also be produced (e.g. 'good night',
-                'good_night', "good-night")
             path (str): if str, interpreted as the full direct path to
                 the resource to be used (one-column vocab text file expected).
                 Otherwise LDT will look for the file in the
@@ -50,11 +46,14 @@ class ResourceDict(Dictionary):
             resource (str): the resource to initialize (if path is a
                 dictionary), as indicated in the config file. For example,
                 "names", "numbers", "associations".
+            freq (bool): for cooccurrence dictionaries, True if integer
+                frequencies should be returned (otherwise booleans are
+                returned). Has no effect on anything else.
         """
 
         super(ResourceDict, self).__init__()
         if len(language) > 2:
-            language = lookup_language(language, reverse=True)
+            language = lookup_language_by_code(language, reverse=True)
         #: the language of the resource
         self.language = language
 
@@ -63,38 +62,86 @@ class ResourceDict(Dictionary):
 
         if not path:
 
-            if resource in ["names", "numbers", "associations"]:
+            if resource in ["names", "numbers", "associations", "gdeps"]:
                 resource_type = "language_resources"
-            elif resource in ["freqdict", "vocabulary", "co-occurrence_data"]:
+                subfolder = self.language
+            elif resource in ["freqdict", "vocabulary", "cooccurrence"]:
                 resource_type = "corpus_resources"
+                subfolder = corpus
 
-            # if not self.language in path["resources"][resource_type]:
-            #     raise DictError("No resources for this language were found, "
-            #                     "check your configuration file.")
             path_to_dict = os.path.join(config["path_to_resources"],
-                                        resource_type, self.language,
-                                        config[resource_type][self.language][
+                                        resource_type, subfolder,
+                                        config[resource_type][subfolder][
                                             resource])
 
             #: the path from which the resource is loaded
             self.path = path_to_dict
 
         try:
-            data = load_resource(self.path, format="infer",
-                                 lowercasing=lowercasing, silent=True)
+            if resource != "cooccurrence":
+                data = load_resource(self.path, format="infer",
+                                     lowercasing=lowercasing, silent=True)
+            else:
+                if freq:
+                    data = load_resource(self.path, format="json_freqdict",
+                                         lowercasing=lowercasing, silent=True)
+                else:
+                    data = load_resource(self.path, format="json",
+                                         lowercasing=lowercasing, silent=True)
             self.data = data
         except FileNotFoundError:
             print("No resource was found, please check the file path "
                   ""+self.path)
 
-
-
-#todo lowercasing and splitting mwus for the whole resource
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def is_a_word(self, word):
         if word in self.data:
             return True
         return False
+
+    @functools.lru_cache(maxsize=config["cache_size"])
+    def are_related(self, word1, word2, freq=False):
+        """Determining if two words are related: a helper method for
+        resources with lists of related words per word entry.
+
+        Note:
+
+            The relations are assumed to be bidirectional. That does not
+            really apply to associations, but in the ldt use case (evaluation
+            of
+            target:neighbor word pairs) it is hard to justify that only one
+            direction should be taken into account, and if so, than what
+            direction it should be.
+
+        Args:
+            word1, word2 (str): the words to check
+            freq (bool): True if the entries are frequency dictionaries
+                (currently it's only the case for corpus cooccurrences)
+
+        Returns:
+            (bool, int): True if the words are found to be related,
+                or cooccurrence frequency in case of cooccurrence dictionary
+                resource
+
+        """
+
+        if freq:
+            if word1 in self.data:
+                if word2 in self.data[word1]:
+                    return self.data[word1][word2]
+            if word2 in self.data:
+                if word1 in self.data[word2]:
+                    return self.data[word2][word1]
+            return 0
+        else:
+            if word1 in self.data:
+                if word2 in self.data[word1]:
+                    return True
+            if word2 in self.data:
+                if word1 in self.data[word2]:
+                    return True
+            return False
+
 
 
 class NameDictionary(ResourceDict):
@@ -102,15 +149,11 @@ class NameDictionary(ResourceDict):
 
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"], path=None, resource="names"):
+                 path=None, resource="names"):
         """ Initializing the names lookup class.
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored
-                spellings of multi-word expressions their dashed and spaced
-                versions should also be produced (e.g. 'good night',
-                'good_night', "good-night")
             path (str, dict): if str, interpreted as the full direct path to
                 the resource to be used (one-column vocab text file expected).
                 Otherwise LDT will look for the file in the
@@ -119,24 +162,21 @@ class NameDictionary(ResourceDict):
         """
         super(NameDictionary, self).__init__(language=language,
                                              lowercasing=lowercasing,
-                                             split_mwu=split_mwu, path=path,
-                                             resource=resource)
+                                             path=path, resource=resource)
+
+    def are_related(self, word1, word2):
+        pass
 
 class NumberDictionary(ResourceDict):
     """A class for language-specific name resources."""
 
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"], path=None,
                  resource="numbers"):
         """ Initializing the numbers lookup class.
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored
-                spellings of multi-word expressions their dashed and spaced
-                versions should also be produced (e.g. 'good night',
-                'good_night', "good-night")
             path (str, dict): if str, interpreted as the full direct path to
                 the resource to be used (one-column vocab text file expected).
                 Otherwise LDT will look for the file in the
@@ -145,10 +185,9 @@ class NumberDictionary(ResourceDict):
         """
         super(NumberDictionary, self).__init__(language=language,
                                              lowercasing=lowercasing,
-                                             split_mwu=split_mwu, path=None,
-                                             resource=resource)
+                                             path=None, resource=resource)
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def is_a_word(self, word):
         """Returns True if the word is an ordinal or cardinal numeral,
         or if if contains an Arabic number.
@@ -173,21 +212,19 @@ class NumberDictionary(ResourceDict):
                 return True
         return False
 
+    def are_related(self, word1, word2):
+        pass
+
 class AssociationDictionary(ResourceDict):
     """A class for language-specific name resources."""
 
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"], path=None,
-                 resource="associations"):
+                 path=None, resource="associations"):
         """ Initializing the associations lookup class.
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored
-                spellings of multi-word expressions their dashed and spaced
-                versions should also be produced (e.g. 'good night',
-                'good_night', "good-night")
             path (str, dict): if str, interpreted as the full direct path to
                 the resource to be used (one-column vocab text file expected).
                 Otherwise LDT will look for the file in the
@@ -196,9 +233,7 @@ class AssociationDictionary(ResourceDict):
         """
         super(AssociationDictionary, self).__init__(language=language,
                                              lowercasing=lowercasing,
-                                             split_mwu=split_mwu, path=path,
-                                             resource=resource)
-
+                                             path=path, resource=resource)
 
 class WebDictionary(ResourceDict):
 
@@ -207,7 +242,7 @@ class WebDictionary(ResourceDict):
 
     def __init__(self, language="en",
                  lowercasing=False,
-                 split_mwu=False, path="helpers/generic_files/web_domains.vocab",
+                path="helpers/generic_files/web_domains.vocab",
                  resource="domain"):
         """ Initializing the class for detecting URLs.
 
@@ -219,10 +254,6 @@ class WebDictionary(ResourceDict):
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored
-                spellings of multi-word expressions their dashed and spaced
-                versions should also be produced (e.g. 'good night',
-                'good_night', "good-night")
             path (str, dict): if str, interpreted as the full direct path to
                 the resource to be used (one-column vocab text file expected).
                 Otherwise LDT will look for the file in the
@@ -233,7 +264,6 @@ class WebDictionary(ResourceDict):
         full_path=os.path.join(dir_path, path)
         super(WebDictionary, self).__init__(language=language,
                                             lowercasing=lowercasing,
-                                            split_mwu=split_mwu,
                                             path=full_path,
                                             resource=resource)
 
@@ -251,6 +281,8 @@ class WebDictionary(ResourceDict):
                 elif domain + "/" in word:
                     return True
 
+    def are_related(self, word1, word2):
+        pass
 
 class FileDictionary(ResourceDict):
 
@@ -258,7 +290,6 @@ class FileDictionary(ResourceDict):
 
     def __init__(self, language="en",
                  lowercasing=False,
-                 split_mwu=False,
                  path="helpers/generic_files/file_extensions.vocab",
                  resource="file"):
         """ Initializing the class for detecting URLs.
@@ -274,10 +305,6 @@ class FileDictionary(ResourceDict):
 
         Args:
             lowercasing (bool): *True* if all data should be lowercased
-            split_mwu (bool): *True* if in addition to underscored
-                spellings of multi-word expressions their dashed and spaced
-                versions should also be produced (e.g. 'good night',
-                'good_night', "good-night")
             path (str, dict): if str, interpreted as the full direct path to
                 the resource to be used (one-column vocab text file expected).
                 Otherwise LDT will look for the file in the
@@ -288,11 +315,17 @@ class FileDictionary(ResourceDict):
         full_path=os.path.join(dir_path, path)
         super(FileDictionary, self).__init__(language=language,
                                             lowercasing=lowercasing,
-                                            split_mwu=split_mwu,
                                             path=full_path,
                                             resource=resource)
 
     def is_a_word(self, word):
+
+        if word.count("/") > 2:
+            return True
+        elif word.count("\\") > 2:
+            if not "\n" in word and not "\t" in word:
+                return True
+
         if not "." in word:
             return False
         else:
@@ -300,6 +333,9 @@ class FileDictionary(ResourceDict):
             if "."+extension in self.data:
                     return True
         return False
+
+    def are_related(self, word1, word2):
+        pass
 
 # if __name__=="__main__":
 #     d={"A":["a"], "B":["B"], }

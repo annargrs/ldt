@@ -30,12 +30,12 @@ import functools
 
 from ldt.helpers.exceptions import AuthorizationError
 
-from ldt.dicts.dictionary import Dictionary as Dictionary
+from ldt.dicts.dictionary import Dictionary
 from ldt.dicts.morphology.wiktionary import MorphWiktionary
 from ldt.dicts.morphology.wordnet.en import MorphWordNet
 from ldt.dicts.morphology.babelnet import MorphBabelNet
 from ldt.dicts.morphology.custom.en import MorphCustomDict
-from ldt.load_config import config as config
+from ldt.load_config import config
 
 class MorphMetaDict(Dictionary):
     """Class implementing a collection of dictionaries which are queried in
@@ -58,7 +58,7 @@ class MorphMetaDict(Dictionary):
                  language=config["default_language"],
                  lowercasing=config["lowercasing"],
                  cache=config["wiktionary_cache"],
-                 babelnet_key=config["babelnet_key"]):
+                 babelnet_key=config["babelnet_key"], custom_base="wiktionary"):
 
         super(MorphMetaDict, self).__init__(language=language,
                                             lowercasing=lowercasing)
@@ -89,12 +89,12 @@ class MorphMetaDict(Dictionary):
                 self._dicts[dictionary] = self.wordnet
                 self._order.append(dictionary)
 
-            if dictionary == "custom" and language.lower() in ["en", "english"]:
-                self.custom = MorphCustomDict(dictionary=None)
-                self._dicts[dictionary] = self.custom
-                self._order.append(dictionary)
+        if language.lower() in ["en", "english"] and custom_base in self._dicts:
+            self.custom = MorphCustomDict(dictionary=self._dicts[custom_base])
+            self._dicts[dictionary] = self.custom
+            self._order.append(dictionary)
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def is_a_word(self, word, minimal=True):
         """ Returning the name of the resource containing an entry for the
         queried word (the first in the pre-defined order).
@@ -126,7 +126,7 @@ class MorphMetaDict(Dictionary):
             return res
         return None
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def get_pos(self, word, minimal=True):
         """Getting the possible POSes for the word.
 
@@ -158,10 +158,10 @@ class MorphMetaDict(Dictionary):
             else:
                 res = self._dicts[dicts[0]].get_pos(word, formatting="list")
         if res:
-            return res
+            return list(set(res))
         return None
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def lemmatize(self, word):
         """Returns a list of lemmas of the target word.
 
@@ -172,13 +172,13 @@ class MorphMetaDict(Dictionary):
             (list): lemmas of the word
         """
         res = []
-        dicts = self.is_a_word(word, minimal=True)
-        if dicts:
-            for dictionary in dicts:
-                try:
-                    res += self._dicts[dictionary].lemmatize(word)
-                except NotImplementedError:
-                    pass
-        if res:
-            return res
+
+        if "wordnet" in self._dicts:
+            wordnet = self._dicts["wordnet"].lemmatize(word)
+            if wordnet:
+                return wordnet
+        if hasattr(self, "custom"):
+            res = self.custom.lemmatize(word)
+            if res:
+                return res
         return None

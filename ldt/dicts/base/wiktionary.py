@@ -17,21 +17,12 @@
 
 import functools
 
-# from nltk.tokenize import word_tokenize
 from wiktionaryparser import WiktionaryParser
 
-from ldt.helpers.resources import lookup_language as lookup_language
-from ldt.helpers.wiktionary_cache import load_wiktionary_cache as \
-    load_wiktionary_cache
-from ldt.dicts.dictionary import Dictionary as Dictionary
-# from ldt.helpers.formatting import remove_text_inside_brackets as \
-#     remove_text_inside_brackets
-# from ldt.helpers.formatting import strip_non_alphabetical_characters as \
-#     strip_non_alphabetical_characters
-# from ldt.config import lowercasing as config_lowercasing
-# from ldt.config import language as config_language
-# from ldt.config import split_mwu as config_split_mwu
-from ldt.load_config import config as config
+from ldt.helpers.resources import lookup_language_by_code
+from ldt.helpers.wiktionary_cache import load_wiktionary_cache
+from ldt.dicts.dictionary import Dictionary
+from ldt.load_config import config
 
 
 class BaseWiktionary(Dictionary):
@@ -58,8 +49,7 @@ class BaseWiktionary(Dictionary):
     """
     # pylint: disable=unused-argument
     def __init__(self, cache=config["wiktionary_cache"], language=config[
-        "default_language"], lowercasing=config["lowercasing"],
-                 split_mwu=config["split_mwu"]):
+        "default_language"], lowercasing=config["lowercasing"]):
         """ Initializing the Wiktionary class.
 
         Unlike the basic Dictionary class, Wiktionary checks the language
@@ -72,11 +62,10 @@ class BaseWiktionary(Dictionary):
 
         """
         super(BaseWiktionary, self).__init__(language=language,
-                                             lowercasing=lowercasing,
-                                             split_mwu=split_mwu)
+                                             lowercasing=lowercasing)
         self.language = language
         if len(self.language) > 2:
-            self.language = lookup_language(self.language, reverse=True)
+            self.language = lookup_language_code(self.language, reverse=True)
         # self._language = language
         if not cache:
             self.cache = None
@@ -90,7 +79,7 @@ class BaseWiktionary(Dictionary):
     def _set_language(self, language):
         """This method ensures the language arg is a 2-letter code."""
         if len(language) > 2:
-            language = lookup_language(language, reverse=True)
+            language = lookup_language_by_code(language, reverse=True)
         self._language = language
 
     def load_cache(self):
@@ -126,7 +115,7 @@ class BaseWiktionary(Dictionary):
                 return True
             return False
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=config["cache_size"])
     def query(self, word):
         """A method to retrieve Wiktionary data online.
 
@@ -145,7 +134,7 @@ class BaseWiktionary(Dictionary):
         """
 
         #convert from language code to canonical name for Wiktionary parser
-        language = lookup_language(self._language)
+        language = lookup_language_by_code(self._language)
 
         #set language
         parser = WiktionaryParser()
