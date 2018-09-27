@@ -142,6 +142,7 @@ See the `Tutorial and API documentation <https://ldt.readthedocs.io/>`_ for more
 Quick links
 -----------
 
+ * `Installation instructions <https://ldt.readthedocs.io/Tutorial/installation.html>`_
  * `Project website <ldtoolkit.space>`_
  * `Tutorial <https://ldt.readthedocs.io/Tutorial/index.html>`_
  * `API reference <https://ldt.readthedocs.io/genindex.html>`_.

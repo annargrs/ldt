@@ -4,7 +4,7 @@ assembling all the information from all the ldt resources.
 
 Example:
 
-    >>> word = ldt.relations.word.Word("government")
+    >>> word = ldt.relations.word.Word("fishy")
     >>> word.pp_info()
     ======MORPHOLOGICAL INFO======
     POS :  ['adjective']
@@ -45,6 +45,7 @@ Example:
     Filenames :  False
     ForeignWords :  False
     Misspellings :  False
+
 
 Todo:
 
@@ -213,11 +214,12 @@ class Word(object):
 
             if res:
                 for rel in res:
-                    if rel.capitalize() in main_rels:
-                        if not rel.capitalize() in self.info:
-                            self.info[rel.capitalize()] = res[rel]
+                    rel_cap = rel.capitalize()
+                    if rel_cap in main_rels:
+                        if not rel_cap in self.info:
+                            self.info[rel_cap] = res[rel]
                         else:
-                            self.info[rel.capitalize()] += res[rel]
+                            self.info[rel_cap] += res[rel]
                     else:
                         if not "OtherRelations" in self.info:
                             self.info["OtherRelations"] = res[rel]
@@ -260,3 +262,6 @@ class Word(object):
             print_rel(i, self.info)
         print("\n")
 
+# if __name__ == '__main__':
+#     cat = Word("cat")
+#     cat.pp_info()

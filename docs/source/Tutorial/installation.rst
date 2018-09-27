@@ -4,9 +4,11 @@
 Installing Linguistic Diagnostics Toolkit
 =========================================
 
-You need Python 3.5 or above. LDT will soon be available in PyPi; for now just clone or download the GitHub repo.
+You need Python 3.5 or above. The latest stable version of LDT is now available in PyPi:
 
-Package requirements:
+>>> pip install ldt
+
+Package requirements (will be installed automatically by pip):
 
 * `nltk <http://www.nltk.org/install.html>`_
 * `pyenchant <https://github.com/rfk/pyenchant>`_
@@ -18,7 +20,13 @@ Package requirements:
 * `timeout-decorator <https://pypi.org/project/timeout-decorator/>`_
 * `inflect <https://pypi.org/project/inflect/>`_
 
-NLTK has many resources, of which three are used by LDT: wordnet, stopwords, lemmatizer.
+To run LDT will expect to find an ``.ldt-config.yaml`` configuration file in the user home folder, as described in the section :ref:`Configuration file`.
+
+--------------
+NLTK resources
+--------------
+
+NLTK has many resources, of which three are used by LDT: ``wordnet``, ``stopwords``, ``lemmatizer``.
 You can install them individually from within Python shell:
 
 .. code-block:: python
@@ -32,6 +40,9 @@ or from command line:
 
    python -m nltk.downloader wordnet
 
+------------
+Spellchecker
+------------
 
 For spellchecker engines, LDT currently relies on the `pyenchant <https://github.com/rfk/pyenchant>`_ library, which
 provides an interface to the system spellcheckers such aspell, hunspell etc. Aspell worked the best in our tests,

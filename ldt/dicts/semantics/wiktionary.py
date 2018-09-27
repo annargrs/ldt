@@ -171,7 +171,7 @@ class Wiktionary(BaseWiktionary, LexicographicDictionary):
 #     return res
 
 
-def dig_deeper(entry, field, res):
+def dig_deeper(entry, field, res, depth=10):
     """A helper function for :func:`get_wiktionary_field_strings`.
     It recursively locates the target field.
 
@@ -179,26 +179,33 @@ def dig_deeper(entry, field, res):
         entry (dict or list): the entity to investigate
         field (str): the field to look up
         res (list): the list of found entities to update
+        depth (integer): maximum recursion depth (otherwise this does blow up
+            memory for some entries like "cat")
 
     Returns:
         (list): the updated list of found entities
     """
-    if isinstance(entry, dict):
-        for key, val in entry.items():
-            if field == key:
-                if entry[key]:
-                    # if isinstance(entry[key], str):
-                    res.append(entry[key])
-                    return res
+    if depth > 0:
+        if isinstance(entry, dict):
+            for key, val in entry.items():
+                if field == key:
+                    if entry[key]:
+                        # if isinstance(entry[key], str):
+                        res.append(entry[key])
+                        return res
 
-            elif isinstance(val, list):
-                for i in val:
-                    res = dig_deeper(val, field, res)
+                elif isinstance(val, list):
+                    for i in val:
+                        depth -= 1
+                        res = dig_deeper(val, field, res, depth)
 
-    elif isinstance(entry, list):
-        for i in entry:
-            res = dig_deeper(i, field, res)
-    return res
+        elif isinstance(entry, list):
+            for i in entry:
+                depth -= 1
+                res = dig_deeper(i, field, res, depth)
+        return res
+    else:
+        return res
 
 def get_wiktionary_field_strings(word, field):
     """A helper function for locating string-only fields
@@ -269,6 +276,6 @@ def _get_relations_full(word):
             rel_dict[i[0]] += i[1]
     return rel_dict
 
-if __name__ == '__main__':
-    d = Wiktionary()
-    print(d.get_relations("close"))
+# if __name__ == '__main__':
+#     d = Wiktionary()
+#     print(d.get_relations("cat"))

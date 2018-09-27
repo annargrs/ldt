@@ -15,3 +15,5 @@ v 0.2.0, 2018-09-24.
 * detection of antonymy with language-specific derivational patterns;
 * bug fixes.
 
+v 0.2.1, 2018-09-25.
+* bug fixes.

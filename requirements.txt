@@ -1,5 +1,5 @@
-ruamel.yaml
 pyenchant
+ruamel.yaml
 wiktionaryparser==0.0.7
 hurry.filesize
 timeout-decorator
