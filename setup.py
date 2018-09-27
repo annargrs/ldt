@@ -9,6 +9,8 @@ import ldt
 
 here = os.path.abspath(os.path.dirname(__file__))
 
+packages = find_packages(here, exclude=["*.tests", "*.tests.*", "tests.*", "tests"])
+
 def read(*filenames, **kwargs):
     encoding = kwargs.get('encoding', 'utf-8')
     sep = kwargs.get('sep', '\n')
@@ -39,35 +41,30 @@ setup(
     license='Apache Software License',
     author='Anna Rogers',
     tests_require=['pytest'],
-    install_requires=["ruamel.yaml", "wiktionaryparser",
+    install_requires=["ruamel.yaml", "wiktionaryparser==0.0.7",
                       "hurry.filesize", "timeout-decorator", "inflect",
-                      "nltk", "vecto", "pandas"],
+                      "nltk", "vecto", "pandas", "pyenchant"],
     cmdclass={'test': PyTest},
     author_email='anna_rogers@uml.edu',
     description='Linguistic diagnostics for word embeddings',
     long_description=long_description,
-    packages=['ldt'],
+    packages=packages,
     package_dir={"ldt":"ldt"},
     include_package_data=True,
     package_data={'ldt': ['test/sample_files/ldt-config.yaml']},
-    # package_data={'': ['*.yaml', '*.txt', '*.py', '*.vocab', '*.tsv',
-    #                    '*.json', '*.frqdict']},
     entry_points={},
     zip_safe=False,
     platforms='any',
     test_suite='ldt.test.test_ldt',
     classifiers = [
         'Programming Language :: Python',
-        'Development Status :: 1 - Alpha',
         'Natural Language :: English',
-        'Environment :: Web Environment',
-        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
-        'Topic :: Software Development :: Libraries :: Python Modules',
-        "Topic :: Text Processing :: Linguistic",
+        "Topic :: Text Processing :: Linguistic"
         ],
-    extras_require={
+    extras_require = {
         'testing': ['pytest'],
     }
 )

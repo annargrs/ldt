@@ -1,2 +1,6 @@
 include README.rst LICENSE
 recursive-include ldt/tests/sample_files *
+include ldt/dicts/derivation/custom/en/en.yaml
+include ldt/dicts/morphology/wordnet/en.vocab
+recursive-include ldt/helpers/generic_files *
+include ldt/relations/antonymy_by_derivation/en.yaml
