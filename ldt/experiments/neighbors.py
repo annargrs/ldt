@@ -34,7 +34,7 @@ from ldt import load_resource
 from ldt.load_config import config
 
 
-def detect_varying_parameters:
+def detect_varying_parameters():
     """Detecting what parameters vary in the input vecto embedding
     metadata"""
     pass
