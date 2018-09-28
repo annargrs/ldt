@@ -19,3 +19,4 @@ from ldt import dicts
 from ldt import relations
 from ldt.relations import Word
 
+from ldt import experiments

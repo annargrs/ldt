@@ -49,8 +49,10 @@ def load_config(path=CONFIGPATH):
 
     if "unittest" in sys.modules:
         options["path_to_resources"] = TESTFILE.strip(".ldt-config.yaml")
-    options["path_to_cache"] = os.path.join(options["path_to_resources"],
-                                            "cache")
+        options["experiments"]["embeddings"] = \
+            [os.path.join(options["path_to_resources"], "sample_embeddings")]
+    options["path_to_cache"] = \
+        os.path.join(options["path_to_resources"], "cache")
     options["wiktionary_cache"] = False
     if options["cache_size"] == "None":
         options["cache_size"] = None

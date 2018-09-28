@@ -41,3 +41,16 @@ corpus_resources:
     freqdict: Wiki201308.freqdict
     vocabulary: Wiki201308.vocab
     cooccurrence: 3grams.json
+
+experiments:
+
+  # the vocabulary sample to be tested ("single-column list of words with .vocab extension")
+  vocab_sample: test_sample.vocab
+
+  #embeddings will be loaded with vecto library from the specified directory:
+  embeddings: [
+  /path/to/embeddings/dir,
+  /path/to/embeddings/dir2
+  ]
+
+

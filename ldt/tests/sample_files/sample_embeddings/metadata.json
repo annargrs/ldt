@@ -1,0 +1,12 @@
+{
+"class": "embeddings",
+    "model": "sample_embeddings_glove",
+    "window": 2,
+    "dimensionality": 25,
+    "context": "linear_unbound",
+    "epochs": 2,
+	"cite": "",
+	"vocabulary": {},
+	"lib_version": "",
+	"system_info": ""
+}
