@@ -23,6 +23,8 @@ LDT is a shiny new Python library for doing two things:
 
 If you have never heard about word embeddings -- you're missing out, here's `an introduction <https://www.shanelynn.ie/get-busy-with-word-embeddings-introduction/>`_.  If you have, head  over to the `project website <ldtoolkit.space>`_ for some new research results. And if you don't care about word embeddings, you can still just use LDT as a supplement to NLTK, SpaCy, and other great NLP tools.
 
+**Note:** LDT is in active development; all the dictionary functionality is already available. Scripts for running experiments and integration with `vecto library <vecto.space>`_ are coming in the nearest weeks. Make sure you update your installation often!
+
 ----------------------
 Current functionality
 ----------------------
