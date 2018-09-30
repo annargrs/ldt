@@ -13,6 +13,12 @@ class Tests(unittest.TestCase):
     The tests in this block inspect generating vector neighborhood data.
     """
 
+    @classmethod
+    def tearDownClass(cls):
+        """Clearning up the test variables."""
+        dir = os.path.join(config["path_to_resources"], "experiments/neighbors/testing")
+        shutil.rmtree(dir)
+
     def test_metadata(self):
         res = ldt.experiments.generate_experiment_metadata(
             experiment_name="test", task="testing")
@@ -36,10 +42,6 @@ class Tests(unittest.TestCase):
                     print(data)
                     res = 'hurricane\t1\tstorm\t0.9598022699356079\n' in data
                     self.assertTrue(res)
-
-    def test_cleanup(self):
-        dir = os.path.join(config["path_to_resources"], "experiments/neighbors/testing")
-        shutil.rmtree(dir)
 
 if __name__ == '__main__':
     unittest.main()
