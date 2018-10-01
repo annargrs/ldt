@@ -30,53 +30,9 @@ from vecto.utils.data import save_json
 from ldt import load_resource
 from ldt import __version__
 from ldt.load_config import config
-
-def generate_identifiable_filenames():
-    pass
+from ldt.experiments.metadata import Metadata
 
 
-def generate_experiment_metadata(experiment_name, task):
-    """Generating experiment metadata consistent with Vecto library format.
-    See `Vecto docs <https://vecto.readthedocs.io/en/docs/tutorial/metadata
-    .html>`_ for more detail.
-
-    Args:
-        experiment_name: the human-readable name of the experiment (e.g.
-            "Profiling CBOW dims 25-500")
-        task: the type of experiment being performed (in LDT - generating or
-            annotating vector neighborhoods)
-
-    Returns:
-        (dict): dictionary with metadata fields
-
-    """
-    metadata = {}
-    metadata["timestamp"] = datetime.datetime.now().isoformat()
-    metadata["class"] = "experiment"
-    metadata["name"] = experiment_name
-    metadata["task"] = task
-    metadata["version"] = __version__
-    metadata["cite"] = \
-        [{"contribution": "LDT library",
-          "bibtex": {
-              "type": "inproceedings",
-              "id": "RogersAnanthakrishnaEtAl_2018",
-              "author": [{"name": "Anna Rogers"},
-                         {"name": "Shashwath Hosur Ananthakrishna"},
-                         {"name": "Anna Rumshisky"}],
-              "title": "What's in Your Embedding, And How It Predicts Task "
-                       "Performance",
-              "url": "http://aclweb.org/anthology/C18-1228",
-              "address": "Santa Fe, New Mexico, USA, August 20-26, 2018",
-              "publisher": "ACL",
-              "booktitle": "Proceedings of the 27th International "
-                           "Conference on Computational Linguistics",
-              "year": 2018,
-              "pages": "2690–2703"
-              }
-         }
-        ]
-    return metadata
 
 def get_neighbors(top_n=100,
                   embeddings_paths=config["experiments"]["embeddings"],
@@ -110,13 +66,14 @@ def get_neighbors(top_n=100,
         experiment_name = datetime.datetime.now().isoformat()
 
     # experiment metadata
-    metadata = generate_experiment_metadata(
+    metadata = Metadata(
         experiment_name="LDT (neighbor extraction): " +experiment_name,
-        task="Retrieving vector neighborhoods")
+        task="get_neighbors")
 
     out_path = os.path.join(config["path_to_resources"],
-                            "experiments/neighbors")
+                            "experiments/neighbors/")
     out_path = os.path.join(out_path, experiment_name)
+
     if not os.path.isdir(out_path):
         os.mkdir(out_path)
 
@@ -158,5 +115,5 @@ def get_neighbors(top_n=100,
                        index=False,
                        sep="\t")
             embeddings = None
-    save_json(metadata, os.path.join(out_path, "metadata.json"))
+    save_json(metadata._metadata, os.path.join(out_path, "metadata.json"))
 

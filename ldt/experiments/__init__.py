@@ -1,1 +1,2 @@
-from .neighbors import get_neighbors, generate_experiment_metadata
+from .neighbors import get_neighbors
+from .metadata import Metadata, Experiment
