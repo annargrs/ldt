@@ -44,8 +44,16 @@ corpus_resources:
 
 experiments:
 
-  # the vocabulary sample to be tested ("single-column list of words with .vocab extension")
-  vocab_sample: test_sample.vocab
+  # the vocabulary dataset to be tested, expected to be a single-column list of words
+  # with .vocab extension. # Provide the full path to the .vocab file here, e.g.
+
+  # vocab_sample: /path/to/test_sample.vocab
+
+  # Alternatively, if you want to make use of vecto-style metadata, provide the name of
+  # the your_dataset subfolder of vocab_samples subfolder in the general ldt resource location.
+  # with one metadata.json file per subfolder.
+
+  vocab_sample: test_sample
 
   #embeddings will be loaded with vecto library from the specified directory:
   embeddings: [

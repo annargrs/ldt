@@ -1,0 +1,7 @@
+{
+"class": "dataset",
+    "task": "vector neighborhood generation",
+    "language": ["english"],
+    "name": "tiny sample dataset",
+    "uuid": "f50ec0b7-f960-400d-91f0-c42a6d44e3d1"
+}
