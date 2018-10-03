@@ -78,7 +78,7 @@ class VectorNeighborhoods(Experiment):
         super(VectorNeighborhoods, self).__init__(
             experiment_name=experiment_name, extra_metadata=extra_metadata, \
             overwrite=overwrite, embeddings=embeddings, output_dir=output_dir,
-            dataset=dataset)
+            dataset=dataset, experiment_subfolder="neighbors")
 
         print(
             "\n\nIf your embeddings are not normalized, retrieving neighbors "
@@ -95,12 +95,12 @@ class VectorNeighborhoods(Experiment):
         # dataset = load_resource(dataset, format="vocab")
         # self.dataset = dataset
 
-        self.output_dir = os.path.join(config["path_to_resources"],
-                                       "experiments", "neighbors",
-                                       experiment_name)
-
-        if not os.path.isdir(self.output_dir):
-            os.mkdir(self.output_dir)
+        # self.output_dir = os.path.join(config["path_to_resources"],
+        #                                "experiments", "neighbors",
+        #                                experiment_name)
+        #
+        # if not os.path.isdir(self.output_dir):
+        #     os.mkdir(self.output_dir)
         self._normalize = normalize
         self._top_n = top_n
 

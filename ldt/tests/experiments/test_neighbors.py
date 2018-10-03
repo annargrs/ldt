@@ -77,12 +77,6 @@ class Tests(unittest.TestCase):
             metadata = json.load(f)
         self.assertTrue("uuid" in metadata and len(metadata["uuid"]) == 36)
 
-    #
-    # def test_dir(self):
-    #     res = ldt.experiments.get_neighbors(top_n=5, experiment_name="testing")
-    #     dir = os.path.join(config["path_to_resources"], "experiments/neighbors/testing")
-    #     self.assertTrue(os.path.isdir(dir))
-    #
     def test_neighbor_extraction(self):
         dir = os.path.join(config["path_to_resources"], "experiments",
                            "neighbors", "testing")
@@ -95,8 +89,8 @@ class Tests(unittest.TestCase):
                     data = sample_neighbor_file.readlines()
                     res = 'hurricane\t1\tstorm\t0.9598022699356079\n' in data
                     self.assertTrue(res)
-
-#test that timestamp for each processed file is saved
+#
+# #test that timestamp for each processed file is saved
 
 if __name__ == '__main__':
     unittest.main()

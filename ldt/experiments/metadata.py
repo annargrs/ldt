@@ -35,7 +35,7 @@ class Experiment(metaclass=abc.ABCMeta):
     # pylint: disable = too-many-arguments
     def __init__(self, experiment_name=None, extra_metadata=None,
                  embeddings=None, dataset=None, output_dir=None,
-                 overwrite=False):
+                 overwrite=False, experiment_subfolder=None):
         """ Initializing an Experiment.
 
         Args:
@@ -53,13 +53,16 @@ class Experiment(metaclass=abc.ABCMeta):
             overwrite (bool): if True, any previous data for the same
                 experiment will be overwritten, and the experiment will be
                 re-started.
+            experiment_subfolder (str): if provided, the experiment results
+                will be saved to this subfolder of the "experiments" folder
         """
 
         if not isinstance(experiment_name, str):
             raise ValueError("Please specify experiment_name argument: a short "
                              "description of the experiment you're conducting.")
 
-        self.output_dir = check_output(output_dir, experiment_name)
+        self.output_dir = check_output(output_dir, experiment_subfolder,
+                                       experiment_name)
 
         self.embeddings = check_input(input_data=embeddings)
 
@@ -182,8 +185,8 @@ def check_input(input_data):
     #         return new_data
     return input_data
 
-def check_output(output_dir, experiment_name):
-    """Helper function that makes sure that all ioutput paths are valid."""
+def check_output(output_dir, experiment_subfolder, experiment_name):
+    """Helper function that makes sure that all output paths are valid."""
     if not isinstance(output_dir, str) or not os.path.isdir(output_dir):
         raise ValueError("Please specify output_dir argument: the "
                          "existing path where the output data for "
@@ -191,9 +194,17 @@ def check_output(output_dir, experiment_name):
     else:
         if " " in experiment_name:
             experiment_name = experiment_name.replace(" ", "_")
-        full_path = os.path.join(output_dir, experiment_name)
-        if not os.path.isdir(full_path):
-            os.mkdir(full_path)
+        if experiment_subfolder:
+            full_path = os.path.join(output_dir, experiment_subfolder)
+            if not os.path.isdir(full_path):
+                os.mkdir(full_path)
+            full_path = os.path.join(full_path, experiment_name)
+            if not os.path.isdir(full_path):
+                os.mkdir(full_path)
+        else:
+            full_path = os.path.join(output_dir, experiment_name)
+            if not os.path.isdir(full_path):
+                os.mkdir(full_path)
     return full_path
 
 
