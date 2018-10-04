@@ -21,14 +21,20 @@ class Tests(unittest.TestCase):
         cls.experiment = ldt.experiments.VectorNeighborhoods(
             experiment_name="testing", overwrite=True, top_n=5)
         cls.experiment.get_results()
+        cls.annotation = ldt.experiments.AnnotateVectorNeighborhoods(
+                experiment_name="testing", overwrite=True)
+        cls.annotation.get_results()
 
-    # @classmethod
-    # def tearDownClass(cls):
-    #     """Clearning up the test dir."""
-    #     cls.experiment = None
-    #     dir = os.path.join(config["path_to_resources"], "experiments",
-    #                        "neighbors", "testing")
-    #     shutil.rmtree(dir)
+    @classmethod
+    def tearDownClass(cls):
+        """Clearning up the test dir."""
+        cls.experiment = None
+        dir = os.path.join(config["path_to_resources"], "experiments",
+                           "neighbors", "testing")
+        shutil.rmtree(dir)
+
+######## tests for metadata and neighborhoods #############
+
 
     def test_dir(self):
         """Creation of subfolder per specific experiment"""
@@ -99,6 +105,14 @@ class Tests(unittest.TestCase):
         timestamp2 = os.path.getmtime(os.path.join(exp2.output_dir,
                                                   "sample_embeddings.tsv"))
         self.assertEqual(timestamp, timestamp2)
+
+########## annotation tests #############
+
+    def test_dir_annotation(self):
+        """Creation of subfolder per specific experiment"""
+        dir = os.path.join(config["path_to_resources"], "experiments",
+                           "neighbors_annotated", "testing")
+        self.assertTrue(os.path.isdir(dir))
 
 if __name__ == '__main__':
     unittest.main()
