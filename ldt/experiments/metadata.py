@@ -43,8 +43,11 @@ class Experiment(metaclass=abc.ABCMeta):
                 (e.g. "Profiling CBOW with window size 2-10")
             extra_metadata (dict): any extra fields to be added to the
                 experiment metadata (overwriting any previously existing fields)
-            embeddings (list of str): a list of paths to input
-                data (each containing a metadata.json file).
+            embeddings (list of str or None): a list of paths to input
+                data (each containing a metadata.json file). If set to None,
+                the config parameters will be ignored (for experiments where
+                embedding metadata has already been processed and can be just
+                copied over from the previous step.)
             output_dir (str): the *existing* path for saving the *subfolder*
                 named with the specified experiment_name, where the output data
                 and metadata.json file will be saved.
@@ -64,7 +67,8 @@ class Experiment(metaclass=abc.ABCMeta):
         self.output_dir = check_output(output_dir, experiment_subfolder,
                                        experiment_name)
 
-        self.embeddings = check_input(input_data=embeddings)
+        if embeddings:
+            self.embeddings = check_input(input_data=embeddings)
 
         self._overwrite = overwrite
         if self._overwrite:
@@ -74,15 +78,16 @@ class Experiment(metaclass=abc.ABCMeta):
             self._metadata["timestamp"] = {}
             self._metadata["version"] = "ldt v. "+__version__
             self._metadata["class"] = "experiment"
-            self._metadata["embeddings"] = []
-            for embedding in embeddings:
-                meta_path = os.path.join(embedding, "metadata.json")
-                if os.path.isfile(meta_path):
-                    embedding_metadata = load_json(meta_path)
-                    embedding_metadata["path"] = embedding
-                    self._metadata["embeddings"].append(embedding_metadata)
-                else:
-                    self._metadata["embeddings"].append(embedding)
+            if hasattr(self, "embeddings"):
+                self._metadata["embeddings"] = []
+                for embedding in embeddings:
+                    meta_path = os.path.join(embedding, "metadata.json")
+                    if os.path.isfile(meta_path):
+                        embedding_metadata = load_json(meta_path)
+                        embedding_metadata["path"] = embedding
+                        self._metadata["embeddings"].append(embedding_metadata)
+                    else:
+                        self._metadata["embeddings"].append(embedding)
 
             self._load_dataset(dataset=dataset)
 

@@ -22,13 +22,13 @@ class Tests(unittest.TestCase):
             experiment_name="testing", overwrite=True, top_n=5)
         cls.experiment.get_results()
 
-    @classmethod
-    def tearDownClass(cls):
-        """Clearning up the test dir."""
-        cls.experiment = None
-        dir = os.path.join(config["path_to_resources"], "experiments",
-                           "neighbors", "testing")
-        shutil.rmtree(dir)
+    # @classmethod
+    # def tearDownClass(cls):
+    #     """Clearning up the test dir."""
+    #     cls.experiment = None
+    #     dir = os.path.join(config["path_to_resources"], "experiments",
+    #                        "neighbors", "testing")
+    #     shutil.rmtree(dir)
 
     def test_dir(self):
         """Creation of subfolder per specific experiment"""
