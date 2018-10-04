@@ -133,7 +133,9 @@ class Experiment(metaclass=abc.ABCMeta):
         the timestamps of when each file was started and finished."""
         input_data = self.find_unprocessed_files()
         self.embeddings = input_data
+
         for i in self.embeddings:
+
             uuid = self._check_uuid_in_metadata(field="embeddings", path=i)
             if uuid:
                 self._metadata["timestamp"][uuid] = {}
@@ -176,20 +178,6 @@ def check_input(input_data):
         for i in input_data:
             if not os.path.exists(i):
                 raise ValueError("Path", i, "does not exist.")
-    #
-    # elif isinstance(input_data, str):
-    #     # if the input is a string, it must be an existing folder
-    #     if not os.path.isdir(input_data):
-    #         raise ValueError("Path", input_data, "does not exist.")
-    #     # converting the folder to a list of constituent paths
-    #     else:
-    #         filenames = os.listdir(input_data)
-    #         if "metadata.json" in filenames:
-    #             filenames = filenames.remove("metadata.json")
-    #         new_data = []
-    #         for i in enumerate(filenames):
-    #             new_data.append(os.path.join(input_data, i[1]))
-    #         return new_data
     return input_data
 
 def check_output(output_dir, experiment_subfolder, experiment_name):
@@ -221,6 +209,3 @@ def generate_identifiable_filenames():
     pass
 
 
-# fname = embedding.rsplit("/", maxsplit=1)[-1]
-# self._metadata["embeddings"][fname] = {}  # {"path": embedding}
-# meta_path = os.path.join(embedding, "metadata.json")

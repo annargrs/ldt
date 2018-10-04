@@ -21,7 +21,6 @@ def remove_text_inside_brackets(text, brackets="()[]"):
         (str): cleaned-up text
     '''
 
-
     count = [0] * (len(brackets) // 2)  # count open/close brackets
     saved_chars = []
     for character in text:

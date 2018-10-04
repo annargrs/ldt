@@ -86,6 +86,7 @@ class Wiktionary(BaseWiktionary, LexicographicDictionary):
             * Preserve colons in translations
 
         """
+        # print(word)
         if not relations:
             relations = self.supported_relations
         else:
@@ -106,22 +107,24 @@ class Wiktionary(BaseWiktionary, LexicographicDictionary):
                     wrd = wrd.strip()
                     wrd = wrd.strip(",")
                     wrd = wrd.split(",")
-                    for mwu in wrd:
-                        mwu = strip_non_alphabetical_characters(mwu,
-                                                                ignore=("-",
-                                                                        " "))
-                        # print(mwu)
-                        mwu = mwu.strip()
-                        for see in ["see", "see also", "See", "See also"]:
-                            if mwu.startswith(see):
-                                mwu = mwu.replace(see, "")
-                        if not " " in mwu:
-                            cleaned.append(mwu)
 
-                        else:
+                    for mwu in wrd:
+                        if mwu:
+                            # print(mwu)
+                            mwu = strip_non_alphabetical_characters(mwu,
+                                                                    ignore=("-",
+                                                                            " "))
                             mwu = mwu.strip()
-                            cleaned.append(mwu)
-                cleaned = list(set(cleaned))
+                            for see in ["see", "see also", "See", "See also"]:
+                                if mwu.startswith(see):
+                                    mwu = mwu.replace(see, "")
+                            if not " " in mwu:
+                                cleaned.append(mwu)
+
+                            else:
+                                mwu = mwu.strip()
+                                cleaned.append(mwu)
+                    cleaned = list(set(cleaned))
                 cleaned = sorted(cleaned)
                 dicts[i] = []
                 for wrd in cleaned:

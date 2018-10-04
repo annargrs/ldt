@@ -89,18 +89,6 @@ class VectorNeighborhoods(Experiment):
         self._metadata["uuid"] = str(uuid.uuid4())
         self._load_dataset(dataset=dataset)
 
-        # if isinstance(dataset, str):
-        #     dataset = os.path.join(config["path_to_resources"],
-        # "experiments", "vocab_samples", dataset)
-        # dataset = load_resource(dataset, format="vocab")
-        # self.dataset = dataset
-
-        # self.output_dir = os.path.join(config["path_to_resources"],
-        #                                "experiments", "neighbors",
-        #                                experiment_name)
-        #
-        # if not os.path.isdir(self.output_dir):
-        #     os.mkdir(self.output_dir)
         self._normalize = normalize
         self._top_n = top_n
 

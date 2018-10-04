@@ -19,19 +19,19 @@ class Tests(unittest.TestCase):
     def setUpClass(cls):
         """Setting up the test variables."""
         cls.experiment = ldt.experiments.VectorNeighborhoods(
-            experiment_name="testing", overwrite=True, top_n=5)
+            experiment_name="testing", overwrite=True, top_n=1)
         cls.experiment.get_results()
         cls.annotation = ldt.experiments.AnnotateVectorNeighborhoods(
                 experiment_name="testing", overwrite=True)
         cls.annotation.get_results()
 
-    @classmethod
-    def tearDownClass(cls):
-        """Clearning up the test dir."""
-        cls.experiment = None
-        dir = os.path.join(config["path_to_resources"], "experiments",
-                           "neighbors", "testing")
-        shutil.rmtree(dir)
+    # @classmethod
+    # def tearDownClass(cls):
+    #     """Clearning up the test dir."""
+    #     cls.experiment = None
+    #     dir = os.path.join(config["path_to_resources"], "experiments",
+    #                        "neighbors", "testing")
+    #     shutil.rmtree(dir)
 
 ######## tests for metadata and neighborhoods #############
 
@@ -113,6 +113,8 @@ class Tests(unittest.TestCase):
         dir = os.path.join(config["path_to_resources"], "experiments",
                            "neighbors_annotated", "testing")
         self.assertTrue(os.path.isdir(dir))
+
+
 
 if __name__ == '__main__':
     unittest.main()

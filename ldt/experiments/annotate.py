@@ -29,6 +29,10 @@ from vecto.utils.data import load_json
 
 from ldt.experiments.metadata import Experiment
 from ldt.load_config import config
+from ldt.dicts.normalize import Normalization
+from ldt.dicts.derivation.meta import DerivationAnalyzer
+from ldt.dicts.semantics.metadictionary import MetaDictionary
+from ldt.relations.pair import RelationsInPair
 
 class AnnotateVectorNeighborhoods(Experiment):
     """This class provides a simple interface for generating top_n vector
@@ -69,7 +73,51 @@ class AnnotateVectorNeighborhoods(Experiment):
             for embedding in self._metadata["embeddings"]:
                 self.embeddings.append(embedding["path"])
 
-        self._ld_scores = ld_scores
+        self.supported_vars = ["SharedPOS", "SharedMorphForm",
+                               "SharedDerivation", "NonCooccurring",
+                               "GDeps", "TargetFrequency",
+                               "NeighborFrequency", "Associations",
+                               "ShortestPath", "Synonyms", "Antonyms",
+                               "Meronyms", "Hyponyms", "Hypernyms",
+                               "OtherRelations", "Numbers", "ProperNouns",
+                               "Noise", "URLs", "Filenames",
+                               "ForeignWords", "Hashtags"]
+
+        self.continuous_vars = ['ShortestPath', 'TargetFrequency',
+                                'NeighborFrequency']
+
+        self.binary_vars = [x for x in self.supported_vars if not \
+            x in self.continuous_vars]
+
+        ld_scores_error = "The ld_scores argument is invalid. It should be " \
+                          "'all' for all supported relations, or a list with " \
+                          "one or more of the following values:\n" + \
+                          " ".join(self.supported_vars)
+
+        if ld_scores == "all":
+            self._ld_scores = self.supported_vars
+        else:
+            if isinstance(ld_scores, list):
+                unsupported = [x for x in ld_scores if not x in
+                                                           self.supported_vars]
+                if unsupported:
+                    raise ValueError(ld_scores_error)
+                else:
+                    self._ld_scores = [x for x in self.supported_vars if x
+                                       in ld_scores]
+            else:
+                raise ValueError(ld_scores_error)
+
+        # setting up ldt resources to be used
+        normalizer = Normalization(language="English",
+                                   order=("wordnet", "custom"),
+                                   lowercasing=True)
+        derivation = DerivationAnalyzer()
+        LexDict = MetaDictionary()
+
+        self.analyzer = RelationsInPair(normalizer=normalizer,
+                                        derivation_dict=derivation,
+                                        lex_dict=LexDict)
 
     def _load_dataset(self, dataset):
         """Dataset for generating vector neighborhoods was already processed in
@@ -78,4 +126,43 @@ class AnnotateVectorNeighborhoods(Experiment):
         pass
 
     def _process(self, embeddings_path):
-        pass
+        filename = get_fname_for_embedding(embeddings_path)
+        neighbor_file_path = os.path.join(self.output_dir.replace(
+                "neighbors_annotated", "neighbors"), filename)
+        df = pd.read_csv(neighbor_file_path, header=0, sep="\t")
+        dicts = df.to_dict(orient="records")
+        for d in dicts:
+            neighbor = d["Neighbor"]
+            target = d["Target"]
+            # print(target, neighbor)
+            relations = self.analyzer.analyze(target, neighbor)
+            for i in self.continuous_vars:
+                if i in relations:
+                    d[i] = relations[i]
+            for i in self.binary_vars:
+                d[i] = i in relations
+
+        df = pd.DataFrame(dicts, columns=["Target", "Rank", "Neighbor",
+                                          "Similarity"]+self._ld_scores)
+        print(df.head())
+        df.to_csv(os.path.join(self.output_dir, filename), index=False,
+                  sep="\t")
+
+        # explicit cache on disk for word function results that would be
+        # explicitly reloaded in each subprocess on each step?
+        #  each process
+
+
+def get_fname_for_embedding(embeddings_path):
+
+    """At the moment, filenames are simply directory names for folders that
+    contained the initial embeddings. They are assumed to be unique."""
+
+    filename = os.path.split(embeddings_path)[-1]+".tsv"
+    return filename
+
+
+if __name__ == '__main__':
+    annotation = AnnotateVectorNeighborhoods(experiment_name="testing",
+                                             overwrite=True)
+    annotation.get_results()
