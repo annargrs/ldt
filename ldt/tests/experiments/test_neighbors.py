@@ -89,8 +89,16 @@ class Tests(unittest.TestCase):
                     data = sample_neighbor_file.readlines()
                     res = 'hurricane\t1\tstorm\t0.9598022699356079\n' in data
                     self.assertTrue(res)
-#
-# #test that timestamp for each processed file is saved
+
+    def test_overwriting(self):
+        timestamp = os.path.getmtime(os.path.join(self.experiment.output_dir,
+                                                  "sample_embeddings.tsv"))
+        exp2 = ldt.experiments.VectorNeighborhoods(experiment_name="testing",
+                                                   overwrite=False, top_n=5)
+        exp2.get_results()
+        timestamp2 = os.path.getmtime(os.path.join(exp2.output_dir,
+                                                  "sample_embeddings.tsv"))
+        self.assertEqual(timestamp, timestamp2)
 
 if __name__ == '__main__':
     unittest.main()

@@ -66,7 +66,8 @@ class Experiment(metaclass=abc.ABCMeta):
 
         self.embeddings = check_input(input_data=embeddings)
 
-        if overwrite:
+        self._overwrite = overwrite
+        if self._overwrite:
 
             self._metadata = {}
 
@@ -86,9 +87,9 @@ class Experiment(metaclass=abc.ABCMeta):
             self._load_dataset(dataset=dataset)
 
         else:
-            metadata_path = os.path.join(output_dir, "metadata.json")
+            metadata_path = os.path.join(self.output_dir, "metadata.json")
             if os.path.isfile(metadata_path):
-                self._metadata = json.load(metadata_path)
+                self._metadata = load_json(metadata_path)
 
         if isinstance(extra_metadata, dict):
             self._metadata.update(extra_metadata)
@@ -149,18 +150,19 @@ class Experiment(metaclass=abc.ABCMeta):
     def find_unprocessed_files(self):
         """Helper method for determining which embeddings have already been
         processed."""
-        unprocessed = self.embeddings
-        for path in self.embeddings:
-            uuid = self._check_uuid_in_metadata(field="embeddings", path=path)
-            if uuid:
-                if uuid in self._metadata["timestamp"]:
-                    unprocessed.remove(path)
-            else:
-                if path in self._metadata["timestamp"]:
-                    unprocessed.remove(path)
-        return unprocessed
-
-
+        if self._overwrite:
+            return self.embeddings
+        else:
+            unprocessed = self.embeddings
+            for path in self.embeddings:
+                uuid = self._check_uuid_in_metadata(field="embeddings", path=path)
+                if uuid:
+                    if uuid in self._metadata["timestamp"]:
+                        unprocessed.remove(path)
+                else:
+                    if path in self._metadata["timestamp"]:
+                        unprocessed.remove(path)
+            return unprocessed
 
 def check_input(input_data):
     """Helper function that makes sure that all input paths are valid."""

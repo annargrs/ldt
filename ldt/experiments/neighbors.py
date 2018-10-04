@@ -172,6 +172,6 @@ class VectorNeighborhoods(Experiment):
                                                    "Similarity"])
             res.to_csv(path_or_buf=os.path.join(self.output_dir,
                                                 embeddings.metadata[
-                                                    "model"]),
+                                                    "model"]+".tsv"),
                        header=True, index=False, sep="\t")
             embeddings = None
