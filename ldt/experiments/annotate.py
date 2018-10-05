@@ -17,6 +17,11 @@ synonyns), or a numerical indicator of a relationship (e.g. the distance
 between them in an ontology). See the full list of available scores `here
 <http://ldtoolkit.space/ldscores/>`_.
 
+Todo:
+
+    * cache saved between sessions
+    * ldt resource settings saved to metadata
+
 """
 
 import os

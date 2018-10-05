@@ -21,7 +21,7 @@ class Tests(unittest.TestCase):
     def setUpClass(cls):
         """Setting up the test variables."""
         cls.experiment = ldt.experiments.VectorNeighborhoods(
-            experiment_name="testing", overwrite=True, top_n=5)
+            experiment_name="testing", overwrite=True, top_n=2)
         cls.experiment.get_results()
 
         normalizer = ldt.dicts.normalize.Normalization(language="English",
@@ -34,7 +34,7 @@ class Tests(unittest.TestCase):
         analyzer = ldt.relations.pair.RelationsInPair(
             normalizer=normalizer, derivation_dict=derivation, lex_dict=lex_dict)
         cls.annotation = ldt.experiments.AnnotateVectorNeighborhoods(
-            experiment_name="testing", overwrite=False,
+            experiment_name="testing", overwrite=True,
             ldt_analyzer=analyzer)
         cls.annotation.get_results()
 
