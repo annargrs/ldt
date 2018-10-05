@@ -133,6 +133,9 @@ class Normalization(MorphMetaDict):
             lowercasing (bool): whether all input should be lowercased
             order (tuple of str): the resources that should be used to check the
               existence of an entry, in that order
+            custom_base (str): the dictionary that should be used for
+                lemmatization of non-WordNet entries (see the tutorial for
+                details)
 
         """
 

@@ -13,7 +13,7 @@ lowercasing: True
 babelnet_key: None
 
 # if True, a recent list of wiktionary entries will be downloaded to avoid queries for non-existing entries
-wiktionary_cache: False
+wiktionary_cache: True
 
 # many LDT operations are expensive to compute. This option sets a limit on
 # the size of cache that the library will use to store potentially

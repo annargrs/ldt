@@ -20,7 +20,6 @@ between them in an ontology). See the full list of available scores `here
 """
 
 import os
-import warnings
 import uuid
 
 import pandas as pd
@@ -43,18 +42,71 @@ class AnnotateVectorNeighborhoods(Experiment):
     def __init__(self, experiment_name=None, extra_metadata=None,
                  overwrite=False, ld_scores="all",
                  output_dir=os.path.join(config["path_to_resources"],
-                                         "experiments")):
+                                         "experiments"),
+                 ldt_analyzer=None):
+
+        """ Retrieving top *n* neighbors for a given vocab sample
+
+        Args:
+            experiment_name (str): the human-readable name for the
+                current experiment, which will be used to make a subfolder
+                storing the generated data. If None, the folder will be simply
+                timestamped.
+            extra_metadata (dict): any extra fields to be added to the
+                experiment metadata (overwriting any previously existing fields)
+            output_dir (str): the *existing* path for saving the *subfolder*
+                named with the specified experiment_name, where the output data
+                and metadata.json file will be saved.
+            overwrite (bool): if True, any previous data for the same
+                experiment will be overwritten, and the experiment will be
+                re-started.
+            ldt_analyzer: :class:`~ldt.relations.pair.RelationsInPair`
+                instance, with lexicographic, morphological and normalization
+                resources set up as desired (see tutorial and
+                class documentation). If None, default settings for English
+                will be used.
+            ld_scores (str or list of str): "all" for all supported scores,
+                or a list of ld_scores. Supported values are:
+
+                    - "SharedPOS",
+                    - "SharedMorphForm",
+                    - "SharedDerivation",
+                    - "NonCooccurring",
+                    - "GDeps",
+                    - "TargetFrequency",
+                    - "NeighborFrequency",
+                    - "Associations",
+                    - "ShortestPath",
+                    - "Synonyms",
+                    - "Antonyms",
+                    - "Meronyms",
+                    - "Hyponyms",
+                    - "Hypernyms",
+                    - "OtherRelations",
+                    - "Numbers",
+                    - "ProperNouns",
+                    - "Noise",
+                    - "URLs",
+                    - "Filenames",
+                    - "ForeignWords",
+                    - "Hashtags"
+                    - 'ShortestPath',
+                    - 'TargetFrequency',
+                    - 'NeighborFrequency'.
+
+        See more details for these scores `here
+        <http://ldtoolkit.space/ldscores/>`_.
+
+        Returns:
+            (None): the annotated neighbors file will be written to disk
+                together with the experiment metadata.
+
+        """
 
         super(AnnotateVectorNeighborhoods, self).__init__(
             experiment_name=experiment_name, extra_metadata=extra_metadata, \
             overwrite=overwrite, embeddings=None, output_dir=output_dir,
             dataset=None, experiment_subfolder="neighbors_annotated")
-
-
-        print(
-            "\n\nIf your embeddings are not normalized, retrieving neighbors "
-            "will take more time. By default LDT normalizes them on loading. "
-            "If you need them not normalized, use normalize=False option.\n")
 
         self._metadata["task"] = "annotate_neighbors"
         self._metadata["uuid"] = str(uuid.uuid4())
@@ -98,8 +150,8 @@ class AnnotateVectorNeighborhoods(Experiment):
             self._ld_scores = self.supported_vars
         else:
             if isinstance(ld_scores, list):
-                unsupported = [x for x in ld_scores if not x in
-                                                           self.supported_vars]
+                unsupported = [x for x in ld_scores if not
+                               x in self.supported_vars]
                 if unsupported:
                     raise ValueError(ld_scores_error)
                 else:
@@ -108,16 +160,19 @@ class AnnotateVectorNeighborhoods(Experiment):
             else:
                 raise ValueError(ld_scores_error)
 
-        # setting up ldt resources to be used
-        normalizer = Normalization(language="English",
-                                   order=("wordnet", "custom"),
-                                   lowercasing=True)
-        derivation = DerivationAnalyzer()
-        LexDict = MetaDictionary()
+        if ldt_analyzer:
+            self.analyzer = ldt_analyzer
+        else:
+            # setting up default ldt resources to be used
+            normalizer = Normalization(language="English",
+                                       order=("wordnet", "custom"),
+                                       lowercasing=True)
+            derivation = DerivationAnalyzer()
+            lex_dict = MetaDictionary()
 
-        self.analyzer = RelationsInPair(normalizer=normalizer,
-                                        derivation_dict=derivation,
-                                        lex_dict=LexDict)
+            self.analyzer = RelationsInPair(normalizer=normalizer,
+                                            derivation_dict=derivation,
+                                            lex_dict=lex_dict)
 
     def _load_dataset(self, dataset):
         """Dataset for generating vector neighborhoods was already processed in
@@ -128,30 +183,25 @@ class AnnotateVectorNeighborhoods(Experiment):
     def _process(self, embeddings_path):
         filename = get_fname_for_embedding(embeddings_path)
         neighbor_file_path = os.path.join(self.output_dir.replace(
-                "neighbors_annotated", "neighbors"), filename)
-        df = pd.read_csv(neighbor_file_path, header=0, sep="\t")
-        dicts = df.to_dict(orient="records")
-        for d in dicts:
-            neighbor = d["Neighbor"]
-            target = d["Target"]
-            # print(target, neighbor)
+            "neighbors_annotated", "neighbors"), filename)
+        input_df = pd.read_csv(neighbor_file_path, header=0, sep="\t")
+        dicts = input_df.to_dict(orient="records")
+        for col_dict in dicts:
+            neighbor = col_dict["Neighbor"]
+            target = col_dict["Target"]
+            print(target, neighbor)
             relations = self.analyzer.analyze(target, neighbor)
             for i in self.continuous_vars:
                 if i in relations:
-                    d[i] = relations[i]
+                    col_dict[i] = relations[i]
             for i in self.binary_vars:
-                d[i] = i in relations
+                col_dict[i] = i in relations
 
-        df = pd.DataFrame(dicts, columns=["Target", "Rank", "Neighbor",
+        output_df = pd.DataFrame(dicts,
+                                 columns=["Target", "Rank", "Neighbor",
                                           "Similarity"]+self._ld_scores)
-        print(df.head())
-        df.to_csv(os.path.join(self.output_dir, filename), index=False,
-                  sep="\t")
-
-        # explicit cache on disk for word function results that would be
-        # explicitly reloaded in each subprocess on each step?
-        #  each process
-
+        output_df.to_csv(os.path.join(self.output_dir, filename),
+                         index=False, sep="\t")
 
 def get_fname_for_embedding(embeddings_path):
 
@@ -161,8 +211,7 @@ def get_fname_for_embedding(embeddings_path):
     filename = os.path.split(embeddings_path)[-1]+".tsv"
     return filename
 
-
-if __name__ == '__main__':
-    annotation = AnnotateVectorNeighborhoods(experiment_name="testing",
-                                             overwrite=True)
-    annotation.get_results()
+# if __name__ == '__main__':
+#     annotation = AnnotateVectorNeighborhoods(experiment_name="testing",
+#                                              overwrite=True)
+#     annotation.get_results()

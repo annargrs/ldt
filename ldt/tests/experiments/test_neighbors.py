@@ -7,6 +7,7 @@ import shutil
 import json
 
 from ldt.load_config import config
+from ldt.helpers.ignore import ignore_warnings
 
 path_to_resources = config["path_to_resources"]
 
@@ -16,13 +17,25 @@ class Tests(unittest.TestCase):
     """
 
     @classmethod
+    @ignore_warnings
     def setUpClass(cls):
         """Setting up the test variables."""
         cls.experiment = ldt.experiments.VectorNeighborhoods(
-            experiment_name="testing", overwrite=True, top_n=1)
+            experiment_name="testing", overwrite=True, top_n=5)
         cls.experiment.get_results()
+
+        normalizer = ldt.dicts.normalize.Normalization(language="English",
+                                                       order=("wordnet", "custom"),
+                                                       lowercasing=True)
+        derivation = ldt.dicts.derivation.meta.DerivationAnalyzer()
+        lex_dict = ldt.dicts.semantics.metadictionary.MetaDictionary(order=(
+            "wordnet","wiktionary"))
+
+        analyzer = ldt.relations.pair.RelationsInPair(
+            normalizer=normalizer, derivation_dict=derivation, lex_dict=lex_dict)
         cls.annotation = ldt.experiments.AnnotateVectorNeighborhoods(
-                experiment_name="testing", overwrite=True)
+            experiment_name="testing", overwrite=False,
+            ldt_analyzer=analyzer)
         cls.annotation.get_results()
 
     # @classmethod
@@ -114,7 +127,15 @@ class Tests(unittest.TestCase):
                            "neighbors_annotated", "testing")
         self.assertTrue(os.path.isdir(dir))
 
-
+    def test_annotation(self):
+        f = os.path.join(config["path_to_resources"], "experiments",
+                           "neighbors_annotated", "testing",
+                           "sample_embeddings.tsv")
+        with open(f, "r") as sample_annotated_file:
+            data = sample_annotated_file.readlines()
+            res = 'premiership\t1\tsemi-final\t0.962702751159668\tTrue\tFalse' \
+                  '\tFalse' in data[1]
+            self.assertTrue(res)
 
 if __name__ == '__main__':
     unittest.main()

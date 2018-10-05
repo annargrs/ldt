@@ -16,6 +16,7 @@
 """
 
 import functools
+import requests
 
 from wiktionaryparser import WiktionaryParser
 
@@ -140,21 +141,25 @@ class BaseWiktionary(Dictionary):
         parser = WiktionaryParser()
         parser.set_default_language(language)
 
-        if not self.cache:
+        @functools.lru_cache(maxsize=config["cache_size"])
+        def retrieve_wikidata(word, parser, silent=True):
             try:
                 return parser.fetch(word)
-            except:
-                print("LDT couldn't reach Wiktionary. Your connection may be "
-                      "down or refused by the server.")
+            except TypeError:
+                if not silent:
+                    print("Query '"+word+"' failed. It is probably missing in "
+                                         "Wiktionary.")
+            except requests.exceptions.ConnectionError:
+                print("Query '"+word+"' failed. LDT couldn't reach "
+                      "Wiktionary. Your connection may be down or refused "
+                      "by the server.")
                 return None
+
+        if not self.cache:
+            retrieve_wikidata(word=word, parser=parser)
 
         else:
             if not word in self.cache:
                 return None
             else:
-                try:
-                    return parser.fetch(word)
-                except:
-                    print("LDT couldn't reach Wiktionary. Your connection may "
-                          "be down or refused by the server.")
-                    return None
+                retrieve_wikidata(word=word, parser=parser)

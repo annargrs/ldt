@@ -163,8 +163,8 @@ class Word(object):
             self.info["Lemmas"] = frozenset(res["lemmas"])
             if "pos" in res:
                 self.info["POS"] = frozenset(res["pos"])
-            # else:
-            #     self.info["POS"] = frozenset(["unclear"])
+            else:
+                self.info["POS"] = frozenset()
 
 
     def _analyze_derivation(self):
@@ -182,7 +182,12 @@ class Word(object):
             "prefixes":"Prefixes", "related_words":"RelatedWords",
             "other":"OtherDerivation"}
 
-        for lemma in self.info["Lemmas"]:
+        if self.info["Lemmas"]:
+            to_analyze = self.info["Lemmas"]
+        else:
+            to_analyze = [self.info["OriginalForm"]]
+
+        for lemma in to_analyze:
 
             res = self._derivation_dict.analyze(lemma)
             for i in res.keys():
@@ -194,6 +199,10 @@ class Word(object):
             for i in fields.keys():
                 self.info[i] = frozenset(self.info[i])
                 self.info[fields[i]] = self.info.pop(i)
+
+            for i in fields.values():
+                if not i in self.info:
+                    self.info[i] = frozenset()
 
     def _get_lex_relations(self):
         """Query the lexicographic metadictionary for the information on
