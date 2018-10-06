@@ -142,7 +142,9 @@ class BaseWiktionary(Dictionary):
         parser.set_default_language(language)
 
         # @functools.lru_cache(maxsize=config["cache_size"])
-        def retrieve_wikidata(word, parser=parser, silent=False):
+        def retrieve_wikidata(word, parser=parser, silent=True):
+            """Helper for querying wiktionaryparser and rasing appropriate
+            exceptions."""
             try:
                 res = parser.fetch(word)
                 return res

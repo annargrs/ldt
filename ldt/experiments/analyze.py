@@ -123,7 +123,7 @@ class LDScoring(Experiment):
             return round(100*num/len_df, 2)
 
         # print(input_df.head())
-        res = {"Embedding":filename}
+        res = {"Embedding":filename.strip(".tsv")}
         # # dicts = input_df.to_dict(orient="records")
         for var in self.binary_vars:
             if var in input_df.columns:

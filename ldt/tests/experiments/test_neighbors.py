@@ -6,6 +6,8 @@ import shutil
 
 import json
 
+import pandas as pd
+
 from ldt.load_config import config
 from ldt.helpers.ignore import ignore_warnings
 
@@ -42,13 +44,15 @@ class Tests(unittest.TestCase):
                                                 overwrite=True)
         cls.scoring.get_results()
 
-    # @classmethod
-    # def tearDownClass(cls):
-    #     """Clearning up the test dir."""
-    #     cls.experiment = None
-    #     dir = os.path.join(config["path_to_resources"], "experiments",
-    #                        "neighbors", "testing")
-    #     shutil.rmtree(dir)
+    @classmethod
+    def tearDownClass(cls):
+        """Clearning up the test dir."""
+        cls.experiment = None
+        subfolders = ["neighbors", "neighbors_annotated", "analysis"]
+        for sub in subfolders:
+            dir = os.path.join(config["path_to_resources"], "experiments",
+                               sub, "testing")
+            shutil.rmtree(dir)
 
 ######## tests for metadata and neighborhoods #############
 
@@ -135,11 +139,10 @@ class Tests(unittest.TestCase):
         f = os.path.join(config["path_to_resources"], "experiments",
                            "neighbors_annotated", "testing",
                            "sample_embeddings.tsv")
-        with open(f, "r") as sample_annotated_file:
-            data = sample_annotated_file.readlines()
-            res = 'premiership\t1\tsemi-final\t0.962702751159668\tTrue\tFalse' \
-                  '\tFalse' in data[1]
-            self.assertTrue(res)
+        res_df = pd.read_csv(f, header=0, sep="\t")
+        operations_is_lemma = res_df.at[res_df['Neighbor'].eq(
+            'operations').idxmax(), 'SharedMorphForm']
+        self.assertFalse(operations_is_lemma)
 
 ########## analysis tests #############
 
@@ -153,10 +156,10 @@ class Tests(unittest.TestCase):
         """Creation of subfolder per specific experiment"""
         file = os.path.join(config["path_to_resources"], "experiments",
                             "analysis", "testing", "ld_scores.tsv")
-        with open(file, "r") as sample_score_file:
-            data = sample_score_file.readlines()
-            res = "Embedding\tSharedPOS\tSharedMorphForm" in data[0]
-            self.assertTrue(res)
+        res_df = pd.read_csv(file, header=0, sep="\t")
+        hashtags = res_df.at[res_df['Embedding'].eq(
+            'sample_embedding').idxmax(), 'Hashtags']
+        self.assertEqual(hashtags, 0.0)
 
 if __name__ == '__main__':
     unittest.main()

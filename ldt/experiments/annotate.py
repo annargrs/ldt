@@ -133,6 +133,8 @@ class AnnotateVectorNeighborhoods(Experiment):
 
         self.message = "Starting LD annotation."
 
+        self._metadata["failed_pairs"] = {}
+
         self.supported_vars = ["SharedPOS", "SharedMorphForm",
                                "SharedDerivation", "NonCooccurring",
                                "GDeps", "TargetFrequency",
@@ -192,24 +194,29 @@ class AnnotateVectorNeighborhoods(Experiment):
         filename = get_fname_for_embedding(embeddings_path)
         neighbor_file_path = os.path.join(self.output_dir.replace(
             "neighbors_annotated", "neighbors"), filename)
+        print("Annotating "+neighbor_file_path)
         input_df = pd.read_csv(neighbor_file_path, header=0, sep="\t")
         dicts = input_df.to_dict(orient="records")
+        failed_pairs = []
         for col_dict in dicts:
             neighbor = col_dict["Neighbor"]
             target = col_dict["Target"]
-            print(target, neighbor)
             relations = self.analyzer.analyze(target, neighbor)
-            for i in self.continuous_vars:
-                if i in relations:
-                    col_dict[i] = relations[i]
-            for i in self.binary_vars:
-                col_dict[i] = i in relations
+            if not relations:
+                failed_pairs.append([target, neighbor])
+            else:
+                for i in self.continuous_vars:
+                    if i in relations:
+                        col_dict[i] = relations[i]
+                for i in self.binary_vars:
+                    col_dict[i] = i in relations
 
         output_df = pd.DataFrame(dicts,
                                  columns=["Target", "Rank", "Neighbor",
                                           "Similarity"]+self._ld_scores)
         output_df.to_csv(os.path.join(self.output_dir, filename),
                          index=False, sep="\t")
+        self._metadata["failed_pairs"][filename] = failed_pairs
 
 def get_fname_for_embedding(embeddings_path):
 

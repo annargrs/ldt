@@ -112,7 +112,7 @@ class RelationsInPair(Dictionary):
         raise NotImplementedError
 
     @functools.lru_cache(maxsize=config["cache_size"])
-    def analyze(self, target, neighbor, silent=True):
+    def _analyze(self, target, neighbor, silent=True):
         """The main function for analyzing the input strings and identifying
         any relations the two words may share.
 
@@ -173,6 +173,18 @@ class RelationsInPair(Dictionary):
         res["NeighborFrequency"] = self._distr_dict.frequency_in_corpus(
             neighbor.info["OriginalForm"])
         return res
+
+    def analyze(self, target, neighbor, silent=True):
+        """Catch-all wrapper for :meth:`_analyze` that ensures that
+        large-scale annotation continues even if something breaks on a
+        particular pair. The offending data will be logged in experiment
+        metadata."""
+        try:
+            return self._analyze(target, neighbor, silent=silent)
+        except:
+            if not silent:
+                print("Something went wrong: "+target+": "+"neighbor.")
+                return None
 
 def _binary_rels(target, neighbor):
     """Helper function for identifying intersections in the property lists

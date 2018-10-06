@@ -55,7 +55,8 @@ class Experiment(metaclass=abc.ABCMeta):
                 experiment.
             overwrite (bool): if True, any previous data for the same
                 experiment will be overwritten, and the experiment will be
-                re-started.
+                re-started. If metadata from previous experiment is not
+                found, this setting is disregarded.
             experiment_subfolder (str): if provided, the experiment results
                 will be saved to this subfolder of the "experiments" folder
         """
@@ -72,32 +73,38 @@ class Experiment(metaclass=abc.ABCMeta):
 
         self._overwrite = overwrite
         if self._overwrite:
-
-            self._metadata = {}
-
-            self._metadata["timestamp"] = {}
-            self._metadata["version"] = "ldt v. "+__version__
-            self._metadata["class"] = "experiment"
-            if hasattr(self, "embeddings"):
-                self._metadata["embeddings"] = []
-                for embedding in embeddings:
-                    meta_path = os.path.join(embedding, "metadata.json")
-                    if os.path.isfile(meta_path):
-                        embedding_metadata = load_json(meta_path)
-                        embedding_metadata["path"] = embedding
-                        self._metadata["embeddings"].append(embedding_metadata)
-                    else:
-                        self._metadata["embeddings"].append(embedding)
-
-            self._load_dataset(dataset=dataset)
+            self._init_metadata(embeddings)
 
         else:
             metadata_path = os.path.join(self.output_dir, "metadata.json")
             if os.path.isfile(metadata_path):
                 self._metadata = load_json(metadata_path)
+            else:
+                self._init_metadata(embeddings)
+                self._overwrite=True
 
+        self._load_dataset(dataset=dataset)
         if isinstance(extra_metadata, dict):
             self._metadata.update(extra_metadata)
+
+    def _init_metadata(self, embeddings):
+        """Metadata Init helper"""
+        self._metadata = {}
+
+        self._metadata["timestamp"] = {}
+        self._metadata["version"] = "ldt v. "+__version__
+        self._metadata["class"] = "experiment"
+        if hasattr(self, "embeddings"):
+            self._metadata["embeddings"] = []
+            for embedding in embeddings:
+                meta_path = os.path.join(embedding, "metadata.json")
+                if os.path.isfile(meta_path):
+                    embedding_metadata = load_json(meta_path)
+                    embedding_metadata["path"] = embedding
+                    self._metadata["embeddings"].append(embedding_metadata)
+                else:
+                    self._metadata["embeddings"].append(embedding)
+
 
     @abc.abstractmethod
     def _load_dataset(self, dataset):
