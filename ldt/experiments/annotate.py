@@ -96,7 +96,6 @@ class AnnotateVectorNeighborhoods(Experiment):
                     - "Filenames",
                     - "ForeignWords",
                     - "Hashtags"
-                    - 'ShortestPath',
                     - 'TargetFrequency',
                     - 'NeighborFrequency'.
 
@@ -154,7 +153,7 @@ class AnnotateVectorNeighborhoods(Experiment):
         ld_scores_error = "The ld_scores argument is invalid. It should be " \
                           "'all' for all supported relations, or a list with " \
                           "one or more of the following values:\n" + \
-                          " ".join(self.supported_vars)
+                          ", ".join(self.supported_vars)
 
         if ld_scores == "all":
             self._ld_scores = self.supported_vars

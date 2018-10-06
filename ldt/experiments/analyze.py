@@ -37,8 +37,9 @@ class LDScoring(Experiment):
     Vecto-style metadata is also generated."""
 
     def __init__(self, experiment_name=None, extra_metadata=None,
-                 overwrite=False, output_dir=os.path.join(
-                     config["path_to_resources"], "experiments")):
+                 overwrite=False, ld_scores="all",
+                 output_dir=os.path.join(config["path_to_resources"],
+                                         "experiments")):
 
         """ Annotating pre-computed top *n* neighbors for a given vocab sample
 
@@ -55,6 +56,36 @@ class LDScoring(Experiment):
             overwrite (bool): if True, any previous data for the same
                 experiment will be overwritten, and the experiment will be
                 re-started.
+            ld_scores (str or list of str): "all" for all supported scores,
+                or a list of ld_scores. Supported values are:
+
+                    - "SharedPOS",
+                    - "SharedMorphForm",
+                    - "SharedDerivation",
+                    - "NonCooccurring",
+                    - "CloseNeighbors",
+                    - "FarNeighbors",
+                    - "LowFreqNeighbors",
+                    - 'HighFreqNeighbors',
+                    - "GDeps",
+                    - "TargetFrequency",
+                    - "NeighborFrequency",
+                    - "Associations",
+                    - "ShortestPathMedian",
+                    - "CloseInOntology",
+                    - "Synonyms",
+                    - "Antonyms",
+                    - "Meronyms",
+                    - "Hyponyms",
+                    - "Hypernyms",
+                    - "OtherRelations",
+                    - "Numbers",
+                    - "ProperNouns",
+                    - "Noise",
+                    - "URLs",
+                    - "Filenames",
+                    - "ForeignWords",
+                    - "Hashtags".
 
         Returns:
 
@@ -102,6 +133,33 @@ class LDScoring(Experiment):
         self.binary_vars = [x for x in self.supported_vars if not \
             x in self.continuous_vars]
 
+        output_vars = ["SharedPOS", "SharedMorphForm", "SharedDerivation",
+                       "NonCooccurring", "CloseNeighbors", "FarNeighbors",
+                        "LowFreqNeighbors", 'HighFreqNeighbors', "GDeps",
+                        "TargetFrequency", "NeighborFrequency", "Associations",
+                        "ShortestPathMedian", "CloseInOntology", "Synonyms",
+                        "Antonyms",  "Meronyms", "Hyponyms", "Hypernyms",
+                        "OtherRelations", "Numbers", "ProperNouns", "Noise",
+                        "URLs", "Filenames", "ForeignWords", "Hashtags"]
+
+        output_scores_error = "The ld_scores argument is invalid. It should " \
+                              "be 'all' for all supported relations, " \
+                              "or a list with one or more of the following " \
+                              "values:\n" + ", ".join(output_vars)
+
+        if ld_scores == "all":
+            self.output_vars = output_vars
+        else:
+            if isinstance(ld_scores, list):
+                unsupported = [x for x in ld_scores if not x in output_vars]
+                if unsupported:
+                    raise ValueError(output_scores_error)
+                else:
+                    self.output_vars = [x for x in output_vars if x in
+                                        ld_scores]
+            else:
+                raise ValueError(output_scores_error)
+
         self.message = None
 
     def _load_dataset(self, dataset):
@@ -110,7 +168,26 @@ class LDScoring(Experiment):
         here."""
         pass
 
-    def _process(self, embeddings_path):
+    def _process(self, embeddings_path, lowfreq_threshold=10000,
+                      far_neighbors_threshold=0.7,
+                      close_neighbors_threshold=0.8, ontology_threshold=0.5):
+        """
+
+        Args:
+            embeddings_path (str): the name of embedding model to process (
+                currently taken to be the name of the corresponding file with
+                annotated neighbors).
+            lowfreq_threshold (int): neighbors below this number will be
+                considered low-frequency, and those above this number -
+                high-frequency.
+            far_neighbors_threshold (float): neighbors further than this number
+                will be considered as "far neighbors".
+            close_neighbors_threshold (float): neighbors closer than this
+                number will be considered as "close neighbors".
+
+        Returns:
+
+        """
         filename = get_fname_for_embedding(embeddings_path)
         annotated_file_path = os.path.join(self.output_dir.replace(
             "analysis", "neighbors_annotated"), filename)
@@ -121,27 +198,32 @@ class LDScoring(Experiment):
         def percentage(num, len_df=len_df):
             """Helper for formatting % numbers"""
             return round(100*num/len_df, 2)
-
-        # print(input_df.head())
         res = {"Embedding":filename.strip(".tsv")}
-        # # dicts = input_df.to_dict(orient="records")
         for var in self.binary_vars:
             if var in input_df.columns:
                 try:
                     res[var] = percentage(num=list(input_df[var]).count(True))
                 except KeyError:
                     pass
-        # if "ShortestPath" in self.binary_vars:
+        if "ShortestPath" in input_df.columns:
+            # median of all found shortest paths - that's what was done in
+            # the paper
+            res["ShortestPathMedian"] = \
+                round(input_df["ShortestPath"].median(), 3)
+            # number of words with paths shorter than threshold
+            close = [x for x in list(
+                input_df["ShortestPath"]) if x <= ontology_threshold]
+            res["CloseInOntology"] = len(close)
         if "NeighborFrequency" in input_df.columns:
             highfreq_neighbors = [x for x in list(
-                input_df["NeighborFrequency"]) if x > 10000]
+                input_df["NeighborFrequency"]) if x > lowfreq_threshold]
             res["HighFreqNeighbors"] = percentage(len(highfreq_neighbors))
             res["LowFreqNeighbors"] = 1-res["HighFreqNeighbors"]
         if "Similarity" in input_df.columns:
             far_neighbors = [x for x in list(
-                input_df["Similarity"]) if x < 0.7]
+                input_df["Similarity"]) if x <= far_neighbors_threshold]
             close_neighbors = [x for x in list(
-                input_df["Similarity"]) if x > 0.8]
+                input_df["Similarity"]) if x >= close_neighbors_threshold]
             res["FarNeighbors"] = percentage(len(far_neighbors))
             res["CloseNeighbors"] = percentage(len(close_neighbors))
         return res
@@ -159,17 +241,9 @@ class LDScoring(Experiment):
         res = []
         for i in self.embeddings:
 
-            # uuid = self._check_uuid_in_metadata(field="embeddings", path=i)
-
             res.append(self._process(embeddings_path=i))
-            cols = ["Embedding", "SharedPOS", "SharedMorphForm",
-                    "SharedDerivation", "NonCooccurring", "GDeps",
-                    "LowFreqNeighbors", "HighFreqNeighbors", "FarNeighbors",
-                    "CloseNeighbors", "Associations", "ShortestPath",
-                    "Synonyms", "Antonyms", "Meronyms", "Hyponyms",
-                    "Hypernyms", "OtherRelations", "Numbers", "ProperNouns",
-                    "Noise", "URLs", "Filenames", "ForeignWords", "Hashtags"]
-            res_df = pd.DataFrame(res, columns=cols)
+
+            res_df = pd.DataFrame(res, columns=["Embedding"]+self.output_vars)
             res_df.to_csv(os.path.join(self.output_dir, "ld_scores.tsv"),
                           index=False, sep="\t")
             self._metadata["timestamp"] = datetime.datetime.now().isoformat()

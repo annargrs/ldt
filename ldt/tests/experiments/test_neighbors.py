@@ -39,9 +39,14 @@ class Tests(unittest.TestCase):
             experiment_name="testing", overwrite=False,
             ldt_analyzer=analyzer)
         cls.annotation.get_results()
-
+        output_scores=["SharedPOS", "SharedMorphForm", "SharedDerivation",
+                        "ShortestPathMedian", "CloseInOntology", "Synonyms",
+                        "Antonyms",  "Meronyms", "Hyponyms", "Hypernyms",
+                        "OtherRelations", "Numbers", "ProperNouns", "Noise",
+                        "URLs", "Filenames", "ForeignWords", "Hashtags"]
         cls.scoring = ldt.experiments.LDScoring(experiment_name="testing",
-                                                overwrite=True)
+                                                overwrite=True,
+                                                ld_scores=output_scores)
         cls.scoring.get_results()
 
     @classmethod
