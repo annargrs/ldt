@@ -133,6 +133,9 @@ class Experiment(metaclass=abc.ABCMeta):
         the timestamps of when each file was started and finished."""
         input_data = self.find_unprocessed_files()
         self.embeddings = input_data
+        if self.embeddings:
+            if self.message:
+                print(self.message)
 
         for i in self.embeddings:
 

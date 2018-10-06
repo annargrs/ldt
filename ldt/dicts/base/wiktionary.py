@@ -141,14 +141,16 @@ class BaseWiktionary(Dictionary):
         parser = WiktionaryParser()
         parser.set_default_language(language)
 
-        @functools.lru_cache(maxsize=config["cache_size"])
-        def retrieve_wikidata(word, parser, silent=True):
+        # @functools.lru_cache(maxsize=config["cache_size"])
+        def retrieve_wikidata(word, parser=parser, silent=False):
             try:
-                return parser.fetch(word)
+                res = parser.fetch(word)
+                return res
             except TypeError:
                 if not silent:
                     print("Query '"+word+"' failed. It is probably missing in "
                                          "Wiktionary.")
+                    return None
             except requests.exceptions.ConnectionError:
                 print("Query '"+word+"' failed. LDT couldn't reach "
                       "Wiktionary. Your connection may be down or refused "
@@ -156,10 +158,10 @@ class BaseWiktionary(Dictionary):
                 return None
 
         if not self.cache:
-            retrieve_wikidata(word=word, parser=parser)
+            return retrieve_wikidata(word)
 
         else:
             if not word in self.cache:
                 return None
             else:
-                retrieve_wikidata(word=word, parser=parser)
+                return retrieve_wikidata(word)

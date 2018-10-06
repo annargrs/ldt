@@ -19,6 +19,7 @@ between them in an ontology). See the full list of available scores `here
 
 Todo:
 
+    * parsing arguments from command line
     * cache saved between sessions
     * ldt resource settings saved to metadata
 
@@ -39,8 +40,8 @@ from ldt.dicts.semantics.metadictionary import MetaDictionary
 from ldt.relations.pair import RelationsInPair
 
 class AnnotateVectorNeighborhoods(Experiment):
-    """This class provides a simple interface for generating top_n vector
-    neighborhoods for a given vocabulary sample, using vecto library.
+    """This class provides a simple interface for annotating pre-computed top_n
+    vector neighborhoods for a given vocabulary sample.
     Vecto-style metadata is also generated."""
 
     #pylint: disable=too-many-arguments
@@ -50,7 +51,7 @@ class AnnotateVectorNeighborhoods(Experiment):
                                          "experiments"),
                  ldt_analyzer=None):
 
-        """ Retrieving top *n* neighbors for a given vocab sample
+        """ Annotating pre-computed top *n* neighbors for a given vocab sample
 
         Args:
             experiment_name (str): the human-readable name for the
@@ -129,6 +130,8 @@ class AnnotateVectorNeighborhoods(Experiment):
             self.embeddings = []
             for embedding in self._metadata["embeddings"]:
                 self.embeddings.append(embedding["path"])
+
+        self.message = "Starting LD annotation."
 
         self.supported_vars = ["SharedPOS", "SharedMorphForm",
                                "SharedDerivation", "NonCooccurring",
