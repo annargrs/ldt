@@ -34,9 +34,13 @@ class Tests(unittest.TestCase):
         analyzer = ldt.relations.pair.RelationsInPair(
             normalizer=normalizer, derivation_dict=derivation, lex_dict=lex_dict)
         cls.annotation = ldt.experiments.AnnotateVectorNeighborhoods(
-            experiment_name="testing", overwrite=True,
+            experiment_name="testing", overwrite=False,
             ldt_analyzer=analyzer)
         cls.annotation.get_results()
+
+        cls.scoring = ldt.experiments.LDScoring(experiment_name="testing",
+                                                overwrite=True)
+        cls.scoring.get_results()
 
     # @classmethod
     # def tearDownClass(cls):
@@ -135,6 +139,23 @@ class Tests(unittest.TestCase):
             data = sample_annotated_file.readlines()
             res = 'premiership\t1\tsemi-final\t0.962702751159668\tTrue\tFalse' \
                   '\tFalse' in data[1]
+            self.assertTrue(res)
+
+########## analysis tests #############
+
+    def test_dir_analysis(self):
+        """Creation of subfolder per specific experiment"""
+        dir = os.path.join(config["path_to_resources"], "experiments",
+                           "analysis", "testing")
+        self.assertTrue(os.path.isdir(dir))
+
+    def test_analysis(self):
+        """Creation of subfolder per specific experiment"""
+        file = os.path.join(config["path_to_resources"], "experiments",
+                            "analysis", "testing", "ld_scores.tsv")
+        with open(file, "r") as sample_score_file:
+            data = sample_score_file.readlines()
+            res = "Embedding\tSharedPOS\tSharedMorphForm" in data[0]
             self.assertTrue(res)
 
 if __name__ == '__main__':

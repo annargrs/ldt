@@ -150,8 +150,12 @@ class LDScoring(Experiment):
     def get_results(self):
         """The basic routine for processing embeddings one-by-one, and saving
         the timestamps of when each file was started and finished."""
-        input_data = self.find_unprocessed_files()
-        self.embeddings = input_data
+
+        if not self._overwrite:
+            if os.path.isfile(os.path.join(self.output_dir, "ld_scores.tsv")):
+                return None
+
+        # self.embeddings = input_data
         res = []
         for i in self.embeddings:
 
