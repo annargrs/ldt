@@ -246,13 +246,15 @@ def are_related_as(target, neighbor):
     rels = ["Synonyms", "Antonyms", "Meronyms", "OtherRelations"]
     for rel in rels:
         if rel in neighbor.info and rel in target.info:
-            for word in [target.info["OriginalForm"]] + list(target.info["Lemmas"]) + list(target.info["Stems"]):
-                if word in target.info[rel]:
+            for word in [target.info["OriginalForm"]] + list(
+                    target.info["Lemmas"]) + list(target.info["Stems"]):
+                if word in neighbor.info[rel]:
                     res.append(rel)
         if rel not in res:
             if rel in neighbor.info and rel in target.info:
-                for word in [target.info["OriginalForm"]] + list(target.info["Lemmas"]) + list(target.info["Stems"]):
-                    if word in neighbor.info[rel]:
+                for word in [neighbor.info["OriginalForm"]] + list(
+                        neighbor.info["Lemmas"]) + list(neighbor.info["Stems"]):
+                    if word in target.info[rel]:
                         res.append(rel)
     return list(set(res))
 
