@@ -137,6 +137,8 @@ class RelationsInPair(Dictionary):
         if not silent:
             print(target.pp_info())
             print(neighbor.pp_info())
+        if neighbor.info["Missing"]:
+            return None
         rels = _binary_rels(target, neighbor)
         res = {}
         for rel in rels:
@@ -183,7 +185,7 @@ class RelationsInPair(Dictionary):
             return self._analyze(target, neighbor, silent=silent)
         except:
             if not silent:
-                print("Something went wrong: "+target+": "+"neighbor.")
+                print("Something went wrong: "+target+": "+neighbor)
                 return None
 
 def _binary_rels(target, neighbor):

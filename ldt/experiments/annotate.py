@@ -132,7 +132,8 @@ class AnnotateVectorNeighborhoods(Experiment):
 
         self.message = "Starting LD annotation."
 
-        self._metadata["failed_pairs"] = {}
+        self._metadata["failed_pairs"] = []
+        self._metadata["total_pairs"] = 0
 
         self.supported_vars = ["SharedPOS", "SharedMorphForm",
                                "SharedDerivation", "NonCooccurring",
@@ -194,15 +195,16 @@ class AnnotateVectorNeighborhoods(Experiment):
         neighbor_file_path = os.path.join(self.output_dir.replace(
             "neighbors_annotated", "neighbors"), filename)
         print("Annotating "+neighbor_file_path)
+
         input_df = pd.read_csv(neighbor_file_path, header=0, sep="\t")
+        self._metadata["total_pairs"] += len(input_df)
         dicts = input_df.to_dict(orient="records")
-        failed_pairs = []
         for col_dict in dicts:
             neighbor = col_dict["Neighbor"]
             target = col_dict["Target"]
             relations = self.analyzer.analyze(target, neighbor)
             if not relations:
-                failed_pairs.append([target, neighbor])
+                self._metadata["failed_pairs"].append(tuple([target, neighbor]))
             else:
                 for i in self.continuous_vars:
                     if i in relations:
@@ -215,7 +217,15 @@ class AnnotateVectorNeighborhoods(Experiment):
                                           "Similarity"]+self._ld_scores)
         output_df.to_csv(os.path.join(self.output_dir, filename),
                          index=False, sep="\t")
-        self._metadata["failed_pairs"][filename] = failed_pairs
+
+    def _postprocess_metadata(self):
+        """Helper method for logging unique failed target:neighbor pairs and
+        calculating the overall coverage (considered as number of non-unique
+        pairs for which dictionary data was successfully found)."""
+        self._metadata["coverage"] = \
+            1 - round(len(self._metadata["failed_pairs"])/self._metadata[
+                "total_pairs"], 2)
+        self._failed_pairs = list(set(tuple(self._metadata["failed_pairs"])))
 
 def get_fname_for_embedding(embeddings_path):
 
@@ -225,7 +235,7 @@ def get_fname_for_embedding(embeddings_path):
     filename = os.path.split(embeddings_path)[-1]+".tsv"
     return filename
 
-# if __name__ == '__main__':
-#     annotation = AnnotateVectorNeighborhoods(experiment_name="testing",
-#                                              overwrite=True)
-#     annotation.get_results()
+if __name__ == '__main__':
+    annotation = AnnotateVectorNeighborhoods(experiment_name="testing",
+                                             overwrite=True)
+    annotation.get_results()

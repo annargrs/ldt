@@ -162,6 +162,7 @@ class Experiment(metaclass=abc.ABCMeta):
             else:
                 self._metadata["timestamp"][i]["end_time"] = \
                     datetime.datetime.now().isoformat()
+            self._postprocess_metadata()
             self.save_metadata()
 
     def find_unprocessed_files(self):
@@ -180,6 +181,11 @@ class Experiment(metaclass=abc.ABCMeta):
                     if path in self._metadata["timestamp"]:
                         unprocessed.remove(path)
             return unprocessed
+
+    def _postprocess_metadata(self):
+        """Helper method for experiments that require extra operations on
+        metadata once the processing has been complete"""
+        pass
 
 def check_input(input_data):
     """Helper function that makes sure that all input paths are valid."""

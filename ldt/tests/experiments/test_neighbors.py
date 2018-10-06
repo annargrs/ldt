@@ -36,7 +36,7 @@ class Tests(unittest.TestCase):
         analyzer = ldt.relations.pair.RelationsInPair(
             normalizer=normalizer, derivation_dict=derivation, lex_dict=lex_dict)
         cls.annotation = ldt.experiments.AnnotateVectorNeighborhoods(
-            experiment_name="testing", overwrite=False,
+            experiment_name="testing", overwrite=True,
             ldt_analyzer=analyzer)
         cls.annotation.get_results()
         output_scores=["SharedPOS", "SharedMorphForm", "SharedDerivation",
