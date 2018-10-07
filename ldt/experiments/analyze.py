@@ -205,6 +205,7 @@ class LDScoring(Experiment):
                     res[var] = percentage(num=list(input_df[var]).count(True))
                 except KeyError:
                     pass
+
         if "ShortestPath" in input_df.columns:
             # median of all found shortest paths - that's what was done in
             # the paper
@@ -216,7 +217,9 @@ class LDScoring(Experiment):
             res["CloseInOntology"] = len(close)
         if "NeighborFrequency" in input_df.columns:
             highfreq_neighbors = [x for x in list(
-                input_df["NeighborFrequency"]) if x > lowfreq_threshold]
+                input_df["NeighborFrequency"]) if isinstance(x, float)]
+            highfreq_neighbors = [x for x in highfreq_neighbors if x >
+                                  lowfreq_threshold]
             res["HighFreqNeighbors"] = percentage(len(highfreq_neighbors))
             res["LowFreqNeighbors"] = 1-res["HighFreqNeighbors"]
         if "Similarity" in input_df.columns:
@@ -248,6 +251,7 @@ class LDScoring(Experiment):
                           index=False, sep="\t")
             self._metadata["timestamp"] = datetime.datetime.now().isoformat()
             self.save_metadata()
+
 
 # if __name__ == '__main__':
 #     annotation = LDScoring(experiment_name="testing", overwrite=True)

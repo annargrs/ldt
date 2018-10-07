@@ -137,27 +137,31 @@ class RelationsInPair(Dictionary):
         if not silent:
             print(target.pp_info())
             print(neighbor.pp_info())
-        if neighbor.info["Missing"]:
-            return None
-        rels = _binary_rels(target, neighbor)
         res = {}
-        for rel in rels:
-            res[rel] = True
+        if neighbor.info["Missing"]:
+            res["Missing"] = True
 
-        paths = []
-        for target_lemma in target.info["Lemmas"]:
-            for neighbor_lemma in neighbor.info["Lemmas"]:
-                    paths.append(self.OntoDict.get_shortest_path(
-                        target_lemma, neighbor_lemma))
-        if paths:
-            res["ShortestPath"] = min(paths)
+        else:
 
-        for target_lemma in target.info["Lemmas"]:
-            for neighbor_lemma in neighbor.info["Lemmas"]:
-                if self.AssociationDictionary.are_related(target_lemma,
-                                                          neighbor_lemma):
-                    res["Associations"] = True
-                    break
+            rels = _binary_rels(target, neighbor)
+
+            for rel in rels:
+                res[rel] = True
+
+            paths = []
+            for target_lemma in target.info["Lemmas"]:
+                for neighbor_lemma in neighbor.info["Lemmas"]:
+                        paths.append(self.OntoDict.get_shortest_path(
+                            target_lemma, neighbor_lemma))
+            if paths:
+                res["ShortestPath"] = min(paths)
+
+            for target_lemma in target.info["Lemmas"]:
+                for neighbor_lemma in neighbor.info["Lemmas"]:
+                    if self.AssociationDictionary.are_related(target_lemma,
+                                                              neighbor_lemma):
+                        res["Associations"] = True
+                        break
 
         if self._cooccurrence:
             if not self._distr_dict.cooccur_in_corpus(target.info[

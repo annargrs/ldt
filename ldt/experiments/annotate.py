@@ -133,6 +133,7 @@ class AnnotateVectorNeighborhoods(Experiment):
         self.message = "Starting LD annotation."
 
         self._metadata["failed_pairs"] = []
+        self._metadata["missed_pairs"] = []
         self._metadata["total_pairs"] = 0
 
         self.supported_vars = ["SharedPOS", "SharedMorphForm",
@@ -191,6 +192,9 @@ class AnnotateVectorNeighborhoods(Experiment):
         pass
 
     def _process(self, embeddings_path):
+
+        prior_data = collect_prior_data(self.output_dir)
+
         filename = get_fname_for_embedding(embeddings_path)
         neighbor_file_path = os.path.join(self.output_dir.replace(
             "neighbors_annotated", "neighbors"), filename)
@@ -202,15 +206,27 @@ class AnnotateVectorNeighborhoods(Experiment):
         for col_dict in dicts:
             neighbor = col_dict["Neighbor"]
             target = col_dict["Target"]
-            relations = self.analyzer.analyze(target, neighbor)
-            if not relations:
-                self._metadata["failed_pairs"].append(tuple([target, neighbor]))
+            if target+":"+neighbor in prior_data:
+                col_dict.update(prior_data[target+":"+neighbor])
             else:
-                for i in self.continuous_vars:
-                    if i in relations:
-                        col_dict[i] = relations[i]
-                for i in self.binary_vars:
-                    col_dict[i] = i in relations
+                relations = self.analyzer.analyze(target, neighbor)
+                if not relations:
+                    self._metadata["failed_pairs"].append(tuple([target, neighbor]))
+                else:
+                    if not "Missing" in relations:
+                        to_check_continuous = self.continuous_vars
+                        to_check_binary = self.binary_vars
+                    else:
+                        to_check_binary = ["NonCooccurring", "GDeps"]
+                        to_check_continuous = ["TargetFrequency",
+                                               "NeighborFrequency"]
+                        self._metadata["missed_pairs"].append(
+                            tuple([target, neighbor]))
+                    for i in to_check_continuous:
+                        if i in relations:
+                            col_dict[i] = relations[i]
+                    for i in to_check_binary:
+                        col_dict[i] = i in relations
 
         output_df = pd.DataFrame(dicts,
                                  columns=["Target", "Rank", "Neighbor",
@@ -222,10 +238,42 @@ class AnnotateVectorNeighborhoods(Experiment):
         """Helper method for logging unique failed target:neighbor pairs and
         calculating the overall coverage (considered as number of non-unique
         pairs for which dictionary data was successfully found)."""
+
+        total_fails = self._metadata["failed_pairs"]+self._metadata[
+            "missed_pairs"]
+        total_fails = list(set(total_fails))
         self._metadata["coverage"] = \
-            1 - round(len(self._metadata["failed_pairs"])/self._metadata[
-                "total_pairs"], 2)
-        self._failed_pairs = list(set(tuple(self._metadata["failed_pairs"])))
+            1 - round(len(total_fails)/self._metadata["total_pairs"], 2)
+
+
+def collect_prior_data(output_dir):
+    """Helper for collecting all the previously processed data (useful in
+    case a large experiment is interrupted in the middle, as many word pairs
+    repeat across different embeddings).
+
+    Args:
+        output_dir (str): the path where the previous results have been saved.
+
+    Returns:
+         (dict): a dictionary with previously computed word relations,
+         with similarity and rank data removed. The keys are target:neighbor
+         pairs.
+
+    """
+    processed_files = os.listdir(output_dir)
+    if "metadata.json" in processed_files:
+        processed_files.remove("metadata.json")
+    prior_res = {}
+    for f in processed_files:
+        input_df = pd.read_csv(os.path.join(output_dir, f), header=0, sep="\t")
+        del input_df["Rank"]
+        del input_df["Similarity"]
+        dicts = input_df.to_dict(orient="records")
+        for pair in dicts:
+            prior_res[pair["Target"]+":"+pair["Neighbor"]] = pair
+    return prior_res
+
+
 
 def get_fname_for_embedding(embeddings_path):
 
