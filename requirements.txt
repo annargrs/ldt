@@ -7,3 +7,4 @@ inflect
 nltk
 vecto
 pandas
+outdated
