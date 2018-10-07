@@ -89,6 +89,7 @@ class VectorNeighborhoods(Experiment):
 
         self._metadata["task"] = "get_neighbors"
         self._metadata["uuid"] = str(uuid.uuid4())
+        self._metadata["top_n"] = top_n
         self._load_dataset(dataset=dataset)
 
         self._normalize = normalize

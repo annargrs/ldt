@@ -100,7 +100,7 @@ class LDScoring(Experiment):
             overwrite=overwrite, embeddings=None, output_dir=output_dir,
             dataset=None, experiment_subfolder="analysis")
 
-        self._metadata["task"] = "ld_scoring"
+        self._metadata["task"] = "ld_scores_analysis"
         self._metadata["uuid"] = str(uuid.uuid4())
         self._load_dataset(dataset=None)
         neighbors_metadata_path = self.output_dir.replace(
@@ -116,6 +116,7 @@ class LDScoring(Experiment):
             self.embeddings = []
             for embedding in self._metadata["embeddings"]:
                 self.embeddings.append(embedding["path"])
+
 
         self.supported_vars = ["SharedPOS", "SharedMorphForm",
                                "SharedDerivation", "NonCooccurring",
@@ -160,7 +161,7 @@ class LDScoring(Experiment):
                                         ld_scores]
             else:
                 raise ValueError(output_scores_error)
-
+        self._metadata["ld_scores"] = self.output_vars
         self.message = None
 
     def _load_dataset(self, dataset):
