@@ -21,9 +21,10 @@ Todo:
 import os
 import datetime
 import abc
+import uuid
 
 import json
-from vecto.utils.data import load_json
+from vecto.utils.data import load_json, save_json
 
 from ldt import __version__
 from ldt.load_config import config
@@ -73,7 +74,7 @@ class Experiment(metaclass=abc.ABCMeta):
 
         self.output_dir = check_output(output_dir, experiment_subfolder,
                                        experiment_name)
-
+        self.message = None
         if embeddings:
             self.embeddings = check_input(input_data=embeddings)
 
@@ -87,14 +88,14 @@ class Experiment(metaclass=abc.ABCMeta):
                 self._metadata = load_json(metadata_path)
             else:
                 self._init_metadata(embeddings)
-                self._overwrite=True
+                self._overwrite = True
 
         self._load_dataset(dataset=dataset)
         if isinstance(extra_metadata, dict):
             self._metadata.update(extra_metadata)
 
     def _init_metadata(self, embeddings):
-        """Metadata Init helper"""
+        """Metadata Initialization helper"""
         self._metadata = {}
 
         self._metadata["timestamp"] = {}
@@ -102,14 +103,18 @@ class Experiment(metaclass=abc.ABCMeta):
         self._metadata["class"] = "experiment"
         if hasattr(self, "embeddings"):
             self._metadata["embeddings"] = []
+            shared_subpath = check_shared_subpath(embeddings, "")
             for embedding in embeddings:
+
                 meta_path = os.path.join(embedding, "metadata.json")
                 if os.path.isfile(meta_path):
                     embedding_metadata = load_json(meta_path)
                     embedding_metadata["path"] = embedding
-                    self._metadata["embeddings"].append(embedding_metadata)
                 else:
-                    self._metadata["embeddings"].append(embedding)
+                    embedding_metadata = create_metadata_stub(embedding, shared_subpath)
+
+                    save_json(embedding_metadata, meta_path)
+                self._metadata["embeddings"].append(embedding_metadata)
 
 
     @abc.abstractmethod
@@ -152,18 +157,18 @@ class Experiment(metaclass=abc.ABCMeta):
 
         for i in self.embeddings:
 
-            uuid = self._check_uuid_in_metadata(field="embeddings", path=i)
-            if uuid:
-                self._metadata["timestamp"][uuid] = {}
-                self._metadata["timestamp"][uuid]["start_time"] = \
+            emb_uuid = self._check_uuid_in_metadata(field="embeddings", path=i)
+            if emb_uuid:
+                self._metadata["timestamp"][emb_uuid] = {}
+                self._metadata["timestamp"][emb_uuid]["start_time"] = \
                     datetime.datetime.now().isoformat()
             else:
                 self._metadata["timestamp"][i]["start_time"] = \
                     datetime.datetime.now().isoformat()
 
             self._process(embeddings_path=i)
-            if uuid:
-                self._metadata["timestamp"][uuid]["end_time"] = \
+            if emb_uuid:
+                self._metadata["timestamp"][emb_uuid]["end_time"] = \
                     datetime.datetime.now().isoformat()
             else:
                 self._metadata["timestamp"][i]["end_time"] = \
@@ -176,22 +181,38 @@ class Experiment(metaclass=abc.ABCMeta):
         processed."""
         if self._overwrite:
             return self.embeddings
-        else:
-            unprocessed = self.embeddings
-            for path in self.embeddings:
-                uuid = self._check_uuid_in_metadata(field="embeddings", path=path)
-                if uuid:
-                    if uuid in self._metadata["timestamp"]:
-                        unprocessed.remove(path)
-                else:
-                    if path in self._metadata["timestamp"]:
-                        unprocessed.remove(path)
-            return unprocessed
+
+        unprocessed = self.embeddings
+        for path in self.embeddings:
+            emb_uuid = self._check_uuid_in_metadata(field="embeddings", path=path)
+            if emb_uuid:
+                if emb_uuid in self._metadata["timestamp"]:
+                    unprocessed.remove(path)
+            else:
+                if path in self._metadata["timestamp"]:
+                    unprocessed.remove(path)
+        return unprocessed
 
     def _postprocess_metadata(self):
         """Helper method for experiments that require extra operations on
         metadata once the processing has been complete"""
         pass
+
+    def get_fname_for_embedding(self, embeddings_path):
+
+        """At the moment, filenames are created from model names of the
+        embedding models, assumed to be unique. If no model names are found
+        in metadata, directory names for folders that
+        contained the initial embeddings. In that case, they better be
+        unique. """
+
+        if "embeddings" in self._metadata:
+            for embedding in self._metadata["embeddings"]:
+                if embedding["path"] == embeddings_path:
+                    return embedding["model"]
+        filename = os.path.split(embeddings_path)[-1]+".tsv"
+        if os.path.isfile(filename):
+            return filename
 
 def check_input(input_data):
     """Helper function that makes sure that all input paths are valid."""
@@ -224,10 +245,54 @@ def check_output(output_dir, experiment_subfolder, experiment_name):
                 os.mkdir(full_path)
     return full_path
 
+def check_shared_subpath(embeddings, head):
+    """Find the maximum removeable subpath that would still leave the model
+    subfolders intelligible"""
+    head = head + os.path.dirname(embeddings[0])
+    for i in embeddings:
+        if not i.startswith(head):
+            return os.path.split(head)[0]
+    embeddings = [x.strip(head) for x in embeddings]
+    return check_shared_subpath(embeddings, head)
 
-
-def generate_identifiable_filenames():
-    """TBD"""
-    pass
-
+def create_metadata_stub(embedding, shared_subpath):
+    """Creating a Vecto-style metadata stub for input embeddings. We highly
+    recommend filling these stubs out right now, while you still remember what
+    your data is and where it is from."""
+    for i in [shared_subpath, embedding]:
+        i = i.strip("/")
+        i = i.strip("\\")
+    model_name = embedding.replace(shared_subpath, "")
+    for i in ["/", "\\"]:
+        model_name = model_name.strip(i)
+        model_name = model_name.replace(i, "_")
+    metadata_stub = {}
+    metadata_stub["path"] = embedding
+    metadata_stub["uuid"] = str(uuid.uuid4())
+    metadata_stub["class"] = "embeddings"
+    metadata_stub["model"] = model_name
+    metadata_stub["dimensionality"] = ""
+    metadata_stub["window"] = ""
+    metadata_stub["context"] = ""
+    metadata_stub["cite"] = {}
+    metadata_stub["corpus"] = [{"name": "",
+                                "size": "",
+                                "description": "",
+                                "source": "",
+                                "domain": "",
+                                "language": [""],
+                                "pre-processing": {
+                                    "cleanup": "",
+                                    "lowercasing": "",
+                                    "tokenization": "",
+                                    "lemmatization": "",
+                                    "stemming": "",
+                                    "POS_tagging": "",
+                                    "syntactic_parsing": ""
+                                    }
+                               }],
+    metadata_stub["vocabulary"] = {"size": "",
+                                   "min_frequency": "",
+                                   "lowercasing": ""}
+    return metadata_stub
 

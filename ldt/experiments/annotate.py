@@ -20,8 +20,9 @@ between them in an ontology). See the full list of available scores `here
 Todo:
 
     * parsing arguments from command line
-    * cache saved between sessions
     * ldt resource settings saved to metadata
+    * add progressbars
+    * multicore processing
 
 """
 
@@ -200,9 +201,9 @@ class AnnotateVectorNeighborhoods(Experiment):
 
         prior_data = collect_prior_data(self.output_dir)
 
-        filename = get_fname_for_embedding(embeddings_path)
+        filename = self.get_fname_for_embedding(embeddings_path)
         neighbor_file_path = os.path.join(self.output_dir.replace(
-            "neighbors_annotated", "neighbors"), filename)
+            "neighbors_annotated", "neighbors"), filename+".tsv")
         print("Annotating "+neighbor_file_path)
 
         input_df = pd.read_csv(neighbor_file_path, header=0, sep="\t")
@@ -280,13 +281,6 @@ def collect_prior_data(output_dir):
 
 
 
-def get_fname_for_embedding(embeddings_path):
-
-    """At the moment, filenames are simply directory names for folders that
-    contained the initial embeddings. They are assumed to be unique."""
-
-    filename = os.path.split(embeddings_path)[-1]+".tsv"
-    return filename
 
 if __name__ == '__main__':
     annotation = AnnotateVectorNeighborhoods(experiment_name="testing",

@@ -28,7 +28,6 @@ import pandas as pd
 from vecto.utils.data import load_json
 
 from ldt.experiments.metadata import Experiment
-from ldt.experiments.annotate import get_fname_for_embedding
 from ldt.load_config import config
 
 class LDScoring(Experiment):
@@ -190,7 +189,7 @@ class LDScoring(Experiment):
         Returns:
 
         """
-        filename = get_fname_for_embedding(embeddings_path)
+        filename = self.get_fname_for_embedding(embeddings_path)
         annotated_file_path = os.path.join(self.output_dir.replace(
             "analysis", "neighbors_annotated"), filename)
         input_df = pd.read_csv(annotated_file_path, header=0, sep="\t")

@@ -71,7 +71,7 @@ experiments:
   experiment_name: testing
 
   # how many neighbors to extract and annotate
-  top_n: 100
+  top_n: 2
 
   # overwriting any previous data, if an experiment with the same name has already been performed:
   overwrite: True

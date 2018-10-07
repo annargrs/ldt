@@ -15,24 +15,21 @@ tuning and hypothesis-driven model development, as described `here
 <http://ldtoolkit.space/analysis/examples/>`_.
 
 """
+
+import sys
+import os
+import ruamel.yaml as yaml
+
 import ldt
 
-from ldt.experiments.metadata import Experiment
-from ldt.experiments.neighbors import VectorNeighborhoods
-from ldt.experiments.annotate import AnnotateVectorNeighborhoods
-from ldt.experiments.analyze import LDScoring
-
-from ldt.dicts.normalize import Normalization
-from ldt.dicts.derivation.meta import DerivationAnalyzer
-from ldt.dicts.semantics.metadictionary import MetaDictionary
-from ldt.relations.pair import RelationsInPair
-
-from ldt.load_config import config
-
-def default_workflow(experiment_name=config["experiments"]["experiment_name"],
-                     overwrite=config["experiments"]["overwrite"],
-                     top_n=config["experiments"]["top_n"]):
-
+def default_workflow(experiment_name=
+                     ldt.config["experiments"]["experiment_name"],
+                     overwrite=ldt.config["experiments"]["overwrite"],
+                     top_n=ldt.config["experiments"]["top_n"]):
+    """Full LDT workflow for English, with most LDT resources used for
+    analysis of relations (except BabelNet). Modify this script as needed.
+    Descriptions of available settings for all resources are available in
+    their respective documentation."""
     #getting vector neighborhoods
     neighborhoods = ldt.experiments.VectorNeighborhoods(
         experiment_name=experiment_name, overwrite=overwrite, top_n=top_n)
@@ -48,7 +45,8 @@ def default_workflow(experiment_name=config["experiments"]["experiment_name"],
         language="English", order=("wordnet", "wiktionary"))
 
     analyzer = ldt.relations.pair.RelationsInPair(normalizer=normalizer,
-        derivation_dict=derivation, lex_dict=lex_dict)
+                                                  derivation_dict=derivation,
+                                                  lex_dict=lex_dict)
 
     # performing annotation
     annotation = ldt.experiments.AnnotateVectorNeighborhoods(
@@ -63,4 +61,28 @@ def default_workflow(experiment_name=config["experiments"]["experiment_name"],
 
 
 if __name__ == "__main__":
-    default_workflow()
+
+    """In command-line setting this script takes one argument: the location 
+    of the configuration yaml file from which most settings are retrieved."""
+
+    if len(sys.argv) == 1:
+        default_workflow(
+            experiment_name=ldt.config["experiments"]["experiment_name"],
+            overwrite=ldt.config["experiments"]["overwrite"],
+            top_n=ldt.config["experiments"]["top_n"])
+    elif len(sys.argv) == 2:
+        config_path = sys.argv[1]
+        if not os.path.isfile(config_path):
+            print("Invalid path to configuration file.")
+            exit()
+        else:
+            with open(config_path) as stream:
+                try:
+                    ldt.config = yaml.safe_load(stream)
+                    default_workflow(
+                        experiment_name=ldt.config["experiments"]["experiment_name"],
+                        overwrite=ldt.config["experiments"]["overwrite"],
+                        top_n=ldt.config["experiments"]["top_n"])
+                except:
+                    print("Something is wrong with the configuration yaml file.")
+                    exit()
