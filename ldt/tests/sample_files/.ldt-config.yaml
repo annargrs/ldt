@@ -61,4 +61,19 @@ experiments:
   /path/to/embeddings/dir2
   ]
 
+# default workflow settings:
+
+  # The data will be saved in "experiments" subfolder of the above path_to_resources location.
+  # LDT analysis is performed in three steps: neighbor extraction, neighbor annotation, and
+  # analysis of results. A subfolder will be created for each of these steps.
+
+  # experiment name (will also be used as a subfolder name for the experiment data)
+  experiment_name: testing
+
+  # how many neighbors to extract and annotate
+  top_n: 100
+
+  # overwriting any previous data, if an experiment with the same name has already been performed:
+  overwrite: True
+
 

@@ -52,6 +52,7 @@ def load_config(path=CONFIGPATH):
         options["experiments"]["embeddings"] = \
             [os.path.join(options["path_to_resources"], "sample_embeddings")]
         options["wiktionary_cache"] = False
+        options["top_n"] = 2
     options["path_to_cache"] = \
         os.path.join(options["path_to_resources"], "cache")
     if options["cache_size"] == "None":

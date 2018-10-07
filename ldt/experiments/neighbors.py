@@ -38,8 +38,10 @@ class VectorNeighborhoods(Experiment):
 
     #pylint: disable=too-many-arguments
 
-    def __init__(self, experiment_name=None, extra_metadata=None,
-                 overwrite=False, top_n=100, normalize=True,
+    def __init__(self, experiment_name=config["experiments"]["experiment_name"],
+                 extra_metadata=None,
+                 overwrite=config["experiments"]["overwrite"],
+                 top_n=config["experiments"]["top_n"], normalize=True,
                  embeddings=config["experiments"]["embeddings"],
                  output_dir=os.path.join(config["path_to_resources"],
                                          "experiments"),

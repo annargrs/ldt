@@ -36,10 +36,11 @@ class LDScoring(Experiment):
     given a collection of annotated vector neighborhood files.
     Vecto-style metadata is also generated."""
 
-    def __init__(self, experiment_name=None, extra_metadata=None,
-                 overwrite=False, ld_scores="all",
-                 output_dir=os.path.join(config["path_to_resources"],
-                                         "experiments")):
+    def __init__(self, experiment_name=config["experiments"]["experiment_name"],
+                 extra_metadata=None,
+                 overwrite=config["experiments"]["overwrite"],
+                 ld_scores="all", output_dir=
+                 os.path.join(config["path_to_resources"], "experiments")):
 
         """ Annotating pre-computed top *n* neighbors for a given vocab sample
 

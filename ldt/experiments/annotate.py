@@ -39,14 +39,17 @@ from ldt.dicts.derivation.meta import DerivationAnalyzer
 from ldt.dicts.semantics.metadictionary import MetaDictionary
 from ldt.relations.pair import RelationsInPair
 
+from ldt.load_config import config
+
 class AnnotateVectorNeighborhoods(Experiment):
     """This class provides a simple interface for annotating pre-computed top_n
     vector neighborhoods for a given vocabulary sample.
     Vecto-style metadata is also generated."""
 
     #pylint: disable=too-many-arguments
-    def __init__(self, experiment_name=None, extra_metadata=None,
-                 overwrite=False, ld_scores="all",
+    def __init__(self, experiment_name=config["experiments"]["experiment_name"],
+                 extra_metadata=None,
+                 overwrite=config["experiments"]["overwrite"], ld_scores="all",
                  output_dir=os.path.join(config["path_to_resources"],
                                          "experiments"),
                  ldt_analyzer=None):

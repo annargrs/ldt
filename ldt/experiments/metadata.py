@@ -26,6 +26,7 @@ import json
 from vecto.utils.data import load_json
 
 from ldt import __version__
+from ldt.load_config import config
 
 
 class Experiment(metaclass=abc.ABCMeta):
@@ -33,9 +34,14 @@ class Experiment(metaclass=abc.ABCMeta):
     infrastructure. All specific experiment types must inherit from it."""
 
     # pylint: disable = too-many-arguments
-    def __init__(self, experiment_name=None, extra_metadata=None,
-                 embeddings=None, dataset=None, output_dir=None,
-                 overwrite=False, experiment_subfolder=None):
+    def __init__(self, experiment_name=config["experiments"]["experiment_name"],
+                 extra_metadata=None,
+                 dataset=config["experiments"]["vocab_sample"],
+                 embeddings=config["experiments"]["embeddings"],
+                 output_dir=os.path.join(config["path_to_resources"],
+                                         "experiments"),
+                 overwrite=config["experiments"]["overwrite"],
+                 experiment_subfolder=None):
         """ Initializing an Experiment.
 
         Args:
