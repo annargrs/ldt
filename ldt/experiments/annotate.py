@@ -30,6 +30,8 @@ import os
 import uuid
 
 import pandas as pd
+# import progressbar
+from tqdm import tqdm
 
 from vecto.utils.data import load_json
 
@@ -209,7 +211,9 @@ class AnnotateVectorNeighborhoods(Experiment):
         input_df = pd.read_csv(neighbor_file_path, header=0, sep="\t")
         self._metadata["total_pairs"] += len(input_df)
         dicts = input_df.to_dict(orient="records")
-        for col_dict in dicts:
+
+        for i in tqdm(range(len(dicts))):
+            col_dict = dicts[i]
             neighbor = col_dict["Neighbor"]
             target = col_dict["Target"]
             if target+":"+neighbor in prior_data:
