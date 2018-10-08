@@ -113,6 +113,8 @@ class LDScoring(Experiment):
         else:
             neighbors_metadata = load_json(neighbors_metadata_path)
             self._metadata["embeddings"] = neighbors_metadata["embeddings"]
+            self._metadata["annotation"] = neighbors_metadata
+            del self._metadata["annotation"]["embeddings"]
             self.embeddings = []
             for embedding in self._metadata["embeddings"]:
                 self.embeddings.append(embedding["path"])
@@ -138,10 +140,9 @@ class LDScoring(Experiment):
         output_vars = ["SharedPOS", "SharedMorphForm", "SharedDerivation",
                        "NonCooccurring", "CloseNeighbors", "FarNeighbors",
                        "LowFreqNeighbors", 'HighFreqNeighbors', "GDeps",
-                       "TargetFrequency", "NeighborFrequency", "Associations",
-                       "ShortestPathMedian", "CloseInOntology", "Synonyms",
-                       "Antonyms",  "Meronyms", "Hyponyms", "Hypernyms",
-                       "OtherRelations", "Numbers", "ProperNouns",
+                       "Associations", "ShortestPathMedian", "CloseInOntology",
+                       "Synonyms", "Antonyms",  "Meronyms", "Hyponyms",
+                       "Hypernyms", "OtherRelations", "Numbers", "ProperNouns",
                        "Misspellings", "URLs", "Filenames", "ForeignWords",
                        "Hashtags", "Noise"]
 
