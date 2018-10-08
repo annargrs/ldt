@@ -191,7 +191,7 @@ class LDScoring(Experiment):
         """
         filename = self.get_fname_for_embedding(embeddings_path)
         annotated_file_path = os.path.join(self.output_dir.replace(
-            "analysis", "neighbors_annotated"), filename)
+            "analysis", "neighbors_annotated"), filename+".tsv")
         input_df = pd.read_csv(annotated_file_path, header=0, sep="\t")
 
         len_df = len(input_df)
