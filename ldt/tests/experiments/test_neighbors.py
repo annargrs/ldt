@@ -49,15 +49,15 @@ class Tests(unittest.TestCase):
                                                 ld_scores=output_scores)
         cls.scoring.get_results()
 
-    @classmethod
-    def tearDownClass(cls):
-        """Clearning up the test dir."""
-        cls.experiment = None
-        subfolders = ["neighbors", "neighbors_annotated", "analysis"]
-        for sub in subfolders:
-            dir = os.path.join(config["path_to_resources"], "experiments",
-                               "testing", sub)
-            shutil.rmtree(dir)
+    # @classmethod
+    # def tearDownClass(cls):
+    #     """Clearning up the test dir."""
+    #     cls.experiment = None
+    #     subfolders = ["neighbors", "neighbors_annotated", "analysis"]
+    #     for sub in subfolders:
+    #         dir = os.path.join(config["path_to_resources"], "experiments",
+    #                            "testing", sub)
+    #         shutil.rmtree(dir)
 
 ######## tests for metadata and neighborhoods #############
 

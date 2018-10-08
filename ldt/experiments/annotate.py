@@ -156,8 +156,8 @@ class AnnotateVectorNeighborhoods(Experiment):
                                "ShortestPath", "Synonyms", "Antonyms",
                                "Meronyms", "Hyponyms", "Hypernyms",
                                "OtherRelations", "Numbers", "ProperNouns",
-                               "Noise", "URLs", "Filenames",
-                               "ForeignWords", "Hashtags"]
+                               "Misspellings", "URLs", "Filenames",
+                               "ForeignWords", "Hashtags", "Noise"]
 
         self.continuous_vars = ['ShortestPath', 'TargetFrequency',
                                 'NeighborFrequency']

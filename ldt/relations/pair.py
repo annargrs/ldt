@@ -207,7 +207,7 @@ def _binary_rels(target, neighbor):
     """
     res = []
     for wordclass in ["Numbers", "ProperNouns", "Noise", "URLs",
-                      "Filenames", "ForeignWords", "Hashtags"]:
+                      "Filenames", "ForeignWords", "Hashtags", "Misspellings"]:
         if target.info[wordclass] == neighbor.info[wordclass] == True:
             res.append(wordclass)
     if target.info["POS"].intersection(neighbor.info["POS"]):

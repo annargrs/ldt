@@ -81,11 +81,12 @@ class LDScoring(Experiment):
                     - "OtherRelations",
                     - "Numbers",
                     - "ProperNouns",
-                    - "Noise",
+                    - "Misspellings",
                     - "URLs",
                     - "Filenames",
                     - "ForeignWords",
-                    - "Hashtags".
+                    - "Hashtags",
+                    - "Noise".
 
         Returns:
 
@@ -124,8 +125,8 @@ class LDScoring(Experiment):
                                "ShortestPath", "Synonyms", "Antonyms",
                                "Meronyms", "Hyponyms", "Hypernyms",
                                "OtherRelations", "Numbers", "ProperNouns",
-                               "Noise", "URLs", "Filenames",
-                               "ForeignWords", "Hashtags"]
+                               "Misspellings", "URLs", "Filenames",
+                               "ForeignWords", "Hashtags", "Noise"]
 
         self.continuous_vars = ['ShortestPath', 'TargetFrequency',
                                 'NeighborFrequency', 'CloseNeighbors',
@@ -136,12 +137,13 @@ class LDScoring(Experiment):
 
         output_vars = ["SharedPOS", "SharedMorphForm", "SharedDerivation",
                        "NonCooccurring", "CloseNeighbors", "FarNeighbors",
-                        "LowFreqNeighbors", 'HighFreqNeighbors', "GDeps",
-                        "TargetFrequency", "NeighborFrequency", "Associations",
-                        "ShortestPathMedian", "CloseInOntology", "Synonyms",
-                        "Antonyms",  "Meronyms", "Hyponyms", "Hypernyms",
-                        "OtherRelations", "Numbers", "ProperNouns", "Noise",
-                        "URLs", "Filenames", "ForeignWords", "Hashtags"]
+                       "LowFreqNeighbors", 'HighFreqNeighbors', "GDeps",
+                       "TargetFrequency", "NeighborFrequency", "Associations",
+                       "ShortestPathMedian", "CloseInOntology", "Synonyms",
+                       "Antonyms",  "Meronyms", "Hyponyms", "Hypernyms",
+                       "OtherRelations", "Numbers", "ProperNouns",
+                       "Misspellings", "URLs", "Filenames", "ForeignWords",
+                       "Hashtags", "Noise"]
 
         output_scores_error = "The ld_scores argument is invalid. It should " \
                               "be 'all' for all supported relations, " \
@@ -258,7 +260,6 @@ class LDScoring(Experiment):
                           index=False, sep="\t")
             self._metadata["timestamp"] = datetime.datetime.now().isoformat()
             self.save_metadata()
-
 
 if __name__ == '__main__':
     annotation = LDScoring(experiment_name="testing", overwrite=True)
