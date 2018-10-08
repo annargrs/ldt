@@ -56,7 +56,7 @@ class Tests(unittest.TestCase):
         subfolders = ["neighbors", "neighbors_annotated", "analysis"]
         for sub in subfolders:
             dir = os.path.join(config["path_to_resources"], "experiments",
-                               sub, "testing")
+                               "testing", sub)
             shutil.rmtree(dir)
 
 ######## tests for metadata and neighborhoods #############
@@ -65,7 +65,7 @@ class Tests(unittest.TestCase):
     def test_dir(self):
         """Creation of subfolder per specific experiment"""
         dir = os.path.join(config["path_to_resources"], "experiments",
-                           "neighbors", "testing")
+                           "testing", "neighbors")
         self.assertTrue(os.path.isdir(dir))
 
     def test_dataset(self):
@@ -76,7 +76,7 @@ class Tests(unittest.TestCase):
     def test_metadata(self):
         """Testing that the experiment metadata is saved"""
         metadata_path = os.path.join(config["path_to_resources"],
-                                     "experiments", "neighbors", "testing",
+                                     "experiments", "testing", "neighbors",
                                      "metadata.json")
         with open(metadata_path, "r") as f:
             metadata = json.load(f)
@@ -85,7 +85,7 @@ class Tests(unittest.TestCase):
     def test_metadata_embeddings(self):
         """Testing that the embeddings metadata is incorporated"""
         metadata_path = os.path.join(config["path_to_resources"],
-                                     "experiments", "neighbors", "testing",
+                                     "experiments", "testing", "neighbors",
                                      "metadata.json")
         with open(metadata_path, "r") as f:
             metadata = json.load(f)
@@ -94,7 +94,7 @@ class Tests(unittest.TestCase):
     def test_metadata_dataset(self):
         """Testing that the dataset metadata is incorporated"""
         metadata_path = os.path.join(config["path_to_resources"],
-                                     "experiments", "neighbors", "testing",
+                                     "experiments", "testing", "neighbors",
                                      "metadata.json")
         with open(metadata_path, "r") as f:
             metadata = json.load(f)
@@ -103,7 +103,7 @@ class Tests(unittest.TestCase):
     def test_metadata_uuid(self):
         """Testing that the dataset metadata is incorporated"""
         metadata_path = os.path.join(config["path_to_resources"],
-                                     "experiments", "neighbors", "testing",
+                                     "experiments", "testing", "neighbors",
                                      "metadata.json")
         with open(metadata_path, "r") as f:
             metadata = json.load(f)
@@ -111,7 +111,7 @@ class Tests(unittest.TestCase):
 
     def test_neighbor_extraction(self):
         dir = os.path.join(config["path_to_resources"], "experiments",
-                           "neighbors", "testing")
+                           "testing", "neighbors")
         files = os.listdir(dir)
         fname = ""
         for f in files:
@@ -137,12 +137,12 @@ class Tests(unittest.TestCase):
     def test_dir_annotation(self):
         """Creation of subfolder per specific experiment"""
         dir = os.path.join(config["path_to_resources"], "experiments",
-                           "neighbors_annotated", "testing")
+                           "testing", "neighbors_annotated")
         self.assertTrue(os.path.isdir(dir))
 
     def test_annotation(self):
         f = os.path.join(config["path_to_resources"], "experiments",
-                           "neighbors_annotated", "testing",
+                           "testing", "neighbors_annotated",
                            "sample_embeddings.tsv")
         res_df = pd.read_csv(f, header=0, sep="\t")
         operations_is_lemma = res_df.at[res_df['Neighbor'].eq(
@@ -154,13 +154,13 @@ class Tests(unittest.TestCase):
     def test_dir_analysis(self):
         """Creation of subfolder per specific experiment"""
         dir = os.path.join(config["path_to_resources"], "experiments",
-                           "analysis", "testing")
+                           "testing", "analysis")
         self.assertTrue(os.path.isdir(dir))
 
     def test_analysis(self):
         """Creation of subfolder per specific experiment"""
         file = os.path.join(config["path_to_resources"], "experiments",
-                            "analysis", "testing", "ld_scores.tsv")
+                            "testing", "analysis", "ld_scores.tsv")
         res_df = pd.read_csv(file, header=0, sep="\t")
         hashtags = res_df.at[res_df['Embedding'].eq(
             'sample_embedding').idxmax(), 'Hashtags']
