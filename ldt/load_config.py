@@ -67,4 +67,19 @@ def load_config(path=CONFIGPATH):
     return options
 
 #pylint: disable=invalid-name
+global config
 config = load_config()
+
+# def update_config(new_config_path):
+#     """Updating the config with the contents of an alternative yaml file."""
+#     if not os.path.isfile(new_config_path):
+#         print("Path not found: ", new_config_path)
+#         return None
+#     with open(new_config_path) as stream:
+#         try:
+#             new_config = yaml.safe_load(stream)
+#             return new_config
+#         except:
+#             print("Something is wrong with the configuration yaml file: ",
+#                   new_config_path)
+

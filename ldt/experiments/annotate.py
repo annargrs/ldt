@@ -4,7 +4,7 @@
 This module provides functionality for annotating vector neighborhoods
 obtained from a number of word embeddings.
 
-This is the second (and most important) step in LDT analysis workflow. The
+This is the second (and most important) step in LDT analysis default_workflow. The
 input is pre-computed vector neighborhood files that are prepared with
 :class:`~ldt.experiments.neighbors.VectorNeighborhoods` class. See the
 documentation of that class for more details.
@@ -121,6 +121,7 @@ class AnnotateVectorNeighborhoods(Experiment):
 
         self._metadata["task"] = "annotate_neighbors"
         self._metadata["uuid"] = str(uuid.uuid4())
+        self._metadata["ldt_config"] = config
         self._load_dataset(dataset=None)
         neighbors_metadata_path = self.output_dir.replace(
             "neighbors_annotated", "neighbors")
@@ -136,7 +137,9 @@ class AnnotateVectorNeighborhoods(Experiment):
             for embedding in self._metadata["embeddings"]:
                 self.embeddings.append(embedding["path"])
 
-        self.message = "Starting LD annotation."
+        self.message = "Starting LD annotation. This will take a while for " \
+                       "the first files, but the remainder should go faster, " \
+                       "because many neighbor pairs will be the same."
 
         self._metadata["failed_pairs"] = []
         self._metadata["missed_pairs"] = []

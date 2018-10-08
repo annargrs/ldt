@@ -1,7 +1,7 @@
 
-"""Full LDT workflow.
+"""Full LDT default_workflow.
 
-This module provides full ldt analysis workflow with default
+This module provides full ldt analysis default_workflow with default
 resources for English, with one-button-press.
 
 The output is saved in the experiments/analysis/your_experiment_name
@@ -21,15 +21,18 @@ import os
 import ruamel.yaml as yaml
 
 import ldt
+from ldt.load_config import config
+import ruamel.yaml as yaml
 
 def default_workflow(experiment_name=
-                     ldt.config["experiments"]["experiment_name"],
-                     overwrite=ldt.config["experiments"]["overwrite"],
-                     top_n=ldt.config["experiments"]["top_n"]):
-    """Full LDT workflow for English, with most LDT resources used for
+                     config["experiments"]["experiment_name"],
+                     overwrite=config["experiments"]["overwrite"],
+                     top_n=config["experiments"]["top_n"]):
+    """Full LDT default_workflow for English, with most LDT resources used for
     analysis of relations (except BabelNet). Modify this script as needed.
     Descriptions of available settings for all resources are available in
     their respective documentation."""
+
     #getting vector neighborhoods
     neighborhoods = ldt.experiments.VectorNeighborhoods(
         experiment_name=experiment_name, overwrite=overwrite, top_n=top_n)
@@ -58,31 +61,3 @@ def default_workflow(experiment_name=
     scoring = ldt.experiments.LDScoring(experiment_name=experiment_name,
                                         overwrite=overwrite)
     scoring.get_results()
-
-
-if __name__ == "__main__":
-
-    """In command-line setting this script takes one argument: the location 
-    of the configuration yaml file from which most settings are retrieved."""
-
-    if len(sys.argv) == 1:
-        default_workflow(
-            experiment_name=ldt.config["experiments"]["experiment_name"],
-            overwrite=ldt.config["experiments"]["overwrite"],
-            top_n=ldt.config["experiments"]["top_n"])
-    elif len(sys.argv) == 2:
-        config_path = sys.argv[1]
-        if not os.path.isfile(config_path):
-            print("Invalid path to configuration file.")
-            exit()
-        else:
-            with open(config_path) as stream:
-                try:
-                    ldt.config = yaml.safe_load(stream)
-                    default_workflow(
-                        experiment_name=ldt.config["experiments"]["experiment_name"],
-                        overwrite=ldt.config["experiments"]["overwrite"],
-                        top_n=ldt.config["experiments"]["top_n"])
-                except:
-                    print("Something is wrong with the configuration yaml file.")
-                    exit()
