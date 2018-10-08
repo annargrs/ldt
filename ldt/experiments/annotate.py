@@ -241,7 +241,7 @@ class AnnotateVectorNeighborhoods(Experiment):
         output_df = pd.DataFrame(dicts,
                                  columns=["Target", "Rank", "Neighbor",
                                           "Similarity"]+self._ld_scores)
-        output_df.to_csv(os.path.join(self.output_dir, filename),
+        output_df.to_csv(os.path.join(self.output_dir, filename+".tsv"),
                          index=False, sep="\t")
 
     def _postprocess_metadata(self):
