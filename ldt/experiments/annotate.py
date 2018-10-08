@@ -55,7 +55,7 @@ class AnnotateVectorNeighborhoods(Experiment):
                  overwrite=config["experiments"]["overwrite"], ld_scores="all",
                  output_dir=os.path.join(config["path_to_resources"],
                                          "experiments"),
-                 ldt_analyzer=None):
+                 ldt_analyzer=None, gdeps=False, cooccurrence=False):
 
         """ Annotating pre-computed top *n* neighbors for a given vocab sample
 
@@ -77,6 +77,10 @@ class AnnotateVectorNeighborhoods(Experiment):
                 resources set up as desired (see tutorial and
                 class documentation). If None, default settings for English
                 will be used.
+            gdeps (bool): whether to use google dependency cooccurrence data
+                (memory-intensive, off by default)
+            cooccurrence (bool): whether to use corpus cooccurrence data
+                (memory-intensive, off by default)
             ld_scores (str or list of str): "all" for all supported scores,
                 or a list of ld_scores. Supported values are:
 
@@ -168,6 +172,10 @@ class AnnotateVectorNeighborhoods(Experiment):
 
         if ld_scores == "all":
             self._ld_scores = self.supported_vars
+            if not gdeps:
+                self._ld_scores.remove("GDeps")
+            if not cooccurrence:
+                self._ld_scores.remove("NonCooccurring")
         else:
             if isinstance(ld_scores, list):
                 unsupported = [x for x in ld_scores if not
@@ -194,7 +202,8 @@ class AnnotateVectorNeighborhoods(Experiment):
 
             self.analyzer = RelationsInPair(normalizer=normalizer,
                                             derivation_dict=derivation,
-                                            lex_dict=lex_dict)
+                                            lex_dict=lex_dict, gdeps=gdeps,
+                                            cooccurrence=cooccurrence)
 
     def _load_dataset(self, dataset):
         """Dataset for generating vector neighborhoods was already processed in

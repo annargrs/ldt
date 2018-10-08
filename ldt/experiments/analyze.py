@@ -190,6 +190,7 @@ class LDScoring(Experiment):
 
         """
         filename = self.get_fname_for_embedding(embeddings_path)
+
         annotated_file_path = os.path.join(self.output_dir.replace(
             "analysis", "neighbors_annotated"), filename+".tsv")
         input_df = pd.read_csv(annotated_file_path, header=0, sep="\t")
@@ -199,7 +200,7 @@ class LDScoring(Experiment):
         def percentage(num, len_df=len_df):
             """Helper for formatting % numbers"""
             return round(100*num/len_df, 2)
-        res = {"Embedding":filename.strip(".tsv")}
+        res = {"Embedding": filename}
         for var in self.binary_vars:
             if var in input_df.columns:
                 try:
@@ -247,6 +248,11 @@ class LDScoring(Experiment):
 
             res.append(self._process(embeddings_path=i))
 
+            for i in ["GDeps", "NonCooccurring"]:
+                if not i in res[0]:
+                    if i in self.output_vars:
+                        self.output_vars.remove(i)
+
             res_df = pd.DataFrame(res, columns=["Embedding"]+self.output_vars)
             res_df.to_csv(os.path.join(self.output_dir, "ld_scores.tsv"),
                           index=False, sep="\t")
@@ -254,6 +260,6 @@ class LDScoring(Experiment):
             self.save_metadata()
 
 
-# if __name__ == '__main__':
-#     annotation = LDScoring(experiment_name="testing", overwrite=True)
-#     annotation.get_results()
+if __name__ == '__main__':
+    annotation = LDScoring(experiment_name="testing", overwrite=True)
+    annotation.get_results()
