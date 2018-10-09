@@ -38,8 +38,9 @@ sys.path.insert(0, root)
 sample_file = os.path.join(root, "ldt/tests/sample_files/.ldt-config.yaml")
 shutil.copyfile(sample_file, tutorial_path)
 
-autodoc_mock_imports = ["_tkinter", "nltk", "enchant", "pyenchant"]
-
+autodoc_mock_imports = ["_tkinter", "pandas", "nltk", "enchant", "pyenchant"]
+for mod_name in autodoc_mock_imports:
+    sys.modules[mod_name] = mock.Mock()
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -236,15 +237,15 @@ texinfo_documents = [
 # import matplotlib
 # matplotlib.use('agg')
 
-import matplotlib
-gui_env = [i for i in matplotlib.rcsetup.interactive_bk]
-print ("I will test for", gui_env)
-for gui in gui_env:
-    print ("testing", gui)
-    try:
-        matplotlib.use(gui,warn=False, force=True)
-        from matplotlib import pyplot as plt
-        print ("    ",gui, "Is Available")
-        print ("Using ..... ",matplotlib.get_backend())
-    except:
-        print ("    ",gui, "Not found")
+# import matplotlib
+# gui_env = [i for i in matplotlib.rcsetup.interactive_bk]
+# print ("I will test for", gui_env)
+# for gui in gui_env:
+#     print ("testing", gui)
+#     try:
+#         matplotlib.use(gui,warn=False, force=True)
+#         from matplotlib import pyplot as plt
+#         print ("    ",gui, "Is Available")
+#         print ("Using ..... ",matplotlib.get_backend())
+#     except:
+#         print ("    ",gui, "Not found")

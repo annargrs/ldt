@@ -1,4 +1,4 @@
-v. 0.3.0, 2018-10-06
+v. 0.3.0, 2018-10-08
 
 * experiments package:
   - extracting vector neighborhoods with optional normalization
