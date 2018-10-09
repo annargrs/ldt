@@ -188,6 +188,8 @@ class LDScoring(Experiment):
                 will be considered as "far neighbors".
             close_neighbors_threshold (float): neighbors closer than this
                 number will be considered as "close neighbors".
+            ontology_threshold (float): neighbors closer in ontology than this
+                number will be considered "CloseInOntology".
 
         Returns:
 

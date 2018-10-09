@@ -240,17 +240,6 @@ def check_output(output_dir, experiment_subfolder, experiment_name):
             full_path = os.path.join(full_path, experiment_subfolder)
             if not os.path.isdir(full_path):
                 os.mkdir(full_path)
-        # if experiment_subfolder:
-        #     full_path = os.path.join(output_dir, experiment_subfolder)
-        #     if not os.path.isdir(full_path):
-        #         os.mkdir(full_path)
-        #     full_path = os.path.join(full_path, experiment_name)
-        #     if not os.path.isdir(full_path):
-        #         os.mkdir(full_path)
-        # else:
-        #     full_path = os.path.join(output_dir, experiment_name)
-        #     if not os.path.isdir(full_path):
-        #         os.mkdir(full_path)
     return full_path
 
 def check_shared_subpath(embeddings, head):

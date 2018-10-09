@@ -188,7 +188,7 @@ class AnnotateVectorNeighborhoods(Experiment):
             else:
                 raise ValueError(ld_scores_error)
 
-        self._metadata["ld_scores"] = self._ld_scores
+        self._metadata["annotated_information"] = self._ld_scores
 
         if ldt_analyzer:
             self.analyzer = ldt_analyzer
