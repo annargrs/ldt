@@ -39,8 +39,7 @@ sample_file = os.path.join(root, "ldt/tests/sample_files/.ldt-config.yaml")
 shutil.copyfile(sample_file, tutorial_path)
 
 autodoc_mock_imports = ["matplotlib", "_tkinter", "pandas", "nltk", "enchant", "pyenchant"]
-for mod_name in autodoc_mock_imports:
-    sys.modules[mod_name] = mock.Mock()
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
