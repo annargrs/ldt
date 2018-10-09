@@ -38,7 +38,7 @@ sys.path.insert(0, root)
 sample_file = os.path.join(root, "ldt/tests/sample_files/.ldt-config.yaml")
 shutil.copyfile(sample_file, tutorial_path)
 
-autodoc_mock_imports = ["nltk", "enchant", "pyenchant"]
+autodoc_mock_imports = ["nltk", "enchant", "pyenchant", '_tkinter']
 
 # -- General configuration ------------------------------------------------
 
