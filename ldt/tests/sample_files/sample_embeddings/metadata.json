@@ -1,0 +1,9 @@
+{
+"class": "embeddings",
+    "model": "sample_embeddings",
+    "uuid" : "f50ec0b7-f960-400d-91f0-c42a6d44e3d0",
+    "window": 2,
+    "dimensionality": 25,
+    "context": "linear_unbound",
+    "epochs": 2
+}

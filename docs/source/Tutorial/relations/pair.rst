@@ -11,8 +11,8 @@ The output of this function is a dictionary with binary or numerical values for 
 
 The basic usage is as follows:
 
->>> relation_analyzer = ldt.relations.RelationsInPair()
->>> relation_analyzer.analyze("black", "white")
+>>> relations = ldt.RelationsInPair()
+>>> relations.analyze("black", "white")
 {'Hyponyms': True,
  'SharedMorphForm': True,
  'SharedPOS': True,
@@ -22,7 +22,7 @@ The basic usage is as follows:
  'Associations': True,
  'TargetFrequency': 491760,
  'NeighborFrequency': 509267}
->>> relation_analyzer.analyze("kindness", "happiness")
+>>> relations.analyze("kindness", "happiness")
 {'Synonyms': True,
  'SharedDerivation': True,
  'SharedMorphForm': True,
@@ -34,7 +34,7 @@ The basic usage is as follows:
 
 ``silent=False`` option exectutes :meth:`~ldt.relations.word.Word.pp_info` function for visual inspection of the information available for the input words.
 
->>> relation_analyzer.analyze("humanist", "anti-humanist", silent=False)
+>>> relations.analyze("humanist", "anti-humanist", silent=False)
 ====== HUMANIST ======
 ====== MORPHOLOGICAL INFO ======
 OriginalForm :  humanist

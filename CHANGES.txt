@@ -1,3 +1,23 @@
+v. 0.3.0, 2018-10-06
+
+* experiments package:
+  - extracting vector neighborhoods with optional normalization
+  - annotating vector neighborhoods with linguistic relations
+  - analysing the results
+  - automatically logging metadata for all experiments
+* bug fixes
+
+v 0.2.1, 2018-09-25.
+
+* bug fixes.
+
+v 0.2.0, 2018-09-24.
+
+* Tutorial;
+* 19 LD variables, including ontology paths;
+* detection of antonymy with language-specific derivational patterns;
+* bug fixes.
+
 v 0.1.0, 2018-08-15 -- Initial release.
 
 * Retrieving lexicographic information from BabelNet, Wiktionary, Wikisaurus and English WordNet;
@@ -7,13 +27,3 @@ v 0.1.0, 2018-08-15 -- Initial release.
 * Parsing Wiktionary etymologies
 * Custom compound splitting routines with filtering by subword length;
 * 4 custom patterns for fixing frequent spelling mistakes.
-
-v 0.2.0, 2018-09-24.
-
-* Tutorial;
-* 19 LD variables, including ontology paths;
-* detection of antonymy with language-specific derivational patterns;
-* bug fixes.
-
-v 0.2.1, 2018-09-25.
-* bug fixes.

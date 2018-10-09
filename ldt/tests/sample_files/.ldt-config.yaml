@@ -13,7 +13,7 @@ lowercasing: True
 babelnet_key: None
 
 # if True, a recent list of wiktionary entries will be downloaded to avoid queries for non-existing entries
-wiktionary_cache: False
+wiktionary_cache: True
 
 # many LDT operations are expensive to compute. This option sets a limit on
 # the size of cache that the library will use to store potentially
@@ -41,3 +41,39 @@ corpus_resources:
     freqdict: Wiki201308.freqdict
     vocabulary: Wiki201308.vocab
     cooccurrence: 3grams.json
+
+experiments:
+
+  # the vocabulary dataset to be tested, expected to be a single-column list of words
+  # with .vocab extension. # Provide the full path to the .vocab file here, e.g.
+
+  # vocab_sample: /path/to/test_sample.vocab
+
+  # Alternatively, if you want to make use of vecto-style metadata, provide the name of
+  # the your_dataset subfolder of vocab_samples subfolder in the general ldt resource location.
+  # with one metadata.json file per subfolder.
+
+  vocab_sample: test_sample
+
+  #embeddings will be loaded with vecto library from the specified directory:
+  embeddings: [
+  /path/to/embeddings/dir,
+  /path/to/embeddings/dir2
+  ]
+
+# default default_workflow settings:
+
+  # The data will be saved in "experiments" subfolder of the above path_to_resources location.
+  # LDT analysis is performed in three steps: neighbor extraction, neighbor annotation, and
+  # analysis of results. A subfolder will be created for each of these steps.
+
+  # experiment name (will also be used as a subfolder name for the experiment data)
+  experiment_name: testing
+
+  # how many neighbors to extract and annotate
+  top_n: 2
+
+  # overwriting any previous data, if an experiment with the same name has already been performed:
+  overwrite: True
+
+

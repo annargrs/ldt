@@ -47,7 +47,8 @@ class Compounds(BaseCustomDict):
         self.morph_dictionary = morph_dictionary
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        resources_path = os.path.join(dir_path, self.language+"/"+self.language+ ".yaml")
+        resources_path = os.path.join(dir_path, self.language,
+                                      self.language+".yaml")
         # print(resources_path)
         if not os.path.isfile(resources_path):
             raise ResourceError(self.language+".yaml not found.")

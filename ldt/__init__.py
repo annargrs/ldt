@@ -18,4 +18,6 @@ from ldt.helpers.loading import load_resource
 from ldt import dicts
 from ldt import relations
 from ldt.relations import Word
+from ldt.relations import RelationsInPair
 
+from ldt import experiments

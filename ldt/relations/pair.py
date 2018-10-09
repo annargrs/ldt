@@ -112,7 +112,7 @@ class RelationsInPair(Dictionary):
         raise NotImplementedError
 
     @functools.lru_cache(maxsize=config["cache_size"])
-    def analyze(self, target, neighbor, silent=True):
+    def _analyze(self, target, neighbor, silent=True):
         """The main function for analyzing the input strings and identifying
         any relations the two words may share.
 
@@ -137,25 +137,31 @@ class RelationsInPair(Dictionary):
         if not silent:
             print(target.pp_info())
             print(neighbor.pp_info())
-        rels = _binary_rels(target, neighbor)
         res = {}
-        for rel in rels:
-            res[rel] = True
+        if neighbor.info["Missing"]:
+            res["Missing"] = True
 
-        paths = []
-        for target_lemma in target.info["Lemmas"]:
-            for neighbor_lemma in neighbor.info["Lemmas"]:
-                    paths.append(self.OntoDict.get_shortest_path(
-                        target_lemma, neighbor_lemma))
-        if paths:
-            res["ShortestPath"] = min(paths)
+        else:
 
-        for target_lemma in target.info["Lemmas"]:
-            for neighbor_lemma in neighbor.info["Lemmas"]:
-                if self.AssociationDictionary.are_related(target_lemma,
-                                                          neighbor_lemma):
-                    res["Associations"] = True
-                    break
+            rels = _binary_rels(target, neighbor)
+
+            for rel in rels:
+                res[rel] = True
+
+            paths = []
+            for target_lemma in target.info["Lemmas"]:
+                for neighbor_lemma in neighbor.info["Lemmas"]:
+                        paths.append(self.OntoDict.get_shortest_path(
+                            target_lemma, neighbor_lemma))
+            if paths:
+                res["ShortestPath"] = min(paths)
+
+            for target_lemma in target.info["Lemmas"]:
+                for neighbor_lemma in neighbor.info["Lemmas"]:
+                    if self.AssociationDictionary.are_related(target_lemma,
+                                                              neighbor_lemma):
+                        res["Associations"] = True
+                        break
 
         if self._cooccurrence:
             if not self._distr_dict.cooccur_in_corpus(target.info[
@@ -174,6 +180,18 @@ class RelationsInPair(Dictionary):
             neighbor.info["OriginalForm"])
         return res
 
+    def analyze(self, target, neighbor, silent=True):
+        """Catch-all wrapper for :meth:`_analyze` that ensures that
+        large-scale annotation continues even if something breaks on a
+        particular pair. The offending data will be logged in experiment
+        metadata."""
+        try:
+            return self._analyze(target, neighbor, silent=silent)
+        except:
+            if not silent:
+                print("Something went wrong: "+target+": "+neighbor)
+                return None
+
 def _binary_rels(target, neighbor):
     """Helper function for identifying intersections in the property lists
     of the target and neighbor word.
@@ -189,7 +207,7 @@ def _binary_rels(target, neighbor):
     """
     res = []
     for wordclass in ["Numbers", "ProperNouns", "Noise", "URLs",
-                      "Filenames", "ForeignWords", "Hashtags"]:
+                      "Filenames", "ForeignWords", "Hashtags", "Misspellings"]:
         if target.info[wordclass] == neighbor.info[wordclass] == True:
             res.append(wordclass)
     if target.info["POS"].intersection(neighbor.info["POS"]):
@@ -234,13 +252,15 @@ def are_related_as(target, neighbor):
     rels = ["Synonyms", "Antonyms", "Meronyms", "OtherRelations"]
     for rel in rels:
         if rel in neighbor.info and rel in target.info:
-            for word in [target.info["OriginalForm"]] + list(target.info["Lemmas"]) + list(target.info["Stems"]):
-                if word in target.info[rel]:
+            for word in [target.info["OriginalForm"]] + list(
+                    target.info["Lemmas"]) + list(target.info["Stems"]):
+                if word in neighbor.info[rel]:
                     res.append(rel)
         if rel not in res:
             if rel in neighbor.info and rel in target.info:
-                for word in [target.info["OriginalForm"]] + list(target.info["Lemmas"]) + list(target.info["Stems"]):
-                    if word in neighbor.info[rel]:
+                for word in [neighbor.info["OriginalForm"]] + list(
+                        neighbor.info["Lemmas"]) + list(neighbor.info["Stems"]):
+                    if word in target.info[rel]:
                         res.append(rel)
     return list(set(res))
 

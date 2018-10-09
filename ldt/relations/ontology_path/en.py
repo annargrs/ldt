@@ -49,7 +49,7 @@ def _get_wn_paths(word1, word2):
             # else:
             #     all_sim.append(0)
     if len(all_sim) > 0:
-        shortest = min(all_sim)
+        shortest = round(min(all_sim), 4)
     else:
         shortest = 0
     return shortest
