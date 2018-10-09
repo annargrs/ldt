@@ -1,7 +1,8 @@
 {
 "class": "dataset",
-    "task": "vector neighborhood generation",
+    "uuid": "f50ec0b7-f960-400d-91f0-c42a6d44e3d1",
+    "task": "get_neighbors",
     "language": ["english"],
-    "name": "tiny sample dataset",
-    "uuid": "f50ec0b7-f960-400d-91f0-c42a6d44e3d1"
+    "name": "test_sample",
+    "description": "just a few words for testing"
 }
