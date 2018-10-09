@@ -12,5 +12,6 @@ LDT Tutorial
    dicts/index
    word/index
    relations/index
+   experiments/index
    troubleshooting
    contact
