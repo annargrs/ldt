@@ -219,8 +219,6 @@ LDT also provides the option of correction of frequent misspelling patterns
 
 .. inclusion-marker-end-do-not-remove
 
-See the `Tutorial and API documentation <https://ldt.readthedocs.io/>`_ for more details on all of these resources.
-
 -----------
 Quick links
 -----------
