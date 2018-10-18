@@ -11,9 +11,11 @@ for evidence of different behavior of word2vec and GloVe with regards to word
 vector neighbors that are related, but were infrequent in the source corpus
 or did not cooccur at all.
 
-If you would like to see how your model fares on distributional scores, we
-are sharing the data that we used in our experiments for English Wikipedia, August 2013 dump can be
-`downloaded here <https://my.pcloud.com/publink/show?code=XZzMFe7Z20t1QWsappQy7BlRdvrqcbrAM6HV>`_. The archive includes:
+The next release of ldt (0.4.0) will include functionality for building
+required distributional resources for any given tokenized corpus. For now, we
+are sharing `the data that we used in our experiments on English Wikipedia
+(August 2013) <https://my.pcloud.com/publink/show?code=XZzMFe7Z20t1QWsappQy7BlRdvrqcbrAM6HV>`_. This includes:
+
   - frequency dictionary,
   - cooccurrence data for linear unbound context window size 2 (more to come),
   - vocab file containing 269,864 words by which which all embeddings were filtered in the experiments described in the `LDT paper <http://aclweb.org/anthology/C18-1228>`_.
