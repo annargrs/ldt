@@ -101,10 +101,12 @@ class RelationsInPair(Dictionary):
             self._lex_dict = lex_dict
 
         if not distr_dict:
-            self._distr_dict = DistributionDict(language=language,
-                                                gdeps=gdeps,
-                                                cooccurrence=cooccurrence,
-                                                cooccurrence_freq=cooccurrence_freq)
+            if config["corpus"]:
+                self._distr_dict = DistributionDict(language=language,
+                                                    gdeps=gdeps,
+                                                    cooccurrence=cooccurrence,
+                                                    cooccurrence_freq=
+                                                    cooccurrence_freq)
         self._gdeps = gdeps
         self._cooccurrence = cooccurrence
 
@@ -149,6 +151,7 @@ class RelationsInPair(Dictionary):
                 res[rel] = True
 
             paths = []
+
             for target_lemma in target.info["Lemmas"]:
                 for neighbor_lemma in neighbor.info["Lemmas"]:
                         paths.append(self.OntoDict.get_shortest_path(
@@ -162,10 +165,31 @@ class RelationsInPair(Dictionary):
                                                               neighbor_lemma):
                         res["Associations"] = True
                         break
+        res = self._distributional_data(target, neighbor, res)
+        return res
 
+    def _distributional_data(self, target, neighbor, res):
+        """ Helper method for retrieving distributional data, if the corpus
+        was specified in config file.
+
+        Args:
+            target (ldt Word object): the target word
+            neighbor (ldt Word object): the neighbor word
+            res (dict): dictionary with already-discovered relations
+
+        Returns:
+            (dict): dictionary with already-discovered relations, updated
+            with distributional data.
+
+        """
+        if not config["corpus"]:
+            return res
+        res["TargetFrequency"] = self._distr_dict.frequency_in_corpus(
+            target.info["OriginalForm"])
+        res["NeighborFrequency"] = self._distr_dict.frequency_in_corpus(
+            neighbor.info["OriginalForm"])
         if self._cooccurrence:
-            if not self._distr_dict.cooccur_in_corpus(target.info[
-                                                          "OriginalForm"],
+            if not self._distr_dict.cooccur_in_corpus(target.info["OriginalForm"],
                                                       neighbor.info["OriginalForm"]):
                 res["NonCooccurring"] = True
 
@@ -173,12 +197,8 @@ class RelationsInPair(Dictionary):
             if self._distr_dict.cooccur_in_gdeps(target.info["OriginalForm"],
                                                  neighbor.info["OriginalForm"]):
                 res["GDeps"] = True
-
-        res["TargetFrequency"] = self._distr_dict.frequency_in_corpus(
-            target.info["OriginalForm"])
-        res["NeighborFrequency"] = self._distr_dict.frequency_in_corpus(
-            neighbor.info["OriginalForm"])
         return res
+
 
     def analyze(self, target, neighbor, silent=True):
         """Catch-all wrapper for :meth:`_analyze` that ensures that
@@ -265,6 +285,6 @@ def are_related_as(target, neighbor):
     return list(set(res))
 
 
-if __name__ == '__main__':
-    relation_analyzer = RelationsInPair()
-    print(relation_analyzer.analyze("cat", "dog"))
+# if __name__ == '__main__':
+#     relation_analyzer = RelationsInPair()
+#     print(relation_analyzer.analyze("cat", "dog"))
