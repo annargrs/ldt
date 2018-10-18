@@ -259,8 +259,11 @@ class LDScoring(Experiment):
                         self.output_vars.remove(i)
 
             res_df = pd.DataFrame(res, columns=["Embedding"]+self.output_vars)
+            res_df = res_df.set_index("Embedding")
+            res_df = res_df.transpose()
+            res_df.index.name = "LDScores"
             res_df.to_csv(os.path.join(self.output_dir, "ld_scores.tsv"),
-                          index=False, sep="\t")
+                          index=True, sep="\t")
             self._metadata["timestamp"] = datetime.datetime.now().isoformat()
             self.save_metadata()
 

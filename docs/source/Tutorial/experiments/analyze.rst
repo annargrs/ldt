@@ -19,13 +19,13 @@ of your ldt data folder: `ld_scores.tsv` file and `metadata.json`.
 
 Sample scoring file format:
 
-+--------------------+----------+----------+
-| Embedding          | Synonyms | Antonyms |
-+--------------------+----------+----------+
-| sample_embeddings  | 0.0      | 0.49     |
-+--------------------+----------+----------+
-| sample_embeddings2 | 0.35     | 0.0      |
-+--------------------+----------+----------+
++----------+-------------------+--------------------+
+| LDScores | sample_embeddings | sample_embeddings2 |
++----------+-------------------+--------------------+
+| Synonyms | 0.0               | 41.4               |
++----------+-------------------+--------------------+
+| Antonyms | 0.35              | 0.0                |
++----------+-------------------+--------------------+
 
 Metadata file includes and partly copies the annotation metadata in the "annotation" key.
 (see :ref:`Annotating vector neighborhoods`).
