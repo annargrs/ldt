@@ -5,14 +5,18 @@ path_to_resources: /the/path/to/cache/and/resources
 # default query language for all dictionaries
 default_language: English
 
-# if you are working with embeddings that were made from a lowercased corpus, set this to True.
+# if you are working with embeddings that were made from a lowercased corpus,
+# set to True.
 lowercasing: True
 
-# BabelNet key is required for querying BabelNet. Register at Babelnet.org/register for up to 1000 free queries a day.
+# BabelNet key is required for querying BabelNet. Register at Babelnet.org/register
+# for up to 1000 free queries a day.
 # If you don't plan to use BabelNet, the parameter should be set to "None".
 babelnet_key: None
 
-# if True, a recent list of wiktionary entries will be downloaded to avoid queries for non-existing entries
+# if True, a recent list of wiktionary entries will be downloaded to avoid
+# queries for non-existing entries. The English file is about 60 Mb, so
+# initial download takes a couple of seconds.
 wiktionary_cache: True
 
 # many LDT operations are expensive to compute. This option sets a limit on
@@ -22,7 +26,17 @@ wiktionary_cache: True
 # same. The value of this parameter has to be an integer or None.
 cache_size: None
 
-# Extra language-specific resources
+###############################################################################
+# EXTRA RESOURCES:
+
+# LDT expects to find the resources listed under the language_resources
+# and corpus_resources in the specified path_to_resources. You can download
+# the whole ldt_data folder here:
+# https://my.pcloud.com/publink/show?code=XZnkSn7ZUdfgWrtnfiyuXhjg9I0es0iPQRWy
+# Unpack it to the location of your choosing and specify that location in
+# the config file as path_to_resources.
+
+# Extra language-specific resources.
 
 language_resources:
   en:
@@ -31,7 +45,7 @@ language_resources:
     associations: associations.json
     gdeps: gdeps.json
 
-# If corpus data is available, specify the corpus folder name. 
+# If corpus data is available, specify the folder name. Otherwise, set to None.
 corpus: Wiki201308
 # corpus: None
 
@@ -41,6 +55,8 @@ corpus_resources:
     freqdict: Wiki201308.freqdict
     vocabulary: Wiki201308.vocab
     cooccurrence: 3grams.json
+
+###############################################################################
 
 experiments:
 
@@ -61,7 +77,7 @@ experiments:
   /path/to/embeddings/dir2
   ]
 
-# default default_workflow settings:
+  # default default_workflow settings:
 
   # The data will be saved in "experiments" subfolder of the above path_to_resources location.
   # LDT analysis is performed in three steps: neighbor extraction, neighbor annotation, and
