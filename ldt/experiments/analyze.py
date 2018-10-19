@@ -146,6 +146,12 @@ class LDScoring(Experiment):
                        "Misspellings", "URLs", "Filenames", "ForeignWords",
                        "Hashtags", "Noise"]
 
+        # corpus_specific = ["NonCooccurring", "LowFreqNeighbors",
+        #                    "HighFreqNeighbors"]
+        #
+        # if not config["corpus"]:
+        #     output_vars = [x for x in output_vars if not x in corpus_specific]
+
         output_scores_error = "The ld_scores argument is invalid. It should " \
                               "be 'all' for all supported relations, " \
                               "or a list with one or more of the following " \
@@ -153,6 +159,13 @@ class LDScoring(Experiment):
 
         if ld_scores == "all":
             self.output_vars = output_vars
+        elif ld_scores == "main":
+            self.output_vars = ["SharedPOS", "SharedMorphForm", "SharedDerivation",
+                       "CloseNeighbors", "FarNeighbors", "Associations", "CloseInOntology",
+                       "Synonyms", "Antonyms",  "Meronyms", "Hyponyms",
+                       "Hypernyms", "OtherRelations", "ProperNouns", "Numbers",
+                       "Misspellings", "ForeignWords"]
+
         else:
             if isinstance(ld_scores, list):
                 unsupported = [x for x in ld_scores if not x in output_vars]
@@ -236,6 +249,9 @@ class LDScoring(Experiment):
                 input_df["Similarity"]) if x >= close_neighbors_threshold]
             res["FarNeighbors"] = percentage(len(far_neighbors))
             res["CloseNeighbors"] = percentage(len(close_neighbors))
+        for i in res:
+            if not i in self.output_vars:
+                del res[i]
         return res
 
 
@@ -259,8 +275,11 @@ class LDScoring(Experiment):
                         self.output_vars.remove(i)
 
             res_df = pd.DataFrame(res, columns=["Embedding"]+self.output_vars)
+            res_df = res_df.set_index("Embedding")
+            res_df = res_df.transpose()
+            res_df.index.name = "LDScores"
             res_df.to_csv(os.path.join(self.output_dir, "ld_scores.tsv"),
-                          index=False, sep="\t")
+                          index=True, sep="\t")
             self._metadata["timestamp"] = datetime.datetime.now().isoformat()
             self.save_metadata()
 

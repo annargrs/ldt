@@ -1,3 +1,9 @@
+v.0.3.1, 2018-10-18
+
+* corpus statistics now optional
+* optimized loading of cooccurrence data in ldt resources
+* minor fixes
+
 v. 0.3.0, 2018-10-08
 
 * experiments package:

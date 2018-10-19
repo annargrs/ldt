@@ -52,7 +52,7 @@ class AnnotateVectorNeighborhoods(Experiment):
     #pylint: disable=too-many-arguments
     def __init__(self, experiment_name=config["experiments"]["experiment_name"],
                  extra_metadata=None,
-                 overwrite=config["experiments"]["overwrite"], ld_scores="all",
+                 overwrite=config["experiments"]["overwrite"], ld_scores="main",
                  output_dir=os.path.join(config["path_to_resources"],
                                          "experiments"),
                  ldt_analyzer=None, gdeps=False, cooccurrence=False):
@@ -162,6 +162,11 @@ class AnnotateVectorNeighborhoods(Experiment):
         self.continuous_vars = ['ShortestPath', 'TargetFrequency',
                                 'NeighborFrequency']
 
+        corpus_specific = ["NonCooccurring", "TargetFrequency", "NeighborFrequency"]
+        if not config["corpus"]:
+            for i in [self.supported_vars, self.continuous_vars]:
+                i = [x for x in i if not i in corpus_specific]
+
         self.binary_vars = [x for x in self.supported_vars if not \
             x in self.continuous_vars]
 
@@ -172,10 +177,14 @@ class AnnotateVectorNeighborhoods(Experiment):
 
         if ld_scores == "all":
             self._ld_scores = self.supported_vars
-            if not gdeps:
-                self._ld_scores.remove("GDeps")
-            if not cooccurrence:
-                self._ld_scores.remove("NonCooccurring")
+
+        elif ld_scores == "main":
+            self._ld_scores = ["SharedPOS", "SharedMorphForm",
+                               "SharedDerivation", "Associations",
+                               "ShortestPath", "Synonyms", "Antonyms",
+                               "Meronyms", "Hyponyms", "Hypernyms",
+                               "OtherRelations", "ProperNouns", "Numbers",
+                               "Misspellings", "ForeignWords"]
         else:
             if isinstance(ld_scores, list):
                 unsupported = [x for x in ld_scores if not
@@ -187,6 +196,16 @@ class AnnotateVectorNeighborhoods(Experiment):
                                        in ld_scores]
             else:
                 raise ValueError(ld_scores_error)
+
+    # removing distributional variables according to config
+        if not gdeps:
+            self._ld_scores.remove("GDeps")
+        if not cooccurrence:
+            self._ld_scores.remove("NonCooccurring")
+        if not config["corpus"]:
+            for i in ["NonCooccurring", "TargetFrequency",
+                      "NeighborFrequency"]:
+                self._ld_scores.remove(i)
 
         self._metadata["annotated_information"] = self._ld_scores
 
@@ -239,9 +258,11 @@ class AnnotateVectorNeighborhoods(Experiment):
                         to_check_continuous = self.continuous_vars
                         to_check_binary = self.binary_vars
                     else:
-                        to_check_binary = ["NonCooccurring", "GDeps"]
-                        to_check_continuous = ["TargetFrequency",
-                                               "NeighborFrequency"]
+                        to_check_binary = [x for x in ["NonCooccurring",
+                                                      "GDeps"] if x in self._ld_scores]
+                        to_check_continuous = [x for x in ["TargetFrequency",
+                                               "NeighborFrequency"] if x in
+                                               self._ld_scores]
                         self._metadata["missed_pairs"].append(
                             tuple([target, neighbor]))
                     for i in to_check_continuous:
