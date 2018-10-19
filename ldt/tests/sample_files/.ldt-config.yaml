@@ -46,11 +46,13 @@ language_resources:
     gdeps: gdeps.json
 
 # If corpus data is available, specify the folder name. Otherwise, set to None.
-corpus: Wiki201308
-# corpus: None
+corpus: None
+#corpus: Wiki201308
+# the dump you can use to produce embeddings comparable
+# to those in our experiments: http://ldtoolkit.space/task_data/
 
 corpus_resources:
-
+# the pre-computed resources for our corpus
   Wiki201308:
     freqdict: Wiki201308.freqdict
     vocabulary: Wiki201308.vocab

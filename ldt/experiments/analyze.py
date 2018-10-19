@@ -137,8 +137,9 @@ class LDScoring(Experiment):
         self.binary_vars = [x for x in self.supported_vars if not \
             x in self.continuous_vars]
 
-        output_vars = ["SharedPOS", "SharedMorphForm", "SharedDerivation",
-                       "NonCooccurring", "CloseNeighbors", "FarNeighbors",
+        output_vars = ["Model", "SharedPOS", "SharedMorphForm",
+                       "SharedDerivation", "NonCooccurring",
+                       "CloseNeighbors", "FarNeighbors",
                        "LowFreqNeighbors", 'HighFreqNeighbors', "GDeps",
                        "Associations", "ShortestPathMedian", "CloseInOntology",
                        "Synonyms", "Antonyms",  "Meronyms", "Hyponyms",
@@ -160,11 +161,13 @@ class LDScoring(Experiment):
         if ld_scores == "all":
             self.output_vars = output_vars
         elif ld_scores == "main":
-            self.output_vars = ["SharedPOS", "SharedMorphForm", "SharedDerivation",
-                       "CloseNeighbors", "FarNeighbors", "Associations", "CloseInOntology",
-                       "Synonyms", "Antonyms",  "Meronyms", "Hyponyms",
-                       "Hypernyms", "OtherRelations", "ProperNouns", "Numbers",
-                       "Misspellings", "ForeignWords"]
+            self.output_vars = ["Model", "SharedPOS", "SharedMorphForm",
+                                "SharedDerivation", "CloseNeighbors",
+                                "FarNeighbors", "Associations",
+                                "CloseInOntology", "Synonyms", "Antonyms",
+                                "Meronyms", "Hyponyms", "Hypernyms",
+                                "OtherRelations", "ProperNouns", "Numbers",
+                                "Misspellings", "ForeignWords"]
 
         else:
             if isinstance(ld_scores, list):
@@ -174,6 +177,7 @@ class LDScoring(Experiment):
                 else:
                     self.output_vars = [x for x in output_vars if x in
                                         ld_scores]
+                    self.output_vars = ["Model"] + self.output_vars
             else:
                 raise ValueError(output_scores_error)
         self._metadata["ld_scores"] = self.output_vars
@@ -218,7 +222,7 @@ class LDScoring(Experiment):
         def percentage(num, len_df=len_df):
             """Helper for formatting % numbers"""
             return round(100*num/len_df, 2)
-        res = {"Embedding": filename}
+        res = {"Model": filename}
         for var in self.binary_vars:
             if var in input_df.columns:
                 try:
@@ -249,10 +253,11 @@ class LDScoring(Experiment):
                 input_df["Similarity"]) if x >= close_neighbors_threshold]
             res["FarNeighbors"] = percentage(len(far_neighbors))
             res["CloseNeighbors"] = percentage(len(close_neighbors))
+        filtered_res = {}
         for i in res:
-            if not i in self.output_vars:
-                del res[i]
-        return res
+            if i in self.output_vars:
+                filtered_res[i] = res[i]
+        return filtered_res
 
 
     def get_results(self):
@@ -274,12 +279,14 @@ class LDScoring(Experiment):
                     if i in self.output_vars:
                         self.output_vars.remove(i)
 
-            res_df = pd.DataFrame(res, columns=["Embedding"]+self.output_vars)
-            res_df = res_df.set_index("Embedding")
+            res_df = pd.DataFrame(res, columns=self.output_vars)
+            # res_df = res_df.set_index("Model")
             res_df = res_df.transpose()
-            res_df.index.name = "LDScores"
+            res_df.columns = res_df.iloc[0]
+            res_df = res_df[1:]
             res_df.to_csv(os.path.join(self.output_dir, "ld_scores.tsv"),
-                          index=True, sep="\t")
+                          index=True, sep="\t", header=1,
+                          index_label="LDScores")
             self._metadata["timestamp"] = datetime.datetime.now().isoformat()
             self.save_metadata()
 

@@ -199,13 +199,16 @@ class AnnotateVectorNeighborhoods(Experiment):
 
     # removing distributional variables according to config
         if not gdeps:
-            self._ld_scores.remove("GDeps")
+            if "GDeps" in self._ld_scores:
+                self._ld_scores.remove("GDeps")
         if not cooccurrence:
-            self._ld_scores.remove("NonCooccurring")
+            if "NonCooccurring" in self._ld_scores:
+                self._ld_scores.remove("NonCooccurring")
         if not config["corpus"]:
             for i in ["NonCooccurring", "TargetFrequency",
                       "NeighborFrequency"]:
-                self._ld_scores.remove(i)
+                if i in self._ld_scores:
+                    self._ld_scores.remove(i)
 
         self._metadata["annotated_information"] = self._ld_scores
 

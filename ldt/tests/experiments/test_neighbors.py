@@ -37,7 +37,7 @@ class Tests(unittest.TestCase):
             normalizer=normalizer, derivation_dict=derivation, lex_dict=lex_dict)
         cls.annotation = ldt.experiments.AnnotateVectorNeighborhoods(
             experiment_name="testing", overwrite=True,
-            ldt_analyzer=analyzer)
+            ldt_analyzer=analyzer, ld_scores="all")
         cls.annotation.get_results()
         output_scores=["SharedPOS", "SharedMorphForm", "SharedDerivation",
                         "ShortestPathMedian", "CloseInOntology", "Synonyms",
@@ -162,8 +162,8 @@ class Tests(unittest.TestCase):
         file = os.path.join(config["path_to_resources"], "experiments",
                             "testing", "analysis", "ld_scores.tsv")
         res_df = pd.read_csv(file, header=0, sep="\t")
-        hashtags = res_df.at[res_df['Embedding'].eq(
-            'sample_embedding').idxmax(), 'Hashtags']
+        hashtags = res_df.at[res_df['LDScores'].eq(
+            'Synonyms').idxmax(), 'sample_embeddings']
         self.assertEqual(hashtags, 0.0)
 
 if __name__ == '__main__':
