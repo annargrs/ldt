@@ -39,25 +39,28 @@ class DistributionDict():
         if gdeps:
             #: ResourceDict: google dependency resource
             self.gdeps = ResourceDict(resource="gdeps", language=language)
-            if wordlist:
-                self.gdeps.data = _filter_by_list(self.gdeps.data, wordlist)
 
         if cooccurrence:
             #: ResourceDict: cooccurrence resource
             self.cooccurrence = ResourceDict(resource="cooccurrence",
                                              corpus=corpus,
                                              freq=cooccurrence_freq)
-            if wordlist:
-                self.cooccurrence.data = _filter_by_list(
-                        self.cooccurrence.data, wordlist)
+        if wordlist:
+            self._update_filter(wordlist)
 
         #: hidden parameter for :meth:`cooccur_in_corpus`
         self._freq = cooccurrence_freq
         #: ResourceDict: frequency dictionary
         self.freqdict = ResourceDict(resource="freqdict", corpus=corpus)
 
+    def _update_filter(self, wordlist):
+        """Helper method for filtering distributional resources down to
+        what's in the passed wordlist"""
 
-
+        if hasattr(self, "gdeps"):
+            self.gdeps.data = _filter_by_list(self.gdeps.data, wordlist)
+        if hasattr(self, "cooccurrence"):
+            self.gdeps.data = _filter_by_list(self.cooccurrence.data, wordlist)
 
     def frequency_in_corpus(self, word):
         """Wrapper method for retrieving word frequency.

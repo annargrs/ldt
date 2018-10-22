@@ -212,7 +212,10 @@ class AnnotateVectorNeighborhoods(Experiment):
 
         self._metadata["annotated_information"] = self._ld_scores
 
+        wordlist = collect_targets_and_neighbors(neighbors_metadata_path)
+
         if ldt_analyzer:
+            ldt_analyzer._distr_dict._update_filter(wordlist)
             self.analyzer = ldt_analyzer
         else:
             # setting up default ldt resources to be used
@@ -225,7 +228,8 @@ class AnnotateVectorNeighborhoods(Experiment):
             self.analyzer = RelationsInPair(normalizer=normalizer,
                                             derivation_dict=derivation,
                                             lex_dict=lex_dict, gdeps=gdeps,
-                                            cooccurrence=cooccurrence)
+                                            cooccurrence=cooccurrence,
+                                            wordlist=wordlist)
 
     def _load_dataset(self, dataset):
         """Dataset for generating vector neighborhoods was already processed in
@@ -319,8 +323,17 @@ def collect_prior_data(output_dir):
             prior_res[pair["Target"]+":"+pair["Neighbor"]] = pair
     return prior_res
 
-
-
+def collect_targets_and_neighbors(output_dir):
+    neighbors_dir = output_dir.strip("metadata.json")
+    neighbor_files = os.listdir(neighbors_dir)
+    if "metadata.json" in neighbor_files:
+        neighbor_files.remove("metadata.json")
+    res = []
+    for f in neighbor_files:
+        input_df = pd.read_csv(os.path.join(neighbors_dir, f), header=0, sep="\t")
+        res += list(input_df["Target"])
+        res += list(input_df["Neighbor"])
+    return list(set(res))
 
 if __name__ == '__main__':
     annotation = AnnotateVectorNeighborhoods(experiment_name="testing",

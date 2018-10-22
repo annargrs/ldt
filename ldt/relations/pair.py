@@ -60,7 +60,9 @@ class RelationsInPair(Dictionary):
             switch for using corpus cooccurrence data (memory-intensive)
         cooccurrence_freq (bool): if True, cooccurrence counts are returned
             rather than booleans (even more memory-intensive)
-
+        wordlist (list of str): if a wordlist is provided, the resources
+            with distributional data will be filtered down to the words in
+            the wordlist, significantly decreasing the memory usage
 
     """
     def __init__(self, language=config["default_language"],
@@ -68,7 +70,7 @@ class RelationsInPair(Dictionary):
                  derivation_dict=None, normalizer=None,
                  lex_dict=None, ontodict=None, association_dict=None,
                  distr_dict=None, gdeps=False,
-                 cooccurrence=False, cooccurrence_freq=False):
+                 cooccurrence=False, cooccurrence_freq=False, wordlist=None):
 
         super(RelationsInPair, self).__init__(language=language,
                                               lowercasing=lowercasing)
@@ -106,7 +108,8 @@ class RelationsInPair(Dictionary):
                                                     gdeps=gdeps,
                                                     cooccurrence=cooccurrence,
                                                     cooccurrence_freq=
-                                                    cooccurrence_freq)
+                                                    cooccurrence_freq,
+                                                    wordlist=wordlist)
         self._gdeps = gdeps
         self._cooccurrence = cooccurrence
 
