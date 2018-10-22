@@ -21,12 +21,15 @@ class DistributionDict():
             (memory-intensive)
         cooccurrence_freq (bool): if True, cooccurrence counts are returned
             rather than booleans (even more memory-intensive)
+        wordlist (list of str): if a wordlist is provided, the resources
+            with distributional data will be filtered down to the words in
+            the wordlist, significantly decreasing the memory usage
 
     """
 
     def __init__(self, language=config["default_language"],
                  corpus=config["corpus"], gdeps=False,
-                 cooccurrence=False, cooccurrence_freq=False):
+                 cooccurrence=False, cooccurrence_freq=False, wordlist=None):
 
         super(DistributionDict, self).__init__()
 
@@ -36,16 +39,25 @@ class DistributionDict():
         if gdeps:
             #: ResourceDict: google dependency resource
             self.gdeps = ResourceDict(resource="gdeps", language=language)
+            if wordlist:
+                self.gdeps.data = _filter_by_list(self.gdeps.data, wordlist)
 
         if cooccurrence:
             #: ResourceDict: cooccurrence resource
             self.cooccurrence = ResourceDict(resource="cooccurrence",
                                              corpus=corpus,
                                              freq=cooccurrence_freq)
+            if wordlist:
+                self.cooccurrence.data = _filter_by_list(
+                        self.cooccurrence.data, wordlist)
+
         #: hidden parameter for :meth:`cooccur_in_corpus`
         self._freq = cooccurrence_freq
         #: ResourceDict: frequency dictionary
         self.freqdict = ResourceDict(resource="freqdict", corpus=corpus)
+
+
+
 
     def frequency_in_corpus(self, word):
         """Wrapper method for retrieving word frequency.
@@ -92,3 +104,13 @@ class DistributionDict():
         if hasattr(self, "gdeps"):
             return self.gdeps.are_related(word1, word2)
         return False
+
+def _filter_by_list(data, wordlist):
+    """Helper for loading larger dictionary-based resources:
+    memory will be freed by only keeping the words relevant for the
+    given session"""
+    new_data = {}
+    for i in wordlist:
+        if i in data:
+            new_data[i] = data[i]
+    return new_data

@@ -23,11 +23,19 @@ class Tests(unittest.TestCase):
             ldt.relations.distribution.DistributionDict(language="english",
                                                         cooccurrence=True,
                                                         cooccurrence_freq=True)
+
+        cls.test_dict_cooc_filtered = \
+            ldt.relations.distribution.DistributionDict(language="english",
+                                                        cooccurrence=True,
+                                                        gdeps=True,
+                                                        wordlist=["cat"])
+
     @classmethod
     def tearDownClass(cls):
         """Clearning up the test variables."""
         cls.test_dict = None
         cls.test_dict_cooc = None
+        cls.test_dict_cooc_filtered = None
 
     def test_init(self):
         """Test initialization"""
@@ -64,6 +72,12 @@ class Tests(unittest.TestCase):
     def test_gdeps_wrap(self):
         """Test cooccurrence in google dependency ngrams (wrapper method)"""
         self.assertTrue(self.test_dict.cooccur_in_gdeps("strongly", "abatised"))
+
+    def test_filtering(self):
+        worked = "pinnock" in \
+                 self.test_dict_cooc_filtered.cooccurrence.data
+        worked2 = "abati" in self.test_dict_cooc_filtered.gdeps.data
+        self.assertFalse(worked or worked2)
 
 if __name__ == '__main__':
     unittest.main()
