@@ -51,7 +51,7 @@ def get_object_size(obj, seen=None):
 
 #todo add lowercasing
 def load_resource(path, format="infer", lowercasing=config["lowercasing"],
-                  silent=True):
+                  silent=True, wordlist=None):
     """
 
     A helper function for loading various files formats, optionally
@@ -71,6 +71,11 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
                 :type yaml: a yaml dictionary
                 :type json_freqdict: a json dictionary with frequency
                     dictionaries as entries
+                :type jsonl: a jasonlines file that will be read
+                    line-by-line and optionally filtered by provided wordlist
+
+        wordlist (list of str): the wordlist by which to filter the contents
+            of a jsonl resource
 
     Returns:
         (set, dict): a set object for vocab files, a dictionary for
@@ -80,7 +85,8 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
     if format == "infer":
         format = path.split(".")[-1]
 
-    if format in ["freqdict", "tsv_dict", "json", "yaml", "json_freqdict"]:
+    if format in ["freqdict", "tsv_dict", "json", "yaml", "json_freqdict",
+                  "jsonl"]:
 
         res = {}
 
@@ -161,6 +167,9 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
                 res = json.load(f)
                 return res
 
+        if format == "jsonl":
+            res = load_jsonl_with_filtering(path, wordlist=wordlist)
+
         if lowercasing:
 
             # test if the dict keys are lists or not
@@ -200,11 +209,11 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
 
     else:
         print("Unknown format. The following formats are supported: \n"
-              "* [freqdict] for tab-separated [Word <tab> Number] files;\n"
-              "* [tsv_dict] for [Word1 <tab> Word2,Word3,Word4...] or [Word1 <tab> Word2];\n"
-              "* [json] for json dictionaries;\n"
-              "* [yaml] for yaml dictionaries;\n"        
-              "* [vocab] for one-word-per-line vocab files.\n")
+              "* [.freqdict] for tab-separated [Word <tab> Number] files;\n"
+              "* [.tsv_dict] for [Word1 <tab> Word2,Word3,Word4...] or [Word1 <tab> Word2];\n"
+              "* [.json] or [.jsonl] for json dictionaries;\n"
+              "* [.yaml] for yaml dictionaries;\n"
+              "* [.vocab] for one-word-per-line vocab files.\n")
         return None
 
     if res:
@@ -212,8 +221,6 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
             print(path, " loaded as ", size(get_object_size(res)))
         return res
 
-    else:
-        return None
 
 def load_language_file(resources_path, language):
 
@@ -227,3 +234,25 @@ def load_language_file(resources_path, language):
         except yaml.YAMLError:
             raise ResourceError("Something is wrong with the .yaml file "
                                 "for this language.")
+
+def load_jsonl_with_filtering(path, wordlist=None):
+    """Loading large jsonl files line-by-line, optionally only storing
+    results that are in a provided wordlist"""
+    res = {}
+    if wordlist:
+        with open(path, "r") as f:
+            for line in f:
+                line = json.loads(line)
+                for i in line:
+                    if i in wordlist:
+                        res[i] = line[i]
+    else:
+        with open(path, "r") as f:
+            for line in f:
+                line = json.loads(line)
+                for i in line:
+                    res[i] = line[i]
+    return res
+
+if __name__ == "__main__":
+    load_jsonl_with_filtering("/home/anna/PycharmProjects/ldt/ldt/tests/sample_files/file_formats/2cols_list.jsonl")
