@@ -167,6 +167,6 @@ class VectorNeighborhoods(Experiment):
                        header=True, index=False, sep="\t")
             embeddings = None
 
-if __name__ == '__main__':
-    annotation = VectorNeighborhoods(experiment_name="testing", overwrite=True)
-    annotation.get_results()
+# if __name__ == '__main__':
+#     annotation = VectorNeighborhoods(experiment_name="testing", overwrite=True)
+#     annotation.get_results()

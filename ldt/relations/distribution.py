@@ -39,12 +39,18 @@ class DistributionDict():
         if gdeps:
             #: ResourceDict: google dependency resource
             self.gdeps = ResourceDict(resource="gdeps", language=language)
+            if wordlist:
+                self.gdeps.data = _filter_by_list(self.gdeps.data, wordlist)
 
         if cooccurrence:
             #: ResourceDict: cooccurrence resource
             self.cooccurrence = ResourceDict(resource="cooccurrence",
                                              corpus=corpus,
                                              freq=cooccurrence_freq)
+            if wordlist:
+                self.cooccurrence.data = _filter_by_list(
+                        self.cooccurrence.data, wordlist)
+
         if wordlist:
             self._update_filter(wordlist)
 

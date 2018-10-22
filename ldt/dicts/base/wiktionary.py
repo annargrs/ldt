@@ -92,7 +92,7 @@ class BaseWiktionary(Dictionary):
                                            lowercasing=self.lowercasing,
                                            path_to_cache=config[
                                                "path_to_resources"],
-                                           wikisaurus=False)
+                                           wikisaurus=False, silent=True)
 
     def is_a_word(self, word):
         """ Determines whether a Wiktionary entry exists for this word.

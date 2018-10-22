@@ -35,7 +35,7 @@ def default_workflow(experiment_name=
 
     #getting vector neighborhoods
     neighborhoods = ldt.experiments.VectorNeighborhoods(
-        experiment_name=experiment_name, overwrite=overwrite, top_n=top_n)
+        experiment_name=experiment_name, overwrite=False, top_n=top_n)
     neighborhoods.get_results()
 
     #setting up ldt resources for annotation with default settings: English,
@@ -49,7 +49,9 @@ def default_workflow(experiment_name=
 
     analyzer = ldt.relations.pair.RelationsInPair(normalizer=normalizer,
                                                   derivation_dict=derivation,
-                                                  lex_dict=lex_dict)
+                                                  lex_dict=lex_dict,
+                                                  gdeps=True,
+                                                  cooccurrence=True)
 
     # performing annotation
     annotation = ldt.experiments.AnnotateVectorNeighborhoods(
