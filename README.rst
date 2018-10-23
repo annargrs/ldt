@@ -22,7 +22,9 @@ If you have never heard about word embeddings -- you're missing out, here's `an 
 LDT for profiling word embeddings
 ---------------------------------
 
-`Install and configure <https://ldt.readthedocs.io/Tutorial/installation.html>`_ ldt, and run this script:
+`Install and configure <https://ldt.readthedocs.io/Tutorial/installation.html>`_
+ldt, and run this sample script (and/or change it to tweak the `resources <https://ldt.readthedocs.io/Tutorial/dicts/index.html>`_
+used for relation detection):
 
 ::
 
@@ -85,8 +87,8 @@ LDT for detecting relations in word pairs
 -----------------------------------------
 
 The main function of LDT is automatic detection of linguistic relations
-that *could* possibly hold in a pair of words. This can now be achieved as
-follows:
+that *could* possibly hold in a pair of words. This super-complicated
+procedure can now be performed in one click:
 
 >>> relation_analyzer = ldt.relations.RelationsInPair()
 >>> relation_analyzer.analyze("black", "white")
@@ -99,9 +101,8 @@ follows:
  'Associations': True}
 
 It goes without saying that *white* and *black* are not always antonyms.
-Context dependence is something we're thinking about, but at the moment ldt
-follows other context-independent evaluation methodologies such as human
-judgements of word similarity/relatedness.
+Context dependence is something we're thinking about, stay tuned for future
+work.
 
 ---------------------------------
 LDT for working with dictionaries
