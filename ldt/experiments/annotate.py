@@ -179,12 +179,13 @@ class AnnotateVectorNeighborhoods(Experiment):
             self._ld_scores = self.supported_vars
 
         elif ld_scores == "main":
-            self._ld_scores = ["SharedPOS", "SharedMorphForm",
-                               "SharedDerivation", "Associations",
-                               "ShortestPath", "Synonyms", "Antonyms",
-                               "Meronyms", "Hyponyms", "Hypernyms",
-                               "OtherRelations", "ProperNouns", "Numbers",
-                               "Misspellings", "ForeignWords"]
+            exclude = ["ShortestPath", "URLs", "Filenames", "Hashtags",
+                       "Noise"]
+            if not config["corpus"]:
+                exclude += ["NonCooccurring", "GDeps", "TargetFrequency",
+                            "NeighborFrequency"]
+            self._ld_scores = [x for x in self.supported_vars if not x in
+                                                                     exclude]
         else:
             if isinstance(ld_scores, list):
                 unsupported = [x for x in ld_scores if not
@@ -216,7 +217,7 @@ class AnnotateVectorNeighborhoods(Experiment):
 
         if ldt_analyzer:
             #todo move this to RelationsInPair
-            if gdeps:
+            if gdeps and config["corpus"]:
                 ldt_analyzer._distr_dict._reload_resource(resource="gdeps",
                                                           wordlist=wordlist)
                 ldt_analyzer._gdeps = True
@@ -275,6 +276,7 @@ class AnnotateVectorNeighborhoods(Experiment):
                         to_check_continuous = self.continuous_vars
                         to_check_binary = self.binary_vars
                     else:
+                        #print(target, neighbor)
                         to_check_binary = [x for x in ["NonCooccurring",
                                                       "GDeps"] if x in self._ld_scores]
                         to_check_continuous = [x for x in ["TargetFrequency",
@@ -291,6 +293,9 @@ class AnnotateVectorNeighborhoods(Experiment):
         output_df = pd.DataFrame(dicts,
                                  columns=["Target", "Rank", "Neighbor",
                                           "Similarity"]+self._ld_scores)
+        # for i in ["TargetFrequency", "NeighborFrequency"]:
+        #     if i in output_df.columns:
+        #         output_df[i] = output_df[i].astype(int)
         output_df.to_csv(os.path.join(self.output_dir, filename+".tsv"),
                          index=False, sep="\t")
 

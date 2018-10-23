@@ -62,7 +62,15 @@ class RelationsInPair(Dictionary):
             rather than booleans (even more memory-intensive)
         wordlist (list of str): if a wordlist is provided, the resources
             with distributional data will be filtered down to the words in
-            the wordlist, significantly decreasing the memory usage
+            the wordlist, significantly decreasing the memory usage.
+
+        Note:
+
+            If no wordlist is provided, cooccurrence and google
+            dependency information will be disabled. The
+            wordlist is supplied automatically during large annotation
+            experiments on the basis of extracted target:neighbor pairs.
+            You can also provide your own.
 
     """
     def __init__(self, language=config["default_language"],
@@ -172,6 +180,7 @@ class RelationsInPair(Dictionary):
                                                               neighbor_lemma):
                         res["Associations"] = True
                         break
+
         res = self._distributional_data(target, neighbor, res)
         return res
 

@@ -38,7 +38,7 @@ class LDScoring(Experiment):
     def __init__(self, experiment_name=config["experiments"]["experiment_name"],
                  extra_metadata=None,
                  overwrite=config["experiments"]["overwrite"],
-                 ld_scores="all", output_dir=
+                 ld_scores="main", output_dir=
                  os.path.join(config["path_to_resources"], "experiments")):
 
         """ Annotating pre-computed top *n* neighbors for a given vocab sample
@@ -161,13 +161,13 @@ class LDScoring(Experiment):
         if ld_scores == "all":
             self.output_vars = output_vars
         elif ld_scores == "main":
-            self.output_vars = ["Model", "SharedPOS", "SharedMorphForm",
-                                "SharedDerivation", "CloseNeighbors",
-                                "FarNeighbors", "Associations",
-                                "CloseInOntology", "Synonyms", "Antonyms",
-                                "Meronyms", "Hyponyms", "Hypernyms",
-                                "OtherRelations", "ProperNouns", "Numbers",
-                                "Misspellings", "ForeignWords"]
+            exclude = ["ShortestPathMedian", "URLs", "Filenames", "Hashtags",
+                       "Noise"]
+            if not config["corpus"]:
+                exclude += ["NonCooccurring", "LowFreqNeighbors",
+                            'HighFreqNeighbors', "GDeps"]
+
+            self.output_vars = [x for x in output_vars if not x in exclude]
 
         else:
             if isinstance(ld_scores, list):
@@ -245,7 +245,7 @@ class LDScoring(Experiment):
             highfreq_neighbors = [x for x in highfreq_neighbors if x >
                                   lowfreq_threshold]
             res["HighFreqNeighbors"] = percentage(len(highfreq_neighbors))
-            res["LowFreqNeighbors"] = 1-res["HighFreqNeighbors"]
+            res["LowFreqNeighbors"] = 100-res["HighFreqNeighbors"]
         if "Similarity" in input_df.columns:
             far_neighbors = [x for x in list(
                 input_df["Similarity"]) if x <= far_neighbors_threshold]
