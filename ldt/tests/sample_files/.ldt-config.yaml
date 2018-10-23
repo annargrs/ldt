@@ -94,4 +94,5 @@ experiments:
   # overwriting any previous data, if an experiment with the same name has already been performed:
   overwrite: True
 
-
+  # how many CPUs to use for the annotation jobs
+  multiprocessing: 4
