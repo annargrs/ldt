@@ -22,24 +22,6 @@ Package requirements (will be installed automatically by pip):
 
 To run LDT will expect to find an ``.ldt-config.yaml`` configuration file in the user home folder, as described in the section :ref:`Configuration file`.
 
---------------
-NLTK resources
---------------
-
-NLTK has many resources, of which three are used by LDT: ``wordnet``, ``stopwords``, ``lemmatizer``.
-You can install them individually from within Python shell:
-
-.. code-block:: python
-
-   import nltk
-   nltk.download("wordnet")
-
-or from command line:
-
-.. code-block:: python
-
-   python -m nltk.downloader wordnet
-
 ------------
 Spellchecker
 ------------

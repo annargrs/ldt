@@ -28,11 +28,14 @@ Todo:
 
 import os
 import uuid
-
 import pandas as pd
 # import progressbar
-from tqdm import tqdm
 
+from tqdm import tqdm
+#from joblib import Parallel, delayed
+from pathos.multiprocessing import ProcessingPool as Pool
+import dill
+from pathos.multiprocessing import ProcessingPool
 from vecto.utils.data import load_json
 
 from ldt.experiments.metadata import Experiment
@@ -248,9 +251,24 @@ class AnnotateVectorNeighborhoods(Experiment):
         here."""
         pass
 
+
+        # print(f" * Processing {len(source_df)} word pairs")
+        #
+        # chunk_size = 10000
+        #
+        # list_df = SplitList(source_df, chunk_size)  #todo hardcoded size of chunks
+        #         #
+        # bar = progressbar.ProgressBar(max_value=len(list_df))
+        # for i in range(len(list_df)):
+        #     bar.update(i)
+        #     df_slice = list_df[i]
+        #     processed_dict = Parallel(n_jobs=4)(delayed(label_word_pair)(row, cols_tuple) for row in df_slice)
+
+
+
     def _process(self, embeddings_path):
 
-        prior_data = collect_prior_data(self.output_dir)
+        self.prior_data = collect_prior_data(self.output_dir)
 
         filename = self.get_fname_for_embedding(embeddings_path)
         neighbor_file_path = os.path.join(self.output_dir.replace(
@@ -261,43 +279,51 @@ class AnnotateVectorNeighborhoods(Experiment):
         self._metadata["total_pairs"] += len(input_df)
         dicts = input_df.to_dict(orient="records")
 
-        for i in tqdm(range(len(dicts))):
+        # for i in tqdm(range(len(dicts))):
+
+        # Parallel(n_jobs=2)(delayed(self._one_pair)(i) for i in range(total))
+        pool = ProcessingPool(nodes=4)
+        dicts = pool.map(self._one_pair, dicts)
+
+        output_df = pd.DataFrame(dicts,
+                                 columns=["Target", "Rank", "Neighbor",
+                                          "Similarity"]+self._ld_scores)
+        output_df.to_csv(os.path.join(self.output_dir, filename+".tsv"),
+                         index=False, sep="\t")
+
+    def _one_pair(self, dicts):
+        for i in range(len(dicts)):
             col_dict = dicts[i]
             neighbor = col_dict["Neighbor"]
             target = col_dict["Target"]
-            if target+":"+neighbor in prior_data:
-                col_dict.update(prior_data[target+":"+neighbor])
+            if target + ":" + neighbor in self.prior_data:
+                col_dict.update(self.prior_data[target + ":" + neighbor])
             else:
                 relations = self.analyzer.analyze(target, neighbor)
                 if not relations:
-                    self._metadata["failed_pairs"].append(tuple([target, neighbor]))
+                    self._metadata["failed_pairs"].append(
+                        tuple([target, neighbor]))
                 else:
                     if not "Missing" in relations:
                         to_check_continuous = self.continuous_vars
                         to_check_binary = self.binary_vars
                     else:
-                        #print(target, neighbor)
+                        # print(target, neighbor)
                         to_check_binary = [x for x in ["NonCooccurring",
-                                                      "GDeps"] if x in self._ld_scores]
+                                                       "GDeps"] if
+                                           x in self._ld_scores]
                         to_check_continuous = [x for x in ["TargetFrequency",
-                                               "NeighborFrequency"] if x in
-                                               self._ld_scores]
+                                                           "NeighborFrequency"] if
+                                               x in self._ld_scores]
                         self._metadata["missed_pairs"].append(
-                            tuple([target, neighbor]))
+                                tuple([target, neighbor]))
                     for i in to_check_continuous:
                         if i in relations:
                             col_dict[i] = relations[i]
                     for i in to_check_binary:
                         col_dict[i] = i in relations
-
-        output_df = pd.DataFrame(dicts,
-                                 columns=["Target", "Rank", "Neighbor",
-                                          "Similarity"]+self._ld_scores)
-        # for i in ["TargetFrequency", "NeighborFrequency"]:
-        #     if i in output_df.columns:
-        #         output_df[i] = output_df[i].astype(int)
-        output_df.to_csv(os.path.join(self.output_dir, filename+".tsv"),
-                         index=False, sep="\t")
+            dicts[i].update(col_dict)
+        return dicts
 
     def _postprocess_metadata(self):
         """Helper method for logging unique failed target:neighbor pairs and
