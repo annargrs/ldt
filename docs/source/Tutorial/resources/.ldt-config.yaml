@@ -1,5 +1,9 @@
 
 # the path to LDT working directory for cache and resources files.
+# Download the whole ldt_data folder here:
+# https://my.pcloud.com/publink/show?code=XZnkSn7ZUdfgWrtnfiyuXhjg9I0es0iPQRWy
+# Unpack it to the location of your choosing and specify that location in
+# the config file as path_to_resources.
 path_to_resources: /the/path/to/cache/and/resources
 
 # default query language for all dictionaries
@@ -30,31 +34,31 @@ cache_size: None
 # EXTRA RESOURCES:
 
 # LDT expects to find the resources listed under the language_resources
-# and corpus_resources in the specified path_to_resources. You can download
-# the whole ldt_data folder here:
-# https://my.pcloud.com/publink/show?code=XZnkSn7ZUdfgWrtnfiyuXhjg9I0es0iPQRWy
-# Unpack it to the location of your choosing and specify that location in
-# the config file as path_to_resources.
+# and corpus_resources in the specified path_to_resources.
 
-# Extra language-specific resources.
+# Extra language-specific resources (English data is bundled in
+# the ldt_data folder you have downloaded).
 
 language_resources:
   en:
     names: names.vocab
     numbers: numbers.vocab
     associations: associations.json
-    gdeps: gdeps.json
+    gdeps: gdeps.jsonl
 
 # If corpus data is available, specify the folder name. Otherwise, set to None.
-corpus: Wiki201308
-# corpus: None
+
+corpus: None
+# corpus: Wiki201308
+# the data for this corpus is bundled in the ldt_data folder. Get the corpus itself
+# here to train embeddings comparable with ours: http://ldtoolkit.space/task_data/)
 
 corpus_resources:
-
+# the data for our corpus, should you choose to use it.
   Wiki201308:
     freqdict: Wiki201308.freqdict
     vocabulary: Wiki201308.vocab
-    cooccurrence: 3grams.json
+    cooccurrence: 3grams.jsonl
 
 ###############################################################################
 
@@ -69,7 +73,12 @@ experiments:
   # the your_dataset subfolder of vocab_samples subfolder in the general ldt resource location.
   # with one metadata.json file per subfolder.
 
+  # toy example for testing:
   vocab_sample: test_sample
+
+  # vocab_sample: ldt_909
+  # this is a large sample of 909 verbs, nouns, adjectives and adverbs,
+  # balanced by frequency and POS. The file is included in the ldt_data folder.
 
   #embeddings will be loaded with vecto library from the specified directory:
   embeddings: [
@@ -84,9 +93,11 @@ experiments:
   # analysis of results. A subfolder will be created for each of these steps.
 
   # experiment name (will also be used as a subfolder name for the experiment data)
-  experiment_name: testing
+  experiment_name: just_playing_with_ldt
 
   # how many neighbors to extract and annotate
+  # (obviously, the larger this number is, the longer it will take). We
+  # found 100 and 1000 yield similar correlation patterns: http://ldtoolkit.space/analysis/correlation/
   top_n: 2
 
   # overwriting any previous data, if an experiment with the same name has already been performed:

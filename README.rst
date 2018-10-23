@@ -22,7 +22,7 @@ If you have never heard about word embeddings -- you're missing out, here's `an 
 LDT for profiling word embeddings
 ---------------------------------
 
-Simply `install and configure <https://ldt.readthedocs.io/Tutorial/installation.html>`_ ldt, and run this script:
+`Install and configure <https://ldt.readthedocs.io/Tutorial/installation.html>`_ ldt, and run this script:
 
 ::
 
@@ -74,9 +74,11 @@ Note:
 
    The current implementation queries online resources, so a large
    experiment will take time. Stay tuned, we're working on making it faster.
-   The distribution analysis is currently provided for embeddings trained on
-   our `pre-processed Wikipedia dump <http://ldtoolkit.space/task_data/>`_,
+   The distribution analysis is currently provided only for embeddings
+   trained on    our `pre-processed Wikipedia dump <http://ldtoolkit.space/task_data/>`_,
    which is also available in dependency-parsed version.
+   Functionality for computing distriburional information from any other
+   corpora is coming.
 
 -----------------------------------------
 LDT for detecting relations in word pairs
@@ -218,7 +220,7 @@ Quick links
 -----------
 
  * `Installation instructions <https://ldt.readthedocs.io/Tutorial/installation.html>`_
- * `Project website <ldtoolkit.space>`_
+ * `Project website <http://ldtoolkit.space>`_
  * `Tutorial <https://ldt.readthedocs.io/Tutorial/index.html>`_
  * `API reference <https://ldt.readthedocs.io/genindex.html>`_.
  * `Published research results <http://aclweb.org/anthology/C18-1228>`_.
