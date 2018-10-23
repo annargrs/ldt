@@ -36,28 +36,36 @@ class DistributionDict():
         #: str: the language of the resource
         self.language = language
 
-        if gdeps:
-            #: ResourceDict: google dependency resource
-            self.gdeps = ResourceDict(resource="gdeps", language=language)
-            if wordlist:
-                self.gdeps.data = _filter_by_list(self.gdeps.data, wordlist)
-
-        if cooccurrence:
-            #: ResourceDict: cooccurrence resource
-            self.cooccurrence = ResourceDict(resource="cooccurrence",
-                                             corpus=corpus,
-                                             freq=cooccurrence_freq)
-            if wordlist:
-                self.cooccurrence.data = _filter_by_list(
-                        self.cooccurrence.data, wordlist)
+        #: ResourceDict: frequency dictionary
+        self.freqdict = ResourceDict(resource="freqdict", corpus=corpus)
 
         if wordlist:
-            self._update_filter(wordlist)
+            if gdeps:
+                #: ResourceDict: google dependency resource
+                self.gdeps = ResourceDict(resource="gdeps", language=language,
+                                          wordlist=wordlist)
+            if cooccurrence:
+                #: ResourceDict: cooccurrence resource
+                self.cooccurrence = ResourceDict(resource="cooccurrence",
+                                                 corpus=corpus,
+                                                 freq=cooccurrence_freq,
+                                                 wordlist=wordlist)
 
         #: hidden parameter for :meth:`cooccur_in_corpus`
         self._freq = cooccurrence_freq
-        #: ResourceDict: frequency dictionary
-        self.freqdict = ResourceDict(resource="freqdict", corpus=corpus)
+
+
+    def _reload_resource(self, resource, wordlist):
+        """Helper for initializing memory-heavy resources during experiments,
+        after initialization of the whole analyzer object"""
+        if resource == "gdeps":
+            self.gdeps = ResourceDict(resource=resource,
+                                      language=config["default_language"],
+                                      wordlist=wordlist)
+        if resource == "cooccurrence":
+            self.cooccurrence = ResourceDict(resource=resource,
+                                             language=config["default_language"],
+                                             wordlist=wordlist)
 
     def _update_filter(self, wordlist):
         """Helper method for filtering distributional resources down to

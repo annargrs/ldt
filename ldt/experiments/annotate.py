@@ -215,7 +215,17 @@ class AnnotateVectorNeighborhoods(Experiment):
         wordlist = collect_targets_and_neighbors(neighbors_metadata_path)
 
         if ldt_analyzer:
-            ldt_analyzer._distr_dict._update_filter(wordlist)
+            #todo move this to RelationsInPair
+            if gdeps:
+                ldt_analyzer._distr_dict._reload_resource(resource="gdeps",
+                                                          wordlist=wordlist)
+                ldt_analyzer._gdeps = True
+            if cooccurrence and config["corpus"]:
+                ldt_analyzer._distr_dict._reload_resource(
+                        resource="cooccurrence", wordlist=wordlist)
+                ldt_analyzer._cooccurrence = True
+
+
             self.analyzer = ldt_analyzer
         else:
             # setting up default ldt resources to be used

@@ -118,17 +118,17 @@ class Tests(unittest.TestCase):
         os.path.join(self.path, "2cols_list.yaml"), silent=True)
         self.assertEqual(res, self.res_dict)
 
-    # def test_load_jsonl(self):
-    #     res = ldt.helpers.loading.load_resource(format="jsonl",
-    #                                             path =
-    #     os.path.join(self.path, "2cols_list.jsonl"), silent=True)
-    #     self.assertEqual(res, self.res_dict)
-    #
-    # def test_load_jsonl_freqdict(self):
-    #     res = ldt.helpers.loading.load_resource(format="jsonl",
-    #                                             path =
-    #     os.path.join(self.path, "jsonl_freqdict.json"), silent=True)
-    #     self.assertEqual(res, self.res_json_freqdict)
+    def test_load_jsonl(self):
+        res = ldt.helpers.loading.load_resource(format="jsonl",
+                                                path =
+        os.path.join(self.path, "2cols_list.jsonl"), silent=True)
+        self.assertIn("eagle", res["falcon"])
+
+    def test_load_jsonl_freqdict(self):
+        res = ldt.helpers.loading.load_resource(format="jsonl",
+                                                path =
+        os.path.join(self.path, "jsonl_freqdict.jsonl"), silent=True)
+        self.assertEqual(6, res["mouse"]["cheese"])
 
 if __name__ == '__main__':
     unittest.main()

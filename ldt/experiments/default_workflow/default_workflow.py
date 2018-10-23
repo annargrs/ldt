@@ -50,13 +50,13 @@ def default_workflow(experiment_name=
     analyzer = ldt.relations.pair.RelationsInPair(normalizer=normalizer,
                                                   derivation_dict=derivation,
                                                   lex_dict=lex_dict,
-                                                  gdeps=True,
-                                                  cooccurrence=True)
+                                                  gdeps=False,
+                                                  cooccurrence=False)
 
     # performing annotation
     annotation = ldt.experiments.AnnotateVectorNeighborhoods(
         experiment_name=experiment_name, overwrite=overwrite,
-        ldt_analyzer=analyzer)
+        ldt_analyzer=analyzer, gdeps=True, cooccurrence=True, ld_scores="all")
     annotation.get_results()
 
     # analysing the results

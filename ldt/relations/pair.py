@@ -110,8 +110,12 @@ class RelationsInPair(Dictionary):
                                                     cooccurrence_freq=
                                                     cooccurrence_freq,
                                                     wordlist=wordlist)
-        self._gdeps = gdeps
-        self._cooccurrence = cooccurrence
+        if wordlist:
+            self._gdeps = gdeps
+            self._cooccurrence = cooccurrence
+        else:
+            self._gdeps = False
+            self._cooccurrence = False
 
     def is_a_word(self, word):
         raise NotImplementedError
@@ -185,6 +189,10 @@ class RelationsInPair(Dictionary):
             with distributional data.
 
         """
+        if self._gdeps:
+            if self._distr_dict.cooccur_in_gdeps(target.info["OriginalForm"],
+                                                 neighbor.info["OriginalForm"]):
+                res["GDeps"] = True
         if not config["corpus"]:
             return res
         res["TargetFrequency"] = self._distr_dict.frequency_in_corpus(
@@ -195,11 +203,6 @@ class RelationsInPair(Dictionary):
             if not self._distr_dict.cooccur_in_corpus(target.info["OriginalForm"],
                                                       neighbor.info["OriginalForm"]):
                 res["NonCooccurring"] = True
-
-        if self._gdeps:
-            if self._distr_dict.cooccur_in_gdeps(target.info["OriginalForm"],
-                                                 neighbor.info["OriginalForm"]):
-                res["GDeps"] = True
         return res
 
 

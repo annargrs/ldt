@@ -43,7 +43,7 @@ language_resources:
     names: names.vocab
     numbers: numbers.vocab
     associations: associations.json
-    gdeps: gdeps.json
+    gdeps: gdeps.jsonl
 
 # If corpus data is available, specify the folder name. Otherwise, set to None.
 corpus: None
@@ -56,7 +56,7 @@ corpus_resources:
   Wiki201308:
     freqdict: Wiki201308.freqdict
     vocabulary: Wiki201308.vocab
-    cooccurrence: 3grams.json
+    cooccurrence: 3grams.jsonl
 
 ###############################################################################
 

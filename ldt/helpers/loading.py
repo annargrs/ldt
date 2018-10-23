@@ -80,6 +80,12 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
     Returns:
         (set, dict): a set object for vocab files, a dictionary for
             everything else
+
+    Todo:
+
+        repackage to functions per format
+        lowercasing for json freqdict and jsonl
+
     """
 
     if format == "infer":
@@ -169,6 +175,7 @@ def load_resource(path, format="infer", lowercasing=config["lowercasing"],
 
         if format == "jsonl":
             res = load_jsonl_with_filtering(path, wordlist=wordlist)
+            return res
 
         if lowercasing:
 
@@ -253,6 +260,3 @@ def load_jsonl_with_filtering(path, wordlist=None):
                 for i in line:
                     res[i] = line[i]
     return res
-
-if __name__ == "__main__":
-    load_jsonl_with_filtering("/home/anna/PycharmProjects/ldt/ldt/tests/sample_files/file_formats/2cols_list.jsonl")
