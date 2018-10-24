@@ -19,6 +19,7 @@ Package requirements (will be installed automatically by pip):
 * `ruamel.yaml <https://pypi.org/project/ruamel.yaml/>`_
 * `timeout-decorator <https://pypi.org/project/timeout-decorator/>`_
 * `inflect <https://pypi.org/project/inflect/>`_
+* `p_tqdm <https://github.com/swansonk14/p_tqdm>`_ and the underlying `pathos.multiprocessing <https://pypi.org/project/pathos/>`_
 
 To run LDT will expect to find an ``.ldt-config.yaml`` configuration file in the user home folder, as described in the section :ref:`Configuration file`.
 
