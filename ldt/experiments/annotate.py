@@ -30,9 +30,12 @@ import os
 import uuid
 import pandas as pd
 import numpy as np
+import progressbar
 
+from pathos.multiprocessing import ProcessingPool
+# from p_tqdm import p_map
+from multiprocessing import Pool
 
-from p_tqdm import p_map
 from vecto.utils.data import load_json
 
 from ldt.experiments.metadata import Experiment
@@ -242,29 +245,47 @@ class AnnotateVectorNeighborhoods(Experiment):
         neighbor_file_path = os.path.join(self.output_dir.replace(
             "neighbors_annotated", "neighbors"), filename+".tsv")
         print("Annotating "+neighbor_file_path)
+        self.metadata["out_path"] = os.path.join(self.output_dir,
+                                                 filename+".tsv")
 
         input_df = pd.read_csv(neighbor_file_path, header=0, sep="\t")
         self.metadata["total_pairs"] += len(input_df)
         dicts = input_df.to_dict(orient="records")
 
+
+
         # simply with pathos.multiprocessing (no progressbar):
-        # pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
-        # dicts = pool.map(_process_one_dict, dicts)
-        dicts = p_map(_process_one_dict, dicts, num_cpus=config["experiments"]["multiprocessing"])
+        chunk_size = config["experiments"]["batch_size"]
+        chunks = [dicts[offs:offs + chunk_size] for offs in range(0, len(dicts), chunk_size)]
+        bar = progressbar.ProgressBar(max_value=len(chunks))
+        print("Processing ", len(chunks), "word pair batches of size", chunk_size)
+        for i in range(len(chunks)):
+            bar.update(i)
+            dicts_chunk = chunks[i]
+            pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
+            # pool = ProcessingPool(nodes=1)
+            dicts_chunk = pool.map(_process_one_dict, dicts_chunk)
+            # print(dicts_chunk)
+            self.save_results(dicts_chunk)
+        # print("starting cycle")
+        # with Pool(2) as p:
+        #     dicts = p.map(_process_one_dict, dicts)
+        # self.save_results(dicts)
+        # with t_qdm progress bar memory blows up
+        # dicts = p_map(_process_one_dict, dicts, num_cpus=config["experiments"]["multiprocessing"])
+        # print("done")
+        # self.save_results(dicts)
 
-        # find missing data
-        for i in dicts:
-            if not self._ld_scores[0] in i:
-                self.metadata["missed_pairs"].append(i["Target"]+":"+i["Neighbor"])
-            elif np.isnan(i[self._ld_scores[0]]):
-                self.metadata["missed_pairs"].append(i["Target"] + ":" + i["Neighbor"])
-
+    def save_results(self, dicts):
         output_df = pd.DataFrame(dicts,
                                  columns=["Target", "Rank", "Neighbor",
                                           "Similarity"]+self._ld_scores)
-
-        output_df.to_csv(os.path.join(self.output_dir, filename+".tsv"),
-                         index=False, sep="\t")
+        if not os.path.exists(self.metadata["out_path"]):
+            output_df.to_csv(self.metadata["out_path"], index=False,
+                             sep="\t", header=True)
+        else:
+            output_df.to_csv(self.metadata["out_path"], index=False, sep="\t",
+                             mode="a", header=False)
 
 
     def _postprocess_metadata(self):
@@ -274,6 +295,25 @@ class AnnotateVectorNeighborhoods(Experiment):
 
         del self.metadata["continuous_vars"]
         del self.metadata["binary_vars"]
+
+        # find missing data
+        input_df = pd.read_csv(self.metadata["out_path"], header=0,
+                               sep="\t")
+        dicts = input_df.to_dict(orient="records")
+        for i in dicts:
+            if not self._ld_scores[0] in i:
+                self.metadata["missed_pairs"].append(i["Target"]+":"+i["Neighbor"])
+            else:
+                try:
+                    if np.isnan(i[self._ld_scores[0]]):
+                        self.metadata["missed_pairs"].append(i["Target"] + ":" + i["Neighbor"])
+                except TypeError:
+                    continue
+                try:
+                    if pd.isnull(i[self._ld_scores[0]]):
+                        self.metadata["missed_pairs"].append(i["Target"] + ":" + i["Neighbor"])
+                except TypeError:
+                    continue
 
         self.metadata["coverage"] = \
             1 - round(len(self.metadata["missed_pairs"]) / self.metadata[
@@ -322,7 +362,7 @@ def collect_targets_and_neighbors(output_dir):
         input_df = pd.read_csv(os.path.join(output_dir, f), header=0, sep="\t")
         res += list(input_df["Target"])
         res += list(input_df["Neighbor"])
-    return list(set(res))
+    return set(res)
 
 def init_analyzer(path, analyzer=None):
 
@@ -330,17 +370,19 @@ def init_analyzer(path, analyzer=None):
     provided, and updating it with the wordlist if one is provided"""
 
     wordlist = collect_targets_and_neighbors(path)
+    print("Loading filtered distributional resources. This takes a while "
+          "for a large experiment.")
 
     if analyzer:
         # todo move this to RelationsInPair
         if "GDeps" in metadata["ld_scores"] and config["corpus"]:
-            ldt_analyzer._distr_dict._reload_resource(resource="gdeps",
+            analyzer._distr_dict._reload_resource(resource="gdeps",
                                                       wordlist=wordlist)
-            ldt_analyzer._gdeps = True
+            analyzer._gdeps = True
         if "NonCooccurring" in metadata["ld_scores"] and config["corpus"]:
-            ldt_analyzer._distr_dict._reload_resource(resource="cooccurrence",
+            analyzer._distr_dict._reload_resource(resource="cooccurrence",
                 wordlist=wordlist)
-            ldt_analyzer._cooccurrence = True
+            analyzer._cooccurrence = True
 
         return analyzer
     else:

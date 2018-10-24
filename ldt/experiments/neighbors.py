@@ -83,7 +83,8 @@ class VectorNeighborhoods(Experiment):
             overwrite=overwrite, embeddings=embeddings, output_dir=output_dir,
             dataset=dataset, experiment_subfolder="neighbors")
 
-        self.message = "\n\nIf your embeddings are not normalized, retrieving " \
+        self.message = "\nStarting vector neighborhoods extraction." \
+                       "\nIf your embeddings are not normalized, retrieving " \
                        "neighbors will take more time. By default LDT " \
                        "normalizes them on loading. If you need them not " \
                        "normalized, use normalize=False option.\n"

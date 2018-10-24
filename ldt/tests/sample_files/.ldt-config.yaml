@@ -94,5 +94,9 @@ experiments:
   # overwriting any previous data, if an experiment with the same name has already been performed:
   overwrite: True
 
-  # how many CPUs to use for the annotation jobs
+  # how many CPUs to use for the annotation jobs. Take into account that you'll also need 5-10gb RAM per process,
+  # depending on top_n
   multiprocessing: 2
+
+  #number of word pairs in a multiprocessing batch: more is more efficient, but at a higher risk of data loss
+  batch_size: 1000

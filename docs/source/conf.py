@@ -131,7 +131,9 @@ html_theme = 'alabaster'
 
 html_theme_options = {
 "github_button": True,
-'github_repo': 'https://github.com/ookimi/ldt',
+'github_user': "annargrs",
+'github_repo': 'ldt',
+"travis_button": True,
 "description": "<br/> <br/>",
 "logo": "ldt_logo.png",
 "fixed_sidebar": True,
@@ -139,10 +141,10 @@ html_theme_options = {
 "show_powered_by": False,
 "sidebar_collapse": True,
 "show_relbars": True,
-"font_size": "1.2em",
+#"font_size": "1 em",
 "code_font_size": "0.89em",
-"sidebar_width":  "25em",
-"page_width": "90em",
+"sidebar_width":  "20em",
+"page_width": "70em",
 # "show_related": True,
 "extra_nav_links": {"Project website":"http://ldtoolkit.space",
                     "Research paper":"http://aclweb.org/anthology/C18-1228"}
@@ -165,16 +167,15 @@ html_static_path = ['_static']
 # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
 html_sidebars = {
     '**': ['about.html',
-        'localtoc.html',
         # 'sourcelink.html'
         # 'globaltoc.html',
         # 'relations.html',  # needs 'show_related': True theme option to display
         'navigation.html',
-        'searchbox.html'
+           # 'localtoc.html',
+           'searchbox.html'
            ],
-    "custom": []
+    "custom": ["Project"]
 }
-#todo: add changelog
 #todo: installation section separately
 
 # -- Options for HTMLHelp output ------------------------------------------

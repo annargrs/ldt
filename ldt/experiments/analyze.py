@@ -181,7 +181,7 @@ class LDScoring(Experiment):
             else:
                 raise ValueError(output_scores_error)
         self.metadata["ld_scores"] = self.output_vars
-        self.message = None
+        self.message = "\n Annotation done! Analyzing the data now."
 
     def _load_dataset(self, dataset):
         """Dataset for generating vector neighborhoods was already processed in
@@ -289,6 +289,8 @@ class LDScoring(Experiment):
                           index_label="LDScores")
             self.metadata["timestamp"] = datetime.datetime.now().isoformat()
             self.save_metadata()
+        print("LD analysis done, the embedding profiles are saved in ",
+              self.output_dir, ".")
 
 if __name__ == '__main__':
     annotation = LDScoring(experiment_name="testing", overwrite=True)
