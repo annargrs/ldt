@@ -1,7 +1,8 @@
-v.0.3.1, 2018-10-18
+v.0.4.0, 2018-10-24
 
-* corpus statistics now optional
+* multicore processing in annotation module
 * optimized loading of cooccurrence data in ldt resources
+* corpus statistics now optional
 * minor fixes
 
 v. 0.3.0, 2018-10-08

@@ -98,4 +98,4 @@ experiments:
   multiprocessing: 2
 
   #number of word pairs in a multiprocessing batch: more is more efficient, but at a higher risk of data loss
-  batch_size: 1000
+  batch_size: 100
