@@ -100,8 +100,8 @@ class LDScoring(Experiment):
             overwrite=overwrite, embeddings=None, output_dir=output_dir,
             dataset=None, experiment_subfolder="analysis")
 
-        self._metadata["task"] = "ld_scores_analysis"
-        self._metadata["uuid"] = str(uuid.uuid4())
+        self.metadata["task"] = "ld_scores_analysis"
+        self.metadata["uuid"] = str(uuid.uuid4())
         self._load_dataset(dataset=None)
         neighbors_metadata_path = self.output_dir.replace(
             "analysis", "neighbors_annotated")
@@ -112,11 +112,11 @@ class LDScoring(Experiment):
                           "was not found at "+neighbors_metadata_path)
         else:
             neighbors_metadata = load_json(neighbors_metadata_path)
-            self._metadata["embeddings"] = neighbors_metadata["embeddings"]
-            self._metadata["annotation"] = neighbors_metadata
-            del self._metadata["annotation"]["embeddings"]
+            self.metadata["embeddings"] = neighbors_metadata["embeddings"]
+            self.metadata["annotation"] = neighbors_metadata
+            del self.metadata["annotation"]["embeddings"]
             self.embeddings = []
-            for embedding in self._metadata["embeddings"]:
+            for embedding in self.metadata["embeddings"]:
                 self.embeddings.append(embedding["path"])
 
 
@@ -180,7 +180,7 @@ class LDScoring(Experiment):
                     self.output_vars = ["Model"] + self.output_vars
             else:
                 raise ValueError(output_scores_error)
-        self._metadata["ld_scores"] = self.output_vars
+        self.metadata["ld_scores"] = self.output_vars
         self.message = None
 
     def _load_dataset(self, dataset):
@@ -287,7 +287,7 @@ class LDScoring(Experiment):
             res_df.to_csv(os.path.join(self.output_dir, "ld_scores.tsv"),
                           index=True, sep="\t", header=1,
                           index_label="LDScores")
-            self._metadata["timestamp"] = datetime.datetime.now().isoformat()
+            self.metadata["timestamp"] = datetime.datetime.now().isoformat()
             self.save_metadata()
 
 if __name__ == '__main__':

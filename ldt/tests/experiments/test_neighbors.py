@@ -33,6 +33,7 @@ class Tests(unittest.TestCase):
         lex_dict = ldt.dicts.semantics.metadictionary.MetaDictionary(order=(
             "wordnet","wiktionary"))
 
+        # global analyzer
         analyzer = ldt.relations.pair.RelationsInPair(
             normalizer=normalizer, derivation_dict=derivation, lex_dict=lex_dict)
         cls.annotation = ldt.experiments.AnnotateVectorNeighborhoods(

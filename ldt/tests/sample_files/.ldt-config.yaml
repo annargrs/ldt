@@ -95,4 +95,4 @@ experiments:
   overwrite: True
 
   # how many CPUs to use for the annotation jobs
-  multiprocessing: 4
+  multiprocessing: 2

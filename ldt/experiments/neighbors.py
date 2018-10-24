@@ -87,9 +87,9 @@ class VectorNeighborhoods(Experiment):
                        "normalizes them on loading. If you need them not " \
                        "normalized, use normalize=False option.\n"
 
-        self._metadata["task"] = "get_neighbors"
-        self._metadata["uuid"] = str(uuid.uuid4())
-        self._metadata["top_n"] = top_n
+        self.metadata["task"] = "get_neighbors"
+        self.metadata["uuid"] = str(uuid.uuid4())
+        self.metadata["top_n"] = top_n
         self._load_dataset(dataset=dataset)
 
         self._normalize = normalize
@@ -112,9 +112,9 @@ class VectorNeighborhoods(Experiment):
             os.path.join(config["path_to_resources"], "experiments",
                          "vocab_samples", dataset, "metadata.json")
         if os.path.isfile(dataset_metadata_path):
-            self._metadata["dataset"] = load_json(dataset_metadata_path)
+            self.metadata["dataset"] = load_json(dataset_metadata_path)
         else:
-            self._metadata["dataset"] = dataset
+            self.metadata["dataset"] = dataset
         dataset_path = dataset_metadata_path.strip("metadata.json")
         # assume there is a single ".vocab" file in the dataset folder
 
@@ -167,6 +167,6 @@ class VectorNeighborhoods(Experiment):
                        header=True, index=False, sep="\t")
             embeddings = None
 
-# if __name__ == '__main__':
-#     annotation = VectorNeighborhoods(experiment_name="testing", overwrite=True)
-#     annotation.get_results()
+if __name__ == '__main__':
+    annotation = VectorNeighborhoods(experiment_name="testing", overwrite=True)
+    annotation.get_results()

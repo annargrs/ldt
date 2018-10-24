@@ -85,24 +85,24 @@ class Experiment(metaclass=abc.ABCMeta):
         else:
             metadata_path = os.path.join(self.output_dir, "metadata.json")
             if os.path.isfile(metadata_path):
-                self._metadata = load_json(metadata_path)
+                self.metadata = load_json(metadata_path)
             else:
                 self._init_metadata(embeddings)
                 self._overwrite = True
 
         self._load_dataset(dataset=dataset)
         if isinstance(extra_metadata, dict):
-            self._metadata.update(extra_metadata)
+            self.metadata.update(extra_metadata)
 
     def _init_metadata(self, embeddings):
         """Metadata Initialization helper"""
-        self._metadata = {}
+        self.metadata = {}
 
-        self._metadata["timestamp"] = {}
-        self._metadata["version"] = "ldt v. "+__version__
-        self._metadata["class"] = "experiment"
+        self.metadata["timestamp"] = {}
+        self.metadata["version"] = "ldt v. " + __version__
+        self.metadata["class"] = "experiment"
         if hasattr(self, "embeddings"):
-            self._metadata["embeddings"] = []
+            self.metadata["embeddings"] = []
             shared_subpath = check_shared_subpath(embeddings, "")
             for embedding in embeddings:
 
@@ -114,7 +114,7 @@ class Experiment(metaclass=abc.ABCMeta):
                     embedding_metadata = create_metadata_stub(embedding, shared_subpath)
 
                     save_json(embedding_metadata, meta_path)
-                self._metadata["embeddings"].append(embedding_metadata)
+                self.metadata["embeddings"].append(embedding_metadata)
 
 
     @abc.abstractmethod
@@ -134,13 +134,13 @@ class Experiment(metaclass=abc.ABCMeta):
     def save_metadata(self):
         """Saving the metadata for the given experiment"""
         with open(os.path.join(self.output_dir, "metadata.json"), "w") as path:
-            json.dump(self._metadata, fp=path, ensure_ascii=False, indent=4,
+            json.dump(self.metadata, fp=path, ensure_ascii=False, indent=4,
                       sort_keys=False, allow_nan=True)
 
     def _check_uuid_in_metadata(self, field, path):
         """Helper method to determine if a given embedding does have
         associated metadata"""
-        for i in self._metadata[field]:
+        for i in self.metadata[field]:
             if i["path"] == path and "uuid" in i:
                 return i["uuid"]
         return False
@@ -159,19 +159,19 @@ class Experiment(metaclass=abc.ABCMeta):
 
             emb_uuid = self._check_uuid_in_metadata(field="embeddings", path=i)
             if emb_uuid:
-                self._metadata["timestamp"][emb_uuid] = {}
-                self._metadata["timestamp"][emb_uuid]["start_time"] = \
+                self.metadata["timestamp"][emb_uuid] = {}
+                self.metadata["timestamp"][emb_uuid]["start_time"] = \
                     datetime.datetime.now().isoformat()
             else:
-                self._metadata["timestamp"][i]["start_time"] = \
+                self.metadata["timestamp"][i]["start_time"] = \
                     datetime.datetime.now().isoformat()
 
             self._process(embeddings_path=i)
             if emb_uuid:
-                self._metadata["timestamp"][emb_uuid]["end_time"] = \
+                self.metadata["timestamp"][emb_uuid]["end_time"] = \
                     datetime.datetime.now().isoformat()
             else:
-                self._metadata["timestamp"][i]["end_time"] = \
+                self.metadata["timestamp"][i]["end_time"] = \
                     datetime.datetime.now().isoformat()
             self._postprocess_metadata()
             self.save_metadata()
@@ -186,10 +186,10 @@ class Experiment(metaclass=abc.ABCMeta):
         for path in self.embeddings:
             emb_uuid = self._check_uuid_in_metadata(field="embeddings", path=path)
             if emb_uuid:
-                if emb_uuid in self._metadata["timestamp"]:
+                if emb_uuid in self.metadata["timestamp"]:
                     unprocessed.remove(path)
             else:
-                if path in self._metadata["timestamp"]:
+                if path in self.metadata["timestamp"]:
                     unprocessed.remove(path)
         return unprocessed
 
@@ -206,8 +206,8 @@ class Experiment(metaclass=abc.ABCMeta):
         contained the initial embeddings. In that case, they better be
         unique. """
 
-        if "embeddings" in self._metadata:
-            for embedding in self._metadata["embeddings"]:
+        if "embeddings" in self.metadata:
+            for embedding in self.metadata["embeddings"]:
                 if embedding["path"] == embeddings_path:
                     return embedding["model"]
         filename = os.path.split(embeddings_path)[-1]+".tsv"
