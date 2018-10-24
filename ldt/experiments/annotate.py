@@ -33,6 +33,7 @@ import numpy as np
 # import progressbar
 
 from tqdm import tqdm
+from p_tqdm import p_map
 from multiprocessing import Pool
 from joblib import Parallel, delayed
 import dill
@@ -280,8 +281,9 @@ class AnnotateVectorNeighborhoods(Experiment):
         # dicts = [self._process_one_dict(i) for i in dicts]
 
         # worked
-        pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
-        dicts = pool.map(_process_one_dict, dicts)
+        # pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
+        # dicts = pool.map(_process_one_dict, dicts)
+        dicts = p_map(_process_one_dict, dicts, num_cpus=config["experiments"]["multiprocessing"])
         # p = Pool(2, initializer(metadata))
         # dicts = p.map(_process_one_dict, dicts)
 
