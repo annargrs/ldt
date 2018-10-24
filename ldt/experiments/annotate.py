@@ -233,33 +233,10 @@ class AnnotateVectorNeighborhoods(Experiment):
         here."""
         pass
 
-
-        # print(f" * Processing {len(source_df)} word pairs")
-        #
-        # chunk_size = 10000
-        #
-        # list_df = SplitList(source_df, chunk_size)  #todo hardcoded size of chunks
-        #         #
-        # bar = progressbar.ProgressBar(max_value=len(list_df))
-        # for i in range(len(list_df)):
-        #     bar.update(i)
-        #     df_slice = list_df[i]
-        #     processed_dict = Parallel(n_jobs=4)(delayed(label_word_pair)(row, cols_tuple) for row in df_slice)
-
-
-
     def _process(self, embeddings_path):
-
-        # self.prior_data = collect_prior_data(self.output_dir)
 
         global prior_data
         prior_data = collect_prior_data(self.metadata["output_dir"])
-
-        # global metadata
-        # metadata=self.metadata
-
-        # global analyzer
-        # analyzer = init_analyzer(metadata)
 
         filename = self.get_fname_for_embedding(embeddings_path)
         neighbor_file_path = os.path.join(self.output_dir.replace(
@@ -270,26 +247,12 @@ class AnnotateVectorNeighborhoods(Experiment):
         self.metadata["total_pairs"] += len(input_df)
         dicts = input_df.to_dict(orient="records")
 
-        # for i in tqdm(range(len(dicts))):
-
-        # dicts = Parallel(n_jobs=2)(delayed(self._process_one_dict)(i) for i in dicts)
-        # dicts = [self._process_one_dict(i) for i in dicts]
-
-        # worked
+        # simply with pathos.multiprocessing (no progressbar):
         # pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
         # dicts = pool.map(_process_one_dict, dicts)
         dicts = p_map(_process_one_dict, dicts, num_cpus=config["experiments"]["multiprocessing"])
-        # p = Pool(2, initializer(metadata))
-        # dicts = p.map(_process_one_dict, dicts)
 
-
-        # pool = Pool(2)  # on 8 processors
-        # dicts = pool.map(self._process_one_dict, dicts)
-        # pool.close()
-        # pool.join()
-
-        # dicts = Parallel(n_jobs=2)(delayed(_process_one_dict)(i) for i in dicts)
-
+        # find missing data
         for i in dicts:
             if not self._ld_scores[0] in i:
                 self.metadata["missed_pairs"].append(i["Target"]+":"+i["Neighbor"])
@@ -311,11 +274,7 @@ class AnnotateVectorNeighborhoods(Experiment):
 
         del self.metadata["continuous_vars"]
         del self.metadata["binary_vars"]
-        # del self.metadata["failed_pairs"]
 
-        # total_fails = self.metadata["failed_pairs"] + self.metadata[
-        #     "missed_pairs"]
-        # total_fails = list(set(total_fails))
         self.metadata["coverage"] = \
             1 - round(len(self.metadata["missed_pairs"]) / self.metadata[
                 "total_pairs"], 2)
@@ -349,6 +308,11 @@ def collect_prior_data(output_dir):
     return prior_res
 
 def collect_targets_and_neighbors(output_dir):
+
+    """Collecting all the target and neighbor words produced by the
+    neighbor extraction step, which will be used to filter off unneeded 
+    words in the large distributional resources and save memory."""
+
     output_dir = output_dir.strip("metadata.json")
     neighbor_files = os.listdir(output_dir)
     if "metadata.json" in neighbor_files:
@@ -361,6 +325,9 @@ def collect_targets_and_neighbors(output_dir):
     return list(set(res))
 
 def init_analyzer(path, analyzer=None):
+
+    """Helper for initializing the RelationsInPair instance if one is not
+    provided, and updating it with the wordlist if one is provided"""
 
     wordlist = collect_targets_and_neighbors(path)
 
@@ -393,23 +360,21 @@ def init_analyzer(path, analyzer=None):
         return analyzer
 
 def _process_one_dict(col_dict):
+    """Helper function that for performing the annotation in a
+    multiprocessing-friendly way. Relies on global analyzer, metadata and
+    prior_data objects."""
 
-    # for i in range(len(dicts)):
-    # col_dict = dicts[i]
     neighbor = col_dict["Neighbor"]
     target = col_dict["Target"]
     if target + ":" + neighbor in prior_data:
         col_dict.update(prior_data[target + ":" + neighbor])
     else:
         relations = analyzer.analyze(target, neighbor)
-        # if not relations:
-        #     metadata["failed_pairs"].append(tuple([target, neighbor]))
         if relations:
             if not "Missing" in relations:
                 to_check_continuous = metadata["continuous_vars"]
                 to_check_binary = metadata["binary_vars"]
             else:
-                # print(target, neighbor)
                 to_check_binary = [x for x in ["NonCooccurring", "GDeps"] if
                                    x in metadata["ld_scores"]]
                 to_check_continuous = [x for x in
@@ -421,17 +386,9 @@ def _process_one_dict(col_dict):
                     col_dict[i] = relations[i]
             for i in to_check_binary:
                 col_dict[i] = i in relations
-    # print(col_dict)
     return col_dict
-
-def initializer(metadata):
-    global analyzer
-    analyzer = init_analyzer(metadata)
 
 if __name__ == '__main__':
     annotation = AnnotateVectorNeighborhoods(experiment_name="testing",
                                              overwrite=True)
-    # global analyzer
-    # analyzer = init_analyzer(annotation.metadata)
-
     annotation.get_results()
