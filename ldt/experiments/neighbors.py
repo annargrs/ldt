@@ -23,6 +23,7 @@ import uuid
 import pandas as pd
 import vecto.embeddings
 from vecto.utils.data import load_json
+from tqdm import tqdm
 
 from ldt import load_resource
 from ldt import __version__
@@ -146,7 +147,8 @@ class VectorNeighborhoods(Experiment):
 
             # get dictionary with list of lists
             neighbors = []
-            for word in self.dataset:
+            for word in tqdm(self.dataset):
+            # for word in self.dataset:
                 neighbor_list = embeddings.get_most_similar_words(
                     word, cnt=self._top_n + 1)[1:]
                 for i in enumerate(neighbor_list):
