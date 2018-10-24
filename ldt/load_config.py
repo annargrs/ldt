@@ -24,10 +24,10 @@ from outdated import warn_if_outdated
 warn_if_outdated('ldt', __version__)
 
 # downloading NLTK resources if they're missing
-if not "unittest" in sys.modules or "sphinx" in sys.modules:
-    nltk.download("wordnet")
-    nltk.download("stopwords")
-    nltk.download("punkt")
+# if not "unittest" in sys.modules or "sphinx" in sys.modules:
+#     nltk.download("wordnet")
+#     nltk.download("stopwords")
+#     nltk.download("punkt")
 
 TESTFILE = os.path.dirname(os.path.realpath(__file__))
 TESTFILE = os.path.join(TESTFILE, "tests/sample_files/.ldt-config.yaml")
