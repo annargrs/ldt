@@ -29,6 +29,7 @@ Todo:
 import os
 import uuid
 import pandas as pd
+import numpy as np
 # import progressbar
 
 from tqdm import tqdm
@@ -126,17 +127,15 @@ class AnnotateVectorNeighborhoods(Experiment):
             overwrite=overwrite, embeddings=None, output_dir=output_dir,
             dataset=None, experiment_subfolder="neighbors_annotated")
 
-        if ldt_analyzer:
-            global analyzer
-            analyzer = ldt_analyzer
-
         self.metadata["task"] = "annotate_neighbors"
         self.metadata["uuid"] = str(uuid.uuid4())
         self.metadata["ldt_config"] = config
         self.metadata["output_dir"] = self.output_dir
+
         self._load_dataset(dataset=None)
         neighbors_metadata_path = self.output_dir.replace(
             "neighbors_annotated", "neighbors")
+
         neighbors_metadata_path = os.path.join(neighbors_metadata_path,
                                                "metadata.json")
         if not os.path.isfile(neighbors_metadata_path):
@@ -154,7 +153,7 @@ class AnnotateVectorNeighborhoods(Experiment):
                        "the first files, but the remainder should go faster, " \
                        "because many neighbor pairs will be the same."
 
-        self.metadata["failed_pairs"] = []
+        # self.metadata["failed_pairs"] = []
         self.metadata["missed_pairs"] = []
         self.metadata["total_pairs"] = 0
 
@@ -223,8 +222,13 @@ class AnnotateVectorNeighborhoods(Experiment):
         self.metadata["ld_scores"] = self._ld_scores
         self.metadata["continuous_vars"] = self.continuous_vars
         self.metadata["binary_vars"] = self.binary_vars
-        #todo remove them when writing out the final metadata
 
+        global metadata
+        metadata = self.metadata
+
+        global analyzer
+        analyzer = init_analyzer(path=neighbors_metadata_path,
+                                 analyzer=ldt_analyzer)
 
 
     def _load_dataset(self, dataset):
@@ -255,11 +259,11 @@ class AnnotateVectorNeighborhoods(Experiment):
         global prior_data
         prior_data = collect_prior_data(self.metadata["output_dir"])
 
-        global metadata
-        metadata=self.metadata
+        # global metadata
+        # metadata=self.metadata
 
-        global analyzer
-        analyzer = init_analyzer(metadata)
+        # global analyzer
+        # analyzer = init_analyzer(metadata)
 
         filename = self.get_fname_for_embedding(embeddings_path)
         neighbor_file_path = os.path.join(self.output_dir.replace(
@@ -289,6 +293,12 @@ class AnnotateVectorNeighborhoods(Experiment):
 
         # dicts = Parallel(n_jobs=2)(delayed(_process_one_dict)(i) for i in dicts)
 
+        for i in dicts:
+            if not self._ld_scores[0] in i:
+                self.metadata["missed_pairs"].append(i["Target"]+":"+i["Neighbor"])
+            elif np.isnan(i[self._ld_scores[0]]):
+                self.metadata["missed_pairs"].append(i["Target"] + ":" + i["Neighbor"])
+
         output_df = pd.DataFrame(dicts,
                                  columns=["Target", "Rank", "Neighbor",
                                           "Similarity"]+self._ld_scores)
@@ -304,14 +314,14 @@ class AnnotateVectorNeighborhoods(Experiment):
 
         del self.metadata["continuous_vars"]
         del self.metadata["binary_vars"]
-        del self.metadata["failed_pairs"]
-        del self.metadata["missed_pairs"]
+        # del self.metadata["failed_pairs"]
 
         # total_fails = self.metadata["failed_pairs"] + self.metadata[
         #     "missed_pairs"]
         # total_fails = list(set(total_fails))
-        # self.metadata["coverage"] = \
-        #     1 - round(len(total_fails) / self.metadata["total_pairs"], 2)
+        self.metadata["coverage"] = \
+            1 - round(len(self.metadata["missed_pairs"]) / self.metadata[
+                "total_pairs"], 2)
 
 
 def collect_prior_data(output_dir):
@@ -342,20 +352,20 @@ def collect_prior_data(output_dir):
     return prior_res
 
 def collect_targets_and_neighbors(output_dir):
-    neighbors_dir = output_dir.strip("metadata.json")
-    neighbor_files = os.listdir(neighbors_dir)
+    output_dir = output_dir.strip("metadata.json")
+    neighbor_files = os.listdir(output_dir)
     if "metadata.json" in neighbor_files:
         neighbor_files.remove("metadata.json")
     res = []
     for f in neighbor_files:
-        input_df = pd.read_csv(os.path.join(neighbors_dir, f), header=0, sep="\t")
+        input_df = pd.read_csv(os.path.join(output_dir, f), header=0, sep="\t")
         res += list(input_df["Target"])
         res += list(input_df["Neighbor"])
     return list(set(res))
 
-def init_analyzer(metadata, analyzer=None):
+def init_analyzer(path, analyzer=None):
 
-    wordlist = collect_targets_and_neighbors(metadata["neighbors_metadata_path"])
+    wordlist = collect_targets_and_neighbors(path)
 
     if analyzer:
         # todo move this to RelationsInPair
@@ -395,9 +405,9 @@ def _process_one_dict(col_dict):
         col_dict.update(prior_data[target + ":" + neighbor])
     else:
         relations = analyzer.analyze(target, neighbor)
-        if not relations:
-            metadata["failed_pairs"].append(tuple([target, neighbor]))
-        else:
+        # if not relations:
+        #     metadata["failed_pairs"].append(tuple([target, neighbor]))
+        if relations:
             if not "Missing" in relations:
                 to_check_continuous = metadata["continuous_vars"]
                 to_check_binary = metadata["binary_vars"]
