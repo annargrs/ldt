@@ -89,7 +89,7 @@ experiments:
   experiment_name: testing
 
   # how many neighbors to extract and annotate
-  top_n: 2
+  top_n: 10
 
   # overwriting any previous data, if an experiment with the same name has already been performed:
   overwrite: True
@@ -98,4 +98,9 @@ experiments:
   multiprocessing: 2
 
   #number of word pairs in a multiprocessing batch: more is more efficient, but at a higher risk of data loss
-  batch_size: 100
+  batch_size: 1000
+
+  # timeout for individual word pair queries: some words take longer to analyze
+  # and drag down the whole process. Timeout of 30 seconds loses about 10
+  # words in a thousand in ld_909 vocab sample on Wikipedia embeddings.
+  timeout: 30

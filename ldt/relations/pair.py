@@ -22,6 +22,7 @@ Todo:
 """
 
 import functools
+import timeout_decorator
 
 from ldt.dicts.dictionary import Dictionary
 from ldt.dicts.normalize import Normalization
@@ -128,6 +129,8 @@ class RelationsInPair(Dictionary):
     def is_a_word(self, word):
         raise NotImplementedError
 
+    @timeout_decorator.timeout(config["experiments"]["timeout"],
+                               use_signals=False)
     @functools.lru_cache(maxsize=config["cache_size"])
     def _analyze(self, target, neighbor, silent=True):
         """The main function for analyzing the input strings and identifying
@@ -222,6 +225,10 @@ class RelationsInPair(Dictionary):
         metadata."""
         try:
             return self._analyze(target, neighbor, silent=silent)
+        except timeout_decorator.timeout_decorator.TimeoutError:
+            if not silent:
+                print("Timed out: " + target + ": " + neighbor)
+            return None
         except:
             if not silent:
                 print("Something went wrong: "+target+": "+neighbor)
