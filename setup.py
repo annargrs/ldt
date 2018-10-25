@@ -53,7 +53,7 @@ setup(
     install_requires=["ruamel.yaml", "wiktionaryparser==0.0.7",
                       "hurry.filesize", "timeout-decorator", "inflect",
                       "nltk", "vecto", "pandas", "pyenchant", "outdated",
-                      "p_tqdm"],
+                      "pathos"],
     cmdclass={'test': PyTest, "install": Install},
     author_email='anna_rogers@uml.edu',
     description='Linguistic diagnostics for word embeddings',

@@ -8,4 +8,4 @@ nltk
 vecto
 pandas
 outdated
-p_tqdm
+pathos

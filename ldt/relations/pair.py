@@ -129,8 +129,7 @@ class RelationsInPair(Dictionary):
     def is_a_word(self, word):
         raise NotImplementedError
 
-    @timeout_decorator.timeout(config["experiments"]["timeout"],
-                               use_signals=False)
+    @timeout_decorator.timeout(config["experiments"]["timeout"], use_signals=False)
     @functools.lru_cache(maxsize=config["cache_size"])
     def _analyze(self, target, neighbor, silent=True):
         """The main function for analyzing the input strings and identifying

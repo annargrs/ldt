@@ -30,12 +30,9 @@ import os
 import uuid
 import pandas as pd
 import numpy as np
-import progressbar
 
+from progressbar.bar import ProgressBar
 from pathos.multiprocessing import ProcessingPool
-# from p_tqdm import p_map
-from multiprocessing import Pool
-
 from vecto.utils.data import load_json
 
 from ldt.experiments.metadata import Experiment
@@ -252,13 +249,11 @@ class AnnotateVectorNeighborhoods(Experiment):
         self.metadata["total_pairs"] += len(input_df)
         dicts = input_df.to_dict(orient="records")
 
-
-
-        # simply with pathos.multiprocessing (no progressbar):
         chunk_size = config["experiments"]["batch_size"]
         chunks = [dicts[offs:offs + chunk_size] for offs in range(0, len(dicts), chunk_size)]
-        bar = progressbar.ProgressBar(max_value=len(chunks))
-        print("Processing ", len(chunks), "word pair batches of size", chunk_size)
+        bar = ProgressBar(max_value=len(chunks))
+        print("\nProcessing ", len(chunks), "word pair batches of size",
+              chunk_size)
         for i in range(len(chunks)):
             bar.update(i)
             dicts_chunk = chunks[i]
@@ -267,14 +262,15 @@ class AnnotateVectorNeighborhoods(Experiment):
             dicts_chunk = pool.map(_process_one_dict, dicts_chunk)
             # print(dicts_chunk)
             self.save_results(dicts_chunk)
-        # print("starting cycle")
-        # with Pool(2) as p:
-        #     dicts = p.map(_process_one_dict, dicts)
-        # self.save_results(dicts)
-        # with t_qdm progress bar memory blows up
-        # dicts = p_map(_process_one_dict, dicts, num_cpus=config["experiments"]["multiprocessing"])
-        # print("done")
-        # self.save_results(dicts)
+
+
+        # print("Processing ", len(chunks), "word pair batches of size", chunk_size)
+        # for dicts_chunk in tqdm(chunks):
+        #     pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
+        #     dicts_chunk = pool.map(_process_one_dict, dicts_chunk)
+        #     self.save_results(dicts_chunk)
+
+
 
     def save_results(self, dicts):
         output_df = pd.DataFrame(dicts,
@@ -318,6 +314,7 @@ class AnnotateVectorNeighborhoods(Experiment):
         self.metadata["coverage"] = \
             1 - round(len(self.metadata["missed_pairs"]) / self.metadata[
                 "total_pairs"], 2)
+        print("Annotation done.")
 
 
 def collect_prior_data(output_dir):

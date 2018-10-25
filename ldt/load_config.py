@@ -60,6 +60,8 @@ def load_config(path=CONFIGPATH):
             [os.path.join(options["path_to_resources"], "sample_embeddings")]
         options["wiktionary_cache"] = False
         options["experiments"]["top_n"] = 2
+        options["experiments"]["batch_size"] = 100
+        options["experiments"]["timeout"] = None
         options["corpus"] = "Wiki201308"
     options["path_to_cache"] = \
         os.path.join(options["path_to_resources"], "cache")
