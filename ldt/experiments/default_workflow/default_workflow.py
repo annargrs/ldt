@@ -56,7 +56,7 @@ def default_workflow(experiment_name=
     # performing annotation
     annotation = ldt.experiments.AnnotateVectorNeighborhoods(
         experiment_name=experiment_name, overwrite=overwrite,
-        ldt_analyzer=analyzer, gdeps=True, cooccurrence=True, ld_scores="main")
+        gdeps=True, cooccurrence=True, ld_scores="main")
     annotation.get_results()
 
     # analysing the results

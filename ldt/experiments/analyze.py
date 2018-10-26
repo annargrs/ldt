@@ -289,7 +289,7 @@ class LDScoring(Experiment):
                           index_label="LDScores")
             self.metadata["timestamp"] = datetime.datetime.now().isoformat()
             self.save_metadata()
-        print("LD analysis done, the embedding profiles are saved in ",
+        print("LD analysis done, the embedding profiles are saved in",
               self.output_dir, ".")
 
 if __name__ == '__main__':

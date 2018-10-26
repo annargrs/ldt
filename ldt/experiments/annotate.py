@@ -30,9 +30,11 @@ import os
 import uuid
 import pandas as pd
 import numpy as np
-
 from progressbar.bar import ProgressBar
 from pathos.multiprocessing import ProcessingPool
+from multiprocessing import Pool
+import multiprocessing.managers as m
+import threading
 from vecto.utils.data import load_json
 
 from ldt.experiments.metadata import Experiment
@@ -222,9 +224,9 @@ class AnnotateVectorNeighborhoods(Experiment):
         global metadata
         metadata = self.metadata
 
-        global analyzer
-        analyzer = init_analyzer(path=neighbors_metadata_path,
-                                 analyzer=ldt_analyzer)
+        global global_analyzer
+        global_analyzer = init_analyzer(path=neighbors_metadata_path,
+                                        analyzer=ldt_analyzer)
 
 
     def _load_dataset(self, dataset):
@@ -235,13 +237,16 @@ class AnnotateVectorNeighborhoods(Experiment):
 
     def _process(self, embeddings_path):
 
+        # global analyzer
+        # analyzer = self.analyzer
+
         global prior_data
         prior_data = collect_prior_data(self.metadata["output_dir"])
 
         filename = self.get_fname_for_embedding(embeddings_path)
         neighbor_file_path = os.path.join(self.output_dir.replace(
             "neighbors_annotated", "neighbors"), filename+".tsv")
-        print("Annotating "+neighbor_file_path)
+        print("\nAnnotating "+neighbor_file_path)
         self.metadata["out_path"] = os.path.join(self.output_dir,
                                                  filename+".tsv")
 
@@ -249,27 +254,44 @@ class AnnotateVectorNeighborhoods(Experiment):
         self.metadata["total_pairs"] += len(input_df)
         dicts = input_df.to_dict(orient="records")
 
-        chunk_size = config["experiments"]["batch_size"]
-        chunks = [dicts[offs:offs + chunk_size] for offs in range(0, len(dicts), chunk_size)]
-        bar = ProgressBar(max_value=len(chunks))
-        print("\nProcessing ", len(chunks), "word pair batches of size",
-              chunk_size)
-        for i in range(len(chunks)):
-            bar.update(i)
-            dicts_chunk = chunks[i]
-            pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
-            # pool = ProcessingPool(nodes=1)
-            dicts_chunk = pool.map(_process_one_dict, dicts_chunk)
-            # print(dicts_chunk)
-            self.save_results(dicts_chunk)
-
-
-        # print("Processing ", len(chunks), "word pair batches of size", chunk_size)
-        # for dicts_chunk in tqdm(chunks):
+        # bar = ProgressBar(max_value=len(chunks))
+        # print("\nProcessing", len(dicts), "word pair in", len(chunks), "batches of size", chunk_size)
+        # for i in range(len(chunks)):
+        #     bar.update(i)
+        #     dicts_chunk = chunks[i]
         #     pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
         #     dicts_chunk = pool.map(_process_one_dict, dicts_chunk)
+        #     print(dicts_chunk)
+        #     print("saving")
         #     self.save_results(dicts_chunk)
 
+
+        # chunk_size = config["experiments"]["batch_size"]
+        # chunks = [dicts[offs:offs + chunk_size] for offs in range(0, len(dicts), chunk_size)]
+        # bar = ProgressBar(max_value=len(chunks))
+        # print("\nProcessing", len(dicts), "word pair in", len(chunks), "batches of size", chunk_size)
+        # for i in range(len(chunks)):
+        #     bar.update(i)
+        #     dicts_chunk = chunks[i]
+        #     pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
+        #     dicts_chunk = pool.map(_process_one_dict, dicts_chunk)
+        #     print(dicts_chunk)
+        #     print("saving")
+        #     self.save_results(dicts_chunk)
+
+        if config["experiments"]["multiprocessing"] == 1:
+            dicts = [_process_one_dict(x) for x in dicts]
+            self.save_results(dicts)
+
+        else:
+        #python multiprocessing
+            pool = Pool(config["experiments"]["multiprocessing"],
+                        initializer=initializer(global_analyzer))
+            dicts = pool.map(_process_one_dict, dicts)
+        #pathos
+            # pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
+            # dicts = pool.map(_process_one_dict, dicts)
+            self.save_results(dicts)
 
 
     def save_results(self, dicts):
@@ -280,6 +302,9 @@ class AnnotateVectorNeighborhoods(Experiment):
             output_df.to_csv(self.metadata["out_path"], index=False,
                              sep="\t", header=True)
         else:
+            # existing_df = pd.read_csv(self.metadata["out_path"], header=0, sep="\t")
+            # existing_dicts = existing_df.to_dict(orient="records")
+            # if not existing_dicts == dicts:
             output_df.to_csv(self.metadata["out_path"], index=False, sep="\t",
                              mode="a", header=False)
 
@@ -314,7 +339,7 @@ class AnnotateVectorNeighborhoods(Experiment):
         self.metadata["coverage"] = \
             1 - round(len(self.metadata["missed_pairs"]) / self.metadata[
                 "total_pairs"], 2)
-        print("Annotation done.")
+        print("\nAnnotation done.")
 
 
 def collect_prior_data(output_dir):
@@ -347,7 +372,7 @@ def collect_prior_data(output_dir):
 def collect_targets_and_neighbors(output_dir):
 
     """Collecting all the target and neighbor words produced by the
-    neighbor extraction step, which will be used to filter off unneeded 
+    neighbor extraction step, which will be used to filter off unneeded
     words in the large distributional resources and save memory."""
 
     output_dir = output_dir.strip("metadata.json")
@@ -367,7 +392,7 @@ def init_analyzer(path, analyzer=None):
     provided, and updating it with the wordlist if one is provided"""
 
     wordlist = collect_targets_and_neighbors(path)
-    print("Loading filtered distributional resources. This takes a while "
+    print("\nLoading filtered distributional resources. This takes a while "
           "for a large experiment.")
 
     if analyzer:
@@ -398,6 +423,14 @@ def init_analyzer(path, analyzer=None):
                                    wordlist=wordlist)
         return analyzer
 
+class initializer():
+    def __init__(self, global_analyzer):
+        self.analyzer = global_analyzer
+
+    def __call__(self):
+        global global_analyzer
+        global_analyzer = self.analyzer
+
 def _process_one_dict(col_dict):
     """Helper function that for performing the annotation in a
     multiprocessing-friendly way. Relies on global analyzer, metadata and
@@ -406,9 +439,10 @@ def _process_one_dict(col_dict):
     neighbor = col_dict["Neighbor"]
     target = col_dict["Target"]
     if target + ":" + neighbor in prior_data:
+        print("previous results found")
         col_dict.update(prior_data[target + ":" + neighbor])
     else:
-        relations = analyzer.analyze(target, neighbor)
+        relations = global_analyzer.analyze(target, neighbor, silent=False)
         if relations:
             if not "Missing" in relations:
                 to_check_continuous = metadata["continuous_vars"]

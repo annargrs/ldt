@@ -95,7 +95,7 @@ experiments:
   overwrite: True
 
   # how many CPUs to use for the annotation jobs.
-  multiprocessing: 2
+  multiprocessing: 1
 
   #number of word pairs in a multiprocessing batch: more is more efficient, but at a higher risk of data loss
   batch_size: 1000

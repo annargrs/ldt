@@ -104,8 +104,6 @@ class Word(object):
             self._lex_dict = lex_dict
         self.analyze(self.original_spelling)
 
-
-
     @functools.lru_cache(maxsize=config["cache_size"])
     def analyze(self, word):
         self.info = {}

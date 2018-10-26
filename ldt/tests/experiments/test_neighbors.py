@@ -30,16 +30,19 @@ class Tests(unittest.TestCase):
                                                        order=("wordnet", "custom"),
                                                        lowercasing=True)
         derivation = ldt.dicts.derivation.meta.DerivationAnalyzer()
-        lex_dict = ldt.dicts.semantics.metadictionary.MetaDictionary(order=(
-            "wordnet","wiktionary"))
+        lex_dict = ldt.dicts.semantics.metadictionary.MetaDictionary(
+                language="English", order=("wordnet", "wiktionary"))
 
         # global analyzer
         analyzer = ldt.relations.pair.RelationsInPair(
-            normalizer=normalizer, derivation_dict=derivation, lex_dict=lex_dict)
+            normalizer=normalizer, derivation_dict=derivation,
+                lex_dict=lex_dict, gdeps=False, cooccurrence=False)
         cls.annotation = ldt.experiments.AnnotateVectorNeighborhoods(
             experiment_name="testing", overwrite=True,
-            ldt_analyzer=analyzer, ld_scores="all")
+            ldt_analyzer=analyzer, ld_scores="main", gdeps=True,
+                cooccurrence=True)
         cls.annotation.get_results()
+
         output_scores=["SharedPOS", "SharedMorphForm", "SharedDerivation",
                         "ShortestPathMedian", "CloseInOntology", "Synonyms",
                         "Antonyms",  "Meronyms", "Hyponyms", "Hypernyms",
@@ -50,15 +53,15 @@ class Tests(unittest.TestCase):
                                                 ld_scores=output_scores)
         cls.scoring.get_results()
 
-    @classmethod
-    def tearDownClass(cls):
-        """Clearning up the test dir."""
-        cls.experiment = None
-        subfolders = ["neighbors", "neighbors_annotated", "analysis"]
-        for sub in subfolders:
-            dir = os.path.join(config["path_to_resources"], "experiments",
-                               "testing", sub)
-            shutil.rmtree(dir)
+    # @classmethod
+    # def tearDownClass(cls):
+    #     """Clearning up the test dir."""
+    #     cls.experiment = None
+    #     subfolders = ["neighbors", "neighbors_annotated", "analysis"]
+    #     for sub in subfolders:
+    #         dir = os.path.join(config["path_to_resources"], "experiments",
+    #                            "testing", sub)
+    #         shutil.rmtree(dir)
 
 ######## tests for metadata and neighborhoods #############
 

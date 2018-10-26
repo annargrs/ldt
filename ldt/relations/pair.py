@@ -129,7 +129,7 @@ class RelationsInPair(Dictionary):
     def is_a_word(self, word):
         raise NotImplementedError
 
-    @timeout_decorator.timeout(config["experiments"]["timeout"], use_signals=False)
+    # @timeout_decorator.timeout(config["experiments"]["timeout"], use_signals=False)
     @functools.lru_cache(maxsize=config["cache_size"])
     def _analyze(self, target, neighbor, silent=True):
         """The main function for analyzing the input strings and identifying
@@ -153,9 +153,9 @@ class RelationsInPair(Dictionary):
                       self._lex_dict)
         neighbor = Word(neighbor, self._derivation_dict, self._normalizer,
                         self._lex_dict)
-        if not silent:
-            print(target.pp_info())
-            print(neighbor.pp_info())
+        # if not silent:
+        #     print(target.pp_info())
+        #     print(neighbor.pp_info())
         res = {}
         if neighbor.info["Missing"]:
             res["Missing"] = True
@@ -228,10 +228,11 @@ class RelationsInPair(Dictionary):
             if not silent:
                 print("Timed out: " + target + ": " + neighbor)
             return None
-        except:
-            if not silent:
-                print("Something went wrong: "+target+": "+neighbor)
-                return None
+        # except:
+        #     if not silent:
+        #         print("Something went wrong: "+target+": "+neighbor)
+        #     else:
+        #         return None
 
 def _binary_rels(target, neighbor):
     """Helper function for identifying intersections in the property lists
