@@ -131,7 +131,7 @@ class RelationsInPair(Dictionary):
 
     # @timeout_decorator.timeout(config["experiments"]["timeout"], use_signals=False)
     @functools.lru_cache(maxsize=config["cache_size"])
-    def _analyze(self, target, neighbor, silent=True):
+    def _analyze(self, target, neighbor, silent=True, distr_data=True):
         """The main function for analyzing the input strings and identifying
         any relations the two words may share.
 
@@ -153,9 +153,9 @@ class RelationsInPair(Dictionary):
                       self._lex_dict)
         neighbor = Word(neighbor, self._derivation_dict, self._normalizer,
                         self._lex_dict)
-        # if not silent:
-        #     print(target.pp_info())
-        #     print(neighbor.pp_info())
+        if not silent:
+            print(target.pp_info())
+            print(neighbor.pp_info())
         res = {}
         if neighbor.info["Missing"]:
             res["Missing"] = True
@@ -182,57 +182,64 @@ class RelationsInPair(Dictionary):
                                                               neighbor_lemma):
                         res["Associations"] = True
                         break
-
-        res = self._distributional_data(target, neighbor, res)
+        if distr_data:
+            # res = self._distributional_data(target, neighbor, res)
+            distr_res = self._distr_dict.analyze(target=target.info["OriginalForm"], neighbor=neighbor.info["OriginalForm"], cooccurrence=self._cooccurrence, gdeps=self._gdeps)
+            res.update(distr_res)
         return res
 
-    def _distributional_data(self, target, neighbor, res):
-        """ Helper method for retrieving distributional data, if the corpus
-        was specified in config file.
+    # def _distributional_data(self, target, neighbor, res):
+    #     """ Helper method for retrieving distributional data, if the corpus
+    #     was specified in config file.
+    #
+    #     Args:
+    #         target (ldt Word object): the target word
+    #         neighbor (ldt Word object): the neighbor word
+    #         res (dict): dictionary with already-discovered relations
+    #
+    #     Returns:
+    #         (dict): dictionary with already-discovered relations, updated
+    #         with distributional data.
+    #
+    #     """
+    #     if self._gdeps:
+    #         if self._distr_dict.cooccur_in_gdeps(target.info["OriginalForm"],
+    #                                              neighbor.info["OriginalForm"]):
+    #             res["GDeps"] = True
+    #     if not config["corpus"]:
+    #         return res
+    #     res["TargetFrequency"] = self._distr_dict.frequency_in_corpus(
+    #         target.info["OriginalForm"])
+    #     res["NeighborFrequency"] = self._distr_dict.frequency_in_corpus(
+    #         neighbor.info["OriginalForm"])
+    #     if self._cooccurrence:
+    #         if not self._distr_dict.cooccur_in_corpus(target.info["OriginalForm"],
+    #                                                   neighbor.info["OriginalForm"]):
+    #             res["NonCooccurring"] = True
+    #     return res
 
-        Args:
-            target (ldt Word object): the target word
-            neighbor (ldt Word object): the neighbor word
-            res (dict): dictionary with already-discovered relations
 
-        Returns:
-            (dict): dictionary with already-discovered relations, updated
-            with distributional data.
-
-        """
-        if self._gdeps:
-            if self._distr_dict.cooccur_in_gdeps(target.info["OriginalForm"],
-                                                 neighbor.info["OriginalForm"]):
-                res["GDeps"] = True
-        if not config["corpus"]:
-            return res
-        res["TargetFrequency"] = self._distr_dict.frequency_in_corpus(
-            target.info["OriginalForm"])
-        res["NeighborFrequency"] = self._distr_dict.frequency_in_corpus(
-            neighbor.info["OriginalForm"])
-        if self._cooccurrence:
-            if not self._distr_dict.cooccur_in_corpus(target.info["OriginalForm"],
-                                                      neighbor.info["OriginalForm"]):
-                res["NonCooccurring"] = True
-        return res
-
-
-    def analyze(self, target, neighbor, silent=True):
+    def analyze(self, target, neighbor, silent=True, debugging=False):
         """Catch-all wrapper for :meth:`_analyze` that ensures that
         large-scale annotation continues even if something breaks on a
         particular pair. The offending data will be logged in experiment
         metadata."""
-        try:
-            return self._analyze(target, neighbor, silent=silent)
-        except timeout_decorator.timeout_decorator.TimeoutError:
-            if not silent:
-                print("Timed out: " + target + ": " + neighbor)
-            return None
-        # except:
-        #     if not silent:
-        #         print("Something went wrong: "+target+": "+neighbor)
-        #     else:
-        #         return None
+        if not debugging:
+            try:
+                return self._analyze(target, neighbor, silent=silent)
+            except timeout_decorator.timeout_decorator.TimeoutError:
+                if not silent:
+                    print("Timed out: " + target + ": " + neighbor)
+                return None
+            except:
+                return None
+        else:
+            try:
+                return self._analyze(target, neighbor, silent=silent)
+            except timeout_decorator.timeout_decorator.TimeoutError:
+                if not silent:
+                    print("Timed out: " + target + ": " + neighbor)
+                return None
 
 def _binary_rels(target, neighbor):
     """Helper function for identifying intersections in the property lists
