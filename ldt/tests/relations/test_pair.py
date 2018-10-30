@@ -25,11 +25,15 @@ class Tests(unittest.TestCase):
         cls.test_dict = ldt.relations.pair.RelationsInPair(
             normalizer=normalizer, derivation_dict=DerivationAnalyzer,
             lex_dict=LexDict, gdeps=False, cooccurrence=False)
+        cls.test_dict2 = ldt.relations.pair.RelationsInPair(
+            normalizer=normalizer, derivation_dict=DerivationAnalyzer,
+            lex_dict=LexDict, distr_dict="None")
 
     @classmethod
     def tearDownClass(cls):
         """Clearning up the test variables."""
         cls.test_dict = None
+        cls.test_dict2 = None
 
     @ignore_warnings
     def test_paths(self):
@@ -101,6 +105,12 @@ class Tests(unittest.TestCase):
         """Test frequency retrieval."""
         res = self.test_dict.analyze("walk", "quickly")
         self.assertEqual(res["TargetFrequency"], 20)
+
+    @ignore_warnings
+    def test_cooccurrence(self):
+        """Test frequency retrieval."""
+        res = self.test_dict2.analyze("walk", "quickly")
+        self.assertNotIn("TargetFrequency", res)
 
 if __name__ == '__main__':
     unittest.main()

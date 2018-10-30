@@ -111,7 +111,11 @@ class RelationsInPair(Dictionary):
         else:
             self._lex_dict = lex_dict
 
-        if not distr_dict:
+        if distr_dict:
+            if not isinstance(distr_dict, str):
+                self._distr_dict = distr_dict
+
+        else:
             if config["corpus"]:
                 self._distr_dict = DistributionDict(language=language,
                                                     gdeps=gdeps,
@@ -183,9 +187,10 @@ class RelationsInPair(Dictionary):
                         res["Associations"] = True
                         break
         if distr_data:
+            if hasattr(self, "_distr_dict"):
             # res = self._distributional_data(target, neighbor, res)
-            distr_res = self._distr_dict.analyze(target=target.info["OriginalForm"], neighbor=neighbor.info["OriginalForm"], cooccurrence=self._cooccurrence, gdeps=self._gdeps)
-            res.update(distr_res)
+                distr_res = self._distr_dict.analyze(target=target.info["OriginalForm"], neighbor=neighbor.info["OriginalForm"], cooccurrence=self._cooccurrence, gdeps=self._gdeps)
+                res.update(distr_res)
         return res
 
     # def _distributional_data(self, target, neighbor, res):
