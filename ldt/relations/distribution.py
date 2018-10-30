@@ -122,6 +122,34 @@ class DistributionDict():
             return self.gdeps.are_related(word1, word2)
         return False
 
+
+    def analyze(self, target, neighbor, cooccurrence=False, gdeps=False):
+        """ Helper method for retrieving distributional data, if the corpus
+        was specified in config file.
+
+        Args:
+            target (ldt Word object): the target word
+            neighbor (ldt Word object): the neighbor word
+            res (dict): dictionary with already-discovered relations
+
+        Returns:
+            (dict): dictionary with already-discovered relations, updated
+            with distributional data.
+
+        """
+        res = {}
+        if gdeps:
+            if self.cooccur_in_gdeps(target, neighbor):
+                res["GDeps"] = True
+        if not config["corpus"]:
+            return res
+        res["TargetFrequency"] = self.frequency_in_corpus(target)
+        res["NeighborFrequency"] = self.frequency_in_corpus(neighbor)
+        if cooccurrence:
+            if not self.cooccur_in_corpus(target, neighbor):
+                res["NonCooccurring"] = True
+        return res
+
 def _filter_by_list(data, wordlist):
     """Helper for loading larger dictionary-based resources:
     memory will be freed by only keeping the words relevant for the

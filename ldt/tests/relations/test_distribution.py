@@ -86,5 +86,10 @@ class Tests(unittest.TestCase):
         remained = "cat" in self.test_dict_filtered.cooccurrence.data
         self.assertTrue(remained and filtered_out)
 
+    def test_analyze(self):
+        """Test frequency retrieval."""
+        res = self.test_dict_filtered.analyze("walk", "quickly")
+        self.assertEqual(res["TargetFrequency"], 20)
+
 if __name__ == '__main__':
     unittest.main()
