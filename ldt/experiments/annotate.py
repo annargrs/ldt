@@ -59,7 +59,7 @@ class AnnotateVectorNeighborhoods(Experiment):
                  overwrite=config["experiments"]["overwrite"], ld_scores="main",
                  output_dir=os.path.join(config["path_to_resources"],
                                          "experiments"),
-                 ldt_analyzer=None, gdeps=False, cooccurrence=False,
+                 ldt_analyzer=None,
                  multiprocessing=config["experiments"]["multiprocessing"],
                  debugging=False):
 
@@ -83,10 +83,6 @@ class AnnotateVectorNeighborhoods(Experiment):
                 resources set up as desired (see tutorial and
                 class documentation). If None, default settings for English
                 will be used.
-            gdeps (bool): whether to use google dependency cooccurrence data
-                (memory-intensive, off by default)
-            cooccurrence (bool): whether to use corpus cooccurrence data
-                (memory-intensive, off by default)
             ld_scores (str or list of str): "all" for all supported scores,
                 or a list of ld_scores. Supported values are:
 
@@ -209,19 +205,6 @@ class AnnotateVectorNeighborhoods(Experiment):
                                        in ld_scores]
             else:
                 raise ValueError(ld_scores_error)
-
-    # removing distributional variables according to config
-        if not gdeps:
-            if "GDeps" in self._ld_scores:
-                self._ld_scores.remove("GDeps")
-        if not cooccurrence:
-            if "NonCooccurring" in self._ld_scores:
-                self._ld_scores.remove("NonCooccurring")
-        if not config["corpus"]:
-            for i in ["NonCooccurring", "TargetFrequency",
-                      "NeighborFrequency"]:
-                if i in self._ld_scores:
-                    self._ld_scores.remove(i)
 
         self.metadata["ld_scores"] = self._ld_scores
         self.metadata["continuous_vars"] = self.continuous_vars
@@ -533,6 +516,5 @@ if __name__ == '__main__':
     annotation = AnnotateVectorNeighborhoods(experiment_name="testing",
                                              overwrite=True,
                                              ldt_analyzer=analyzer,
-                                             ld_scores="all", gdeps=True,
-                                             cooccurrence=True, multiprocessing=1)
+                                             ld_scores="all", multiprocessing=1)
     annotation.get_results()
