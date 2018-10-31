@@ -28,7 +28,7 @@ class DistributionDict():
     """
 
     def __init__(self, language=config["default_language"],
-                 corpus=config["corpus"], gdeps=False,
+                 corpus=config["corpus"], frequencies=True, gdeps=False,
                  cooccurrence=False, cooccurrence_freq=False, wordlist=None):
 
         super(DistributionDict, self).__init__()
@@ -37,7 +37,9 @@ class DistributionDict():
         self.language = language
 
         #: ResourceDict: frequency dictionary
-        self.freqdict = ResourceDict(resource="freqdict", corpus=corpus)
+        self.frequencies = frequencies
+        if frequencies:
+            self.freqdict = ResourceDict(resource="freqdict", corpus=corpus)
 
         if wordlist:
             if gdeps:
@@ -86,10 +88,11 @@ class DistributionDict():
             (int): the frequency of the word in the corpus.
 
         """
-        try:
-            return int(self.freqdict.data[word])
-        except KeyError:
-            return 0
+        if hasattr(self, "freqdict"):
+            try:
+                return int(self.freqdict.data[word])
+            except KeyError:
+                return 0
 
     def cooccur_in_corpus(self, word1, word2):
         """Wrapper method for retrieving cooccurrence information.
@@ -123,7 +126,7 @@ class DistributionDict():
         return False
 
 
-    def analyze(self, target, neighbor, cooccurrence=False, gdeps=False):
+    def analyze(self, target, neighbor):
         """ Helper method for retrieving distributional data, if the corpus
         was specified in config file.
 
@@ -138,14 +141,15 @@ class DistributionDict():
 
         """
         res = {}
-        if gdeps:
+        if self.gdeps:
             if self.cooccur_in_gdeps(target, neighbor):
                 res["GDeps"] = True
         if not config["corpus"]:
             return res
-        res["TargetFrequency"] = self.frequency_in_corpus(target)
-        res["NeighborFrequency"] = self.frequency_in_corpus(neighbor)
-        if cooccurrence:
+        if self.frequencies:
+            res["TargetFrequency"] = self.frequency_in_corpus(target)
+            res["NeighborFrequency"] = self.frequency_in_corpus(neighbor)
+        if self.cooccurrence:
             if not self.cooccur_in_corpus(target, neighbor):
                 res["NonCooccurring"] = True
         return res
