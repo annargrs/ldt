@@ -52,18 +52,6 @@ class RelationsInPair(Dictionary):
             :class:`ldt.relations.ontology_path.ontodict.OntoDict`
         association_dict (ldt dictionary object): see
             :class:`ldt.dicts.resources.AssociationDictionary`
-        distr_dict (ldt dictionary object): see
-            :class:`ldt.relations.distribution.DistributionDict`
-        gdeps (bool): in case distr_dict is initialized, this is the
-            switch for using google dependency cooccurrence data (
-            memory-intensive)
-        cooccurrence (bool): in case distr_dict is initialized, this is the
-            switch for using corpus cooccurrence data (memory-intensive)
-        cooccurrence_freq (bool): if True, cooccurrence counts are returned
-            rather than booleans (even more memory-intensive)
-        wordlist (list of str): if a wordlist is provided, the resources
-            with distributional data will be filtered down to the words in
-            the wordlist, significantly decreasing the memory usage.
 
         Note:
 
@@ -77,9 +65,7 @@ class RelationsInPair(Dictionary):
     def __init__(self, language=config["default_language"],
                  lowercasing=config["lowercasing"],
                  derivation_dict=None, normalizer=None,
-                 lex_dict=None, ontodict=None, association_dict=None,
-                 distr_dict=None, gdeps=False,
-                 cooccurrence=False, cooccurrence_freq=False, wordlist=None):
+                 lex_dict=None, ontodict=None, association_dict=None):
 
         super(RelationsInPair, self).__init__(language=language,
                                               lowercasing=lowercasing)
@@ -111,29 +97,24 @@ class RelationsInPair(Dictionary):
         else:
             self._lex_dict = lex_dict
 
-        if distr_dict:
-            if not isinstance(distr_dict, str):
-                self._distr_dict = distr_dict
-
-        else:
-            if config["corpus"]:
-                self._distr_dict = DistributionDict(language=language,
-                                                    gdeps=gdeps,
-                                                    cooccurrence=cooccurrence,
-                                                    cooccurrence_freq=
-                                                    cooccurrence_freq,
-                                                    wordlist=wordlist)
-        if wordlist:
-            self._gdeps = gdeps
-            self._cooccurrence = cooccurrence
-        else:
-            self._gdeps = False
-            self._cooccurrence = False
+        # if distr_dict:
+        #     if not isinstance(distr_dict, str):
+        #         self._distr_dict = distr_dict
+        #
+        # else:
+        #     if config["corpus"] or gdeps:
+        #         self._distr_dict = DistributionDict(language=language,
+        #                                             gdeps=gdeps,
+        #                                             cooccurrence=cooccurrence,
+        #                                             cooccurrence_freq=
+        #                                             cooccurrence_freq,
+        #                                             wordlist=wordlist,
+        #                                             frequencies=frequencies)
 
     def is_a_word(self, word):
         raise NotImplementedError
 
-    # @timeout_decorator.timeout(config["experiments"]["timeout"], use_signals=False)
+    @timeout_decorator.timeout(config["experiments"]["timeout"], use_signals=False)
     @functools.lru_cache(maxsize=config["cache_size"])
     def _analyze(self, target, neighbor, silent=True, distr_data=True):
         """The main function for analyzing the input strings and identifying
@@ -186,11 +167,12 @@ class RelationsInPair(Dictionary):
                                                               neighbor_lemma):
                         res["Associations"] = True
                         break
-        if distr_data:
-            if hasattr(self, "_distr_dict"):
-            # res = self._distributional_data(target, neighbor, res)
-                distr_res = self._distr_dict.analyze(target=target.info["OriginalForm"], neighbor=neighbor.info["OriginalForm"], cooccurrence=self._cooccurrence, gdeps=self._gdeps)
-                res.update(distr_res)
+        # if distr_data:
+        #     if hasattr(self, "_distr_dict"):
+        #     # res = self._distributional_data(target, neighbor, res)
+        #         distr_res = self._distr_dict.analyze(target=target.info["OriginalForm"], neighbor=neighbor.info["OriginalForm"])
+        #         print(distr_res)
+        #         res.update(distr_res)
         return res
 
     # def _distributional_data(self, target, neighbor, res):
@@ -319,6 +301,6 @@ def are_related_as(target, neighbor):
     return list(set(res))
 
 
-# if __name__ == '__main__':
-#     relation_analyzer = RelationsInPair()
-#     print(relation_analyzer.analyze("cat", "dog"))
+if __name__ == '__main__':
+    relation_analyzer = RelationsInPair()
+    print(relation_analyzer.analyze("cat", "dog"))
