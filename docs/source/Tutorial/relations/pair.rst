@@ -2,7 +2,8 @@
 Combining information from ldt word objects
 ===========================================
 
-All the information from various LDT resources is combined in the :class:`~ldt.relations.pair.RelationsInPair` class.
+All the information from various LDT resources (except :ref:`Distributional information`)
+is combined in the :class:`~ldt.relations.pair.RelationsInPair` class.
 Similarly to the :class:`~ldt.relations.word.Word`, it can work on raw string input and initialize all the necessary
 resources with default parameters. You can also pass pre-initialied dictionary objects (normalizer, derivation,
 lexicographic and distributional dictionaries) for faster processing on scale. See the docstring of :class:`~ldt.relations.pair.RelationsInPair` for the full list of options.
@@ -19,18 +20,14 @@ The basic usage is as follows:
  'Synonyms': True,
  'Antonyms': True,
  'ShortestPath': 0.058823529411764705,
- 'Associations': True,
- 'TargetFrequency': 491760,
- 'NeighborFrequency': 509267}
+ 'Associations': True}
 >>> relations.analyze("kindness", "happiness")
 {'Synonyms': True,
  'SharedDerivation': True,
  'SharedMorphForm': True,
  'SharedPOS': True,
  'ShortestPath': 0.08333333333333333,
- 'Associations': True,
- 'TargetFrequency': 5119,
- 'NeighborFrequency': 14543}
+ 'Associations': True}
 
 ``silent=False`` option exectutes :meth:`~ldt.relations.word.Word.pp_info` function for visual inspection of the information available for the input words.
 
@@ -95,6 +92,4 @@ Missing :  False
 |
 {'SharedPOS': True,
  'Synonyms': True,
- 'ShortestPath': 0.2,
- 'TargetFrequency': 6469,
- 'NeighborFrequency': 0}
+ 'ShortestPath': 0.2}

@@ -106,7 +106,7 @@ class DistributionDict():
         """
         if hasattr(self, "cooccurrence"):
             return self.cooccurrence.are_related(word1, word2, freq=self._freq)
-        return False
+        # return False
 
 
     def cooccur_in_gdeps(self, word1, word2):
@@ -141,17 +141,18 @@ class DistributionDict():
 
         """
         res = {}
-        if self.gdeps:
+        if hasattr(self, "gdeps"):
             if self.cooccur_in_gdeps(target, neighbor):
                 res["GDeps"] = True
         if not config["corpus"]:
             return res
-        if self.frequencies:
+        if hasattr(self, "frequencies"):
             res["TargetFrequency"] = self.frequency_in_corpus(target)
             res["NeighborFrequency"] = self.frequency_in_corpus(neighbor)
-        if self.cooccurrence:
-            if not self.cooccur_in_corpus(target, neighbor):
-                res["NonCooccurring"] = True
+        if hasattr(self, "cooccurrence"):
+            res["NonCooccurring"] = not self.cooccur_in_corpus(target, neighbor)
+            # if not self.cooccur_in_corpus(target, neighbor):
+            #     res["NonCooccurring"] = True
         return res
 
 def _filter_by_list(data, wordlist):
