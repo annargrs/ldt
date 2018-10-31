@@ -36,8 +36,7 @@ class Tests(unittest.TestCase):
         # global analyzer
         analyzer = ldt.relations.pair.RelationsInPair(
             normalizer=normalizer, derivation_dict=derivation,
-                lex_dict=lex_dict, gdeps=False, cooccurrence=False,
-                distr_dict="None")
+                lex_dict=lex_dict)
         cls.annotation = ldt.experiments.AnnotateVectorNeighborhoods(
             experiment_name="testing", overwrite=True,
             ldt_analyzer=analyzer, ld_scores="main", multiprocessing=1,
