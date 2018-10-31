@@ -32,7 +32,7 @@ import uuid
 import pandas as pd
 import numpy as np
 #from progressbar.bar import ProgressBar
-#from pathos.multiprocessing import ProcessingPool
+from pathos.multiprocessing import ProcessingPool
 #from multiprocessing import Pool
 #import multiprocessing.managers as m
 #import threading
@@ -287,14 +287,15 @@ class AnnotateVectorNeighborhoods(Experiment):
                 dicts = newdicts
 #            dicts = [_process_one_dict(x) for x in dicts]
             self.save_results(dicts)
-        # else:
+        else:
         # #python multiprocessing
         #     pool = Pool(self.multiprocessing, initializer=initializer(global_analyzer))
         #     dicts = pool.map(_process_one_dict, dicts)
         # #pathos
-        #     # pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
-        #     # dicts = pool.map(_process_one_dict, dicts)
-        #     self.save_results(dicts)
+            print("working with", config["experiments"]["multiprocessing"], "cores")
+            pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
+            dicts = pool.map(_process_one_dict, dicts)
+            self.save_results(dicts)
         print("Adding distributional data")
         dicts = self.add_distr_data(dicts)
         self.save_results(dicts, overwrite=True)
@@ -555,5 +556,5 @@ if __name__ == '__main__':
                                              overwrite=True,
                                              ldt_analyzer=analyzer,
                                              ld_scores="all",
-                                             multiprocessing=1, debugging=True)
+                                             multiprocessing=2, debugging=True)
     annotation.get_results()
