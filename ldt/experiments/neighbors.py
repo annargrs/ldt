@@ -23,7 +23,8 @@ import uuid
 import pandas as pd
 import vecto.embeddings
 from vecto.utils.data import load_json
-from progressbar.bar import ProgressBar
+# from progressbar.bar import ProgressBar
+from tqdm import tqdm
 
 from ldt import load_resource
 from ldt import __version__
@@ -138,7 +139,7 @@ class VectorNeighborhoods(Experiment):
         Returns:
             None
         """
-        print("Extracting neighbors:", embeddings_path)
+        print("Extracting word vector neighborhoods:", embeddings_path)
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -148,10 +149,11 @@ class VectorNeighborhoods(Experiment):
 
             # get dictionary with list of lists
             neighbors = []
-            bar = ProgressBar(max_value=len(self.dataset))
-            for i in range(len(self.dataset)):
-                bar.update(i)
-                word = self.dataset[i]
+            # bar = ProgressBar(max_value=len(self.dataset))
+            # for i in range(len(self.dataset)):
+            for word in tqdm(self.dataset):
+                # bar.update(i)
+                # word = self.dataset[i]
             # for word in tqdm(self.dataset):
             # for word in self.dataset:
                 neighbor_list = embeddings.get_most_similar_words(

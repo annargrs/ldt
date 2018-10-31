@@ -150,7 +150,8 @@ class AnnotateVectorNeighborhoods(Experiment):
             for embedding in self.metadata["embeddings"]:
                 self.embeddings.append(embedding["path"])
 
-        self.message = "\nStarting LD annotation. This will take a while for " \
+        self.message = "\n\nStarting LD annotation. This will take a while " \
+                       "for " \
                        "the first files, but the remainder should go faster, " \
                        "because many neighbor pairs will be the same."
 
@@ -230,10 +231,6 @@ class AnnotateVectorNeighborhoods(Experiment):
 
     def _process(self, embeddings_path):
 
-        # global analyzer
-        # analyzer = self.analyzer
-        print("\nProcessing", embeddings_path)
-
         global prior_data
         prior_data = collect_prior_data(self.metadata["output_dir"])
         # print("collected prior data", len(prior_data))
@@ -298,7 +295,7 @@ class AnnotateVectorNeighborhoods(Experiment):
             # dicts = pool.map(_process_one_dict, dicts)
             dicts = p_map(_process_one_dict, dicts, num_cpus=config["experiments"]["multiprocessing"])
             # self.save_results(dicts)
-        print("\nAdding distributional data")
+
         dicts = self.add_distr_data(dicts)
         self.save_results(dicts, overwrite=True)
 
@@ -376,6 +373,7 @@ class AnnotateVectorNeighborhoods(Experiment):
         scores = [x for x in distr_scores if x in self._ld_scores]
         if not scores:
             return dicts
+        print("\nLoading and adding distributional data. This could take a few minutes for a large dataset.")
         gdeps = "GDeps" in self._ld_scores
         cooccurrence = "NonCooccurring" in self._ld_scores
         if gdeps or cooccurrence:
