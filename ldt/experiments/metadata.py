@@ -133,6 +133,8 @@ class Experiment(metaclass=abc.ABCMeta):
 
     def save_metadata(self):
         """Saving the metadata for the given experiment"""
+        # print("dumping metadata")
+        # print(self.metadata)
         with open(os.path.join(self.output_dir, "metadata.json"), "w") as path:
             json.dump(self.metadata, fp=path, ensure_ascii=False, indent=4,
                       sort_keys=False, allow_nan=True)

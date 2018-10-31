@@ -36,11 +36,12 @@ class Tests(unittest.TestCase):
         # global analyzer
         analyzer = ldt.relations.pair.RelationsInPair(
             normalizer=normalizer, derivation_dict=derivation,
-                lex_dict=lex_dict, gdeps=False, cooccurrence=False)
+                lex_dict=lex_dict, gdeps=False, cooccurrence=False,
+                distr_dict="None")
         cls.annotation = ldt.experiments.AnnotateVectorNeighborhoods(
             experiment_name="testing", overwrite=True,
-            ldt_analyzer=analyzer, ld_scores="main", gdeps=True,
-                cooccurrence=True, multiprocessing=1)
+            ldt_analyzer=analyzer, ld_scores="main", multiprocessing=1,
+                debugging=True)
         cls.annotation.get_results()
 
         output_scores=["SharedPOS", "SharedMorphForm", "SharedDerivation",

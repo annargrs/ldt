@@ -210,11 +210,13 @@ class AnnotateVectorNeighborhoods(Experiment):
         self.metadata["continuous_vars"] = self.continuous_vars
         self.metadata["binary_vars"] = self.binary_vars
 
-        global metadata
-        metadata = self.metadata
+        self.ldt_analyzer = ldt_analyzer
 
-        global global_analyzer
-        global_analyzer = ldt_analyzer
+        # global metadata
+        # metadata = self.metadata
+        #
+        # global global_analyzer
+        # global_analyzer = ldt_analyzer
         # global_analyzer = init_analyzer(path=neighbors_metadata_path,
         #                                 analyzer=ldt_analyzer)
 
@@ -230,11 +232,16 @@ class AnnotateVectorNeighborhoods(Experiment):
         # global analyzer
         # analyzer = self.analyzer
         print("processing", embeddings_path)
-        print(os.path.isfile("/home/anna/PycharmProjects/ldt/ldt/tests/sample_files/experiments/testing/neighbors_annotated/sample_embeddings.tsv"))
 
         global prior_data
         prior_data = collect_prior_data(self.metadata["output_dir"])
-        print("collected prior data", len(prior_data))
+        # print("collected prior data", len(prior_data))
+
+        global metadata
+        metadata = self.metadata
+
+        global global_analyzer
+        global_analyzer = self.ldt_analyzer
 
         filename = self.get_fname_for_embedding(embeddings_path)
         neighbor_file_path = os.path.join(self.output_dir.replace(
@@ -276,12 +283,10 @@ class AnnotateVectorNeighborhoods(Experiment):
             newdicts = []
             for d in dicts:
                 newdicts.append(_process_one_dict(d))
+                # newdicts.append(self._process_one_dict_meth(d))
                 dicts = newdicts
 #            dicts = [_process_one_dict(x) for x in dicts]
             self.save_results(dicts)
-        print("Adding distributional data")
-        dicts = self.add_distr_data(dicts)
-        self.save_results(dicts, overwrite=True)
         # else:
         # #python multiprocessing
         #     pool = Pool(self.multiprocessing, initializer=initializer(global_analyzer))
@@ -290,7 +295,9 @@ class AnnotateVectorNeighborhoods(Experiment):
         #     # pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
         #     # dicts = pool.map(_process_one_dict, dicts)
         #     self.save_results(dicts)
-
+        print("Adding distributional data")
+        dicts = self.add_distr_data(dicts)
+        self.save_results(dicts, overwrite=True)
 
     def save_results(self, dicts, overwrite=False):
         output_df = pd.DataFrame(dicts,
@@ -366,9 +373,40 @@ class AnnotateVectorNeighborhoods(Experiment):
             distr_scores = distr_dict.analyze(target=d["Target"],
                                               neighbor=d["Neighbor"])
             d.update(distr_scores)
+        distr_dict = None
         return dicts
 
-
+    def _process_one_dict_meth(self, col_dict):
+        """Helper function that for performing the annotation in a
+        multiprocessing-friendly way. Relies on global analyzer, metadata and
+        prior_data objects."""
+        neighbor = col_dict["Neighbor"]
+        target = col_dict["Target"]
+    #    print(target + ":" + neighbor in prior_data)
+        if target + ":" + neighbor in prior_data:
+    #        print("using prior results")
+            # print(prior_data[target + ":" + neighbor])
+            col_dict.update(prior_data[target + ":" + neighbor])
+        else:
+            relations = self.analyzer.analyze(target, neighbor, silent=True,
+                                              debugging=metadata["debugging"])
+            if relations:
+                if not "Missing" in relations:
+                    to_check_continuous = metadata["continuous_vars"]
+                    to_check_binary = metadata["binary_vars"]
+                else:
+                    to_check_binary = [x for x in ["NonCooccurring", "GDeps"] if
+                                       x in metadata["ld_scores"]]
+                    to_check_continuous = [x for x in
+                                           ["TargetFrequency", "NeighborFrequency"]
+                                           if x in metadata["ld_scores"]]
+                    metadata["missed_pairs"].append(tuple([target, neighbor]))
+                for i in to_check_continuous:
+                    if i in relations:
+                        col_dict[i] = relations[i]
+                for i in to_check_binary:
+                    col_dict[i] = i in relations
+        return col_dict
 
 def collect_targets_and_neighbors(dicts):
 
@@ -512,9 +550,10 @@ if __name__ == '__main__':
     # global analyzer
     analyzer = ldt.relations.pair.RelationsInPair(
             normalizer=normalizer, derivation_dict=derivation,
-            lex_dict=lex_dict)
+            lex_dict=lex_dict, distr_dict="None")
     annotation = AnnotateVectorNeighborhoods(experiment_name="testing",
                                              overwrite=True,
                                              ldt_analyzer=analyzer,
-                                             ld_scores="all", multiprocessing=1)
+                                             ld_scores="all",
+                                             multiprocessing=1, debugging=True)
     annotation.get_results()
