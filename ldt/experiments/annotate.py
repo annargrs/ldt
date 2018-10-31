@@ -31,6 +31,7 @@ import os
 import uuid
 import pandas as pd
 import numpy as np
+from p_tqdm import p_map
 #from progressbar.bar import ProgressBar
 from pathos.multiprocessing import ProcessingPool
 #from multiprocessing import Pool
@@ -149,7 +150,7 @@ class AnnotateVectorNeighborhoods(Experiment):
             for embedding in self.metadata["embeddings"]:
                 self.embeddings.append(embedding["path"])
 
-        self.message = "Starting LD annotation. This will take a while for " \
+        self.message = "\nStarting LD annotation. This will take a while for " \
                        "the first files, but the remainder should go faster, " \
                        "because many neighbor pairs will be the same."
 
@@ -231,7 +232,7 @@ class AnnotateVectorNeighborhoods(Experiment):
 
         # global analyzer
         # analyzer = self.analyzer
-        print("processing", embeddings_path)
+        print("\nProcessing", embeddings_path)
 
         global prior_data
         prior_data = collect_prior_data(self.metadata["output_dir"])
@@ -279,24 +280,25 @@ class AnnotateVectorNeighborhoods(Experiment):
         #     print("saving")
         #     self.save_results(dicts_chunk)
         if metadata["multiprocessing"] == 1:
-            print("working with one core")
+            print("\nMultiprocessing: 1 core")
             newdicts = []
             for d in dicts:
                 newdicts.append(_process_one_dict(d))
                 # newdicts.append(self._process_one_dict_meth(d))
                 dicts = newdicts
 #            dicts = [_process_one_dict(x) for x in dicts]
-            self.save_results(dicts)
+#             self.save_results(dicts)
         else:
         # #python multiprocessing
         #     pool = Pool(self.multiprocessing, initializer=initializer(global_analyzer))
         #     dicts = pool.map(_process_one_dict, dicts)
         # #pathos
-            print("working with", config["experiments"]["multiprocessing"], "cores")
-            pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
-            dicts = pool.map(_process_one_dict, dicts)
-            self.save_results(dicts)
-        print("Adding distributional data")
+            print("\nMultiprocessing:", metadata["multiprocessing"], "cores")
+            # pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
+            # dicts = pool.map(_process_one_dict, dicts)
+            dicts = p_map(_process_one_dict, dicts, num_cpus=config["experiments"]["multiprocessing"])
+            # self.save_results(dicts)
+        print("\nAdding distributional data")
         dicts = self.add_distr_data(dicts)
         self.save_results(dicts, overwrite=True)
 
@@ -331,7 +333,9 @@ class AnnotateVectorNeighborhoods(Experiment):
         input_df = pd.read_csv(self.metadata["out_path"], header=0,
                                sep="\t")
         dicts = input_df.to_dict(orient="records")
+        set_dicts = {}
         for i in dicts:
+            set_dicts[i["Target"]+":"+i["Neighbor"]] = i
             if not self._ld_scores[0] in i:
                 self.metadata["missed_pairs"].append(i["Target"]+":"+i["Neighbor"])
             else:
@@ -349,6 +353,19 @@ class AnnotateVectorNeighborhoods(Experiment):
         self.metadata["coverage"] = \
             1 - round(len(self.metadata["missed_pairs"]) / self.metadata[
                 "total_pairs"], 2)
+
+        #order the dataframe in the original order
+        res = []
+        input_neighbors_df = pd.read_csv(self.metadata["out_path"].replace(
+                "neighbors_annotated", "neighbors"), header=0, sep="\t")
+        neighbor_dicts = input_neighbors_df.to_dict(orient="records")
+        for i in neighbor_dicts:
+            k = i["Target"]+":"+i["Neighbor"]
+            try:
+                res.append(set_dicts[k])
+            except KeyError:
+                pass
+        self.save_results(res, overwrite=True)
         print("\nAnnotation done.")
 
 
@@ -449,7 +466,7 @@ def collect_prior_data(output_dir):
          pairs.
 
     """
-    print("collecting prior data in", output_dir)
+    print("\nCollecting prior data in", output_dir)
     processed_files = os.listdir(output_dir)
     if "metadata.json" in processed_files:
         processed_files.remove("metadata.json")
@@ -538,7 +555,26 @@ def _process_one_dict(col_dict):
                     col_dict[i] = relations[i]
             for i in to_check_binary:
                 col_dict[i] = i in relations
+    save_result(col_dict)
     return col_dict
+
+def save_result(dicts, overwrite=False):
+    if isinstance(dicts, dict):
+        dicts = [dicts]
+    output_df = pd.DataFrame(dicts,
+                             columns=["Target", "Rank", "Neighbor",
+                                      "Similarity"]+metadata["ld_scores"])
+    if not os.path.exists(metadata["out_path"]):
+        output_df.to_csv(metadata["out_path"], index=False,
+                         sep="\t", header=True)
+    else:
+        if not overwrite:
+            output_df.to_csv(metadata["out_path"], index=False, sep="\t",
+                             mode="a", header=False)
+        else:
+            output_df.to_csv(metadata["out_path"], index=False,
+                             sep="\t", header=True)
+
 
 if __name__ == '__main__':
     normalizer = ldt.dicts.normalize.Normalization(language="English",
@@ -556,5 +592,5 @@ if __name__ == '__main__':
                                              overwrite=True,
                                              ldt_analyzer=analyzer,
                                              ld_scores="all",
-                                             multiprocessing=2, debugging=True)
+                                             multiprocessing=4, debugging=True)
     annotation.get_results()
