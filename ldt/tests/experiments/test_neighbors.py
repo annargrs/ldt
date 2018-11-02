@@ -23,7 +23,7 @@ class Tests(unittest.TestCase):
     def setUpClass(cls):
         """Setting up the test variables."""
         cls.experiment = ldt.experiments.VectorNeighborhoods(
-            experiment_name="testing", overwrite=True, top_n=2)
+            experiment_name="testing", overwrite=False, top_n=2)
         cls.experiment.get_results()
 
         normalizer = ldt.dicts.normalize.Normalization(language="English",

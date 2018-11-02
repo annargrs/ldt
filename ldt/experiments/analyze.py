@@ -181,7 +181,7 @@ class LDScoring(Experiment):
             else:
                 raise ValueError(output_scores_error)
         self.metadata["ld_scores"] = self.output_vars
-        self.message = "\n Annotation done! Analyzing the data now."
+        self.message = None #"\n Annotation done! Analyzing the data now."
 
     def _load_dataset(self, dataset):
         """Dataset for generating vector neighborhoods was already processed in
@@ -264,6 +264,8 @@ class LDScoring(Experiment):
         """The basic routine for processing embeddings one-by-one, and saving
         the timestamps of when each file was started and finished."""
 
+        self._start_experiment()
+
         if not self._overwrite:
             if os.path.isfile(os.path.join(self.output_dir, "ld_scores.tsv")):
                 return None
@@ -289,7 +291,7 @@ class LDScoring(Experiment):
                           index_label="LDScores")
             self.metadata["timestamp"] = datetime.datetime.now().isoformat()
             self.save_metadata()
-        print("LD analysis done, the embedding profiles are saved in",
+        print("\nLD analysis is finished, the embedding profiles are saved in",
               self.output_dir, ".")
 
 if __name__ == '__main__':

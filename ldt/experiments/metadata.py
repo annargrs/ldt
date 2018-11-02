@@ -145,17 +145,26 @@ class Experiment(metaclass=abc.ABCMeta):
         for i in self.metadata[field]:
             if i["path"] == path and "uuid" in i:
                 return i["uuid"]
-        return False
+        return None
 
+    def _start_experiment(self):
+        input_data = self.find_unprocessed_files()
+        self.embeddings = input_data
+        if not self.embeddings:
+            print("\n", self.metadata["task"].upper(), ": no new data to process.\n")
+            return None
+        else:
+            print("\n", self.metadata["task"].upper(), ": the following will be processed:\n", self.embeddings)
+            if self.message:
+                print(self.message)
 
     def get_results(self):
         """The basic routine for processing embeddings one-by-one, and saving
         the timestamps of when each file was started and finished."""
-        input_data = self.find_unprocessed_files()
-        self.embeddings = input_data
-        if self.embeddings:
-            if self.message:
-                print(self.message)
+
+        self._start_experiment()
+        if not self.embeddings:
+            return None
 
         for i in self.embeddings:
 
@@ -181,18 +190,25 @@ class Experiment(metaclass=abc.ABCMeta):
     def find_unprocessed_files(self):
         """Helper method for determining which embeddings have already been
         processed."""
+        if not hasattr(self, "embeddings"):
+            return []
         if self._overwrite:
             return self.embeddings
-
-        unprocessed = self.embeddings
+        seen = []
+        print(self.embeddings)
         for path in self.embeddings:
+            print("Checking path", path)
+            to_check = [path]
             emb_uuid = self._check_uuid_in_metadata(field="embeddings", path=path)
-            if emb_uuid:
-                if emb_uuid in self.metadata["timestamp"]:
-                    unprocessed.remove(path)
-            else:
-                if path in self.metadata["timestamp"]:
-                    unprocessed.remove(path)
+            print(emb_uuid)
+            to_check += [emb_uuid]
+            for i in to_check:
+                if i:
+                    if i in self.metadata["timestamp"]:
+                        if "end_time" in self.metadata["timestamp"][i]:
+                            seen.append(path)
+        unprocessed = [x for x in self.embeddings if not x in seen]
+        print("the following files will be processed:", unprocessed)
         return unprocessed
 
     def _postprocess_metadata(self):

@@ -49,8 +49,7 @@ def default_workflow(experiment_name=
 
     analyzer = ldt.relations.pair.RelationsInPair(normalizer=normalizer,
                                                   derivation_dict=derivation,
-                                                  lex_dict=lex_dict,
-                                                  distr_dict="None")
+                                                  lex_dict=lex_dict)
 
     # performing annotation
     annotation = ldt.experiments.AnnotateVectorNeighborhoods(

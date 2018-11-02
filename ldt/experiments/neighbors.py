@@ -177,5 +177,6 @@ class VectorNeighborhoods(Experiment):
             embeddings = None
 
 if __name__ == '__main__':
-    annotation = VectorNeighborhoods(experiment_name="testing", overwrite=True)
+    annotation = VectorNeighborhoods(experiment_name="testing",
+                                     overwrite=False)
     annotation.get_results()
