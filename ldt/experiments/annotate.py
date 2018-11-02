@@ -286,13 +286,18 @@ class AnnotateVectorNeighborhoods(Experiment):
         else:
             print("\nMultiprocessing:", metadata["multiprocessing"], "cores")
         #python multiprocessing library
-            pool = Pool(metadata["multiprocessing"], initializer=initializer(global_analyzer))
-            dicts = pool.map(_process_one_dict, dicts)
+            # pool = Pool(metadata["multiprocessing"], initializer=initializer(global_analyzer))
+            # dicts = pool.map(_process_one_dict, dicts)
         # #pathos.multiprocessing
 
         #     pool = ProcessingPool(nodes=metadata["multiprocessing"])
         #     dicts = pool.map(_process_one_dict, dicts)
-
+        #try with method
+            # t_dicts = []
+            # for d in dicts:
+            #     t_dicts.append((d,))
+            pool = ProcessingPool(nodes=metadata["multiprocessing"])
+            dicts = pool.map(self._process_one_dict_meth, dicts)
 
             # dicts = p_map(_process_one_dict, dicts, num_cpus=metadata["multiprocessing"])
             # self.save_results(dicts)
@@ -401,6 +406,8 @@ class AnnotateVectorNeighborhoods(Experiment):
         """Helper function that for performing the annotation in a
         multiprocessing-friendly way. Relies on global analyzer, metadata and
         prior_data objects."""
+        # col_dict = col_dict[0]
+        print(col_dict)
         neighbor = col_dict["Neighbor"]
         target = col_dict["Target"]
     #    print(target + ":" + neighbor in prior_data)
@@ -409,8 +416,10 @@ class AnnotateVectorNeighborhoods(Experiment):
             # print(prior_data[target + ":" + neighbor])
             col_dict.update(prior_data[target + ":" + neighbor])
         else:
-            relations = self.analyzer.analyze(target, neighbor, silent=True,
-                                              debugging=metadata["debugging"])
+            # relations = self.analyzer.analyze(target, neighbor, silent=True,
+            #                                   debugging=metadata["debugging"])
+            relations = global_analyzer.analyze(target, neighbor,
+                                                silent=True, debugging=metadata["debugging"])
             if relations:
                 if not "Missing" in relations:
                     to_check_continuous = metadata["continuous_vars"]
@@ -427,6 +436,7 @@ class AnnotateVectorNeighborhoods(Experiment):
                         col_dict[i] = relations[i]
                 for i in to_check_binary:
                     col_dict[i] = i in relations
+        print("processed", col_dict)
         save_result(col_dict)
         return col_dict
 
