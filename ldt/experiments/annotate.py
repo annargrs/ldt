@@ -31,12 +31,14 @@ import os
 import uuid
 import pandas as pd
 import numpy as np
+#import multiprocessing
+#import multiprocessing.pool
+# from billiard import
 from p_tqdm import p_map
 #from progressbar.bar import ProgressBar
 from pathos.multiprocessing import ProcessingPool
-#from multiprocessing import Pool
+from multiprocessing import Pool
 #import multiprocessing.managers as m
-#import threading
 from vecto.utils.data import load_json
 
 from ldt.experiments.metadata import Experiment
@@ -46,8 +48,28 @@ from ldt.dicts.derivation.meta import DerivationAnalyzer
 from ldt.dicts.semantics.metadictionary import MetaDictionary
 from ldt.relations.pair import RelationsInPair
 from ldt.relations.distribution import DistributionDict
-
 from ldt.load_config import config
+
+
+# class NoDaemonProcess(multiprocessing.Process):
+#   def __init__(self, group=None, target=None, name=None, args=(), kwargs={},
+#                *, daemon=None):
+#     super(NoDaemonProcess, self).__init__(group, target, name, args, kwargs, daemon=daemon)
+#     if 'daemon' in multiprocessing.process._current_process._config:
+#       del multiprocessing.process._current_process._config['daemon']
+#     self._config = multiprocessing.process._current_process._config.copy()
+#   # make 'daemon' attribute always return False
+#   def _get_daemon(self):
+#     return False
+#   def _set_daemon(self, value):
+#     pass
+#   daemon = property(_get_daemon, _set_daemon)
+#
+# # We sub-class multiprocessing.pool.Pool instead of multiprocessing.Pool
+# # because the latter is only a wrapper function, not a proper class.
+# class MyPool(multiprocessing.pool.Pool):
+#     Process = NoDaemonProcess
+
 
 class AnnotateVectorNeighborhoods(Experiment):
     """This class provides a simple interface for annotating pre-computed top_n
@@ -252,30 +274,6 @@ class AnnotateVectorNeighborhoods(Experiment):
         self.metadata["total_pairs"] += len(input_df)
         dicts = input_df.to_dict(orient="records")
 
-        # bar = ProgressBar(max_value=len(chunks))
-        # print("\nProcessing", len(dicts), "word pair in", len(chunks), "batches of size", chunk_size)
-        # for i in range(len(chunks)):
-        #     bar.update(i)
-        #     dicts_chunk = chunks[i]
-        #     pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
-        #     dicts_chunk = pool.map(_process_one_dict, dicts_chunk)
-        #     print(dicts_chunk)
-        #     print("saving")
-        #     self.save_results(dicts_chunk)
-
-
-        # chunk_size = config["experiments"]["batch_size"]
-        # chunks = [dicts[offs:offs + chunk_size] for offs in range(0, len(dicts), chunk_size)]
-        # bar = ProgressBar(max_value=len(chunks))
-        # print("\nProcessing", len(dicts), "word pair in", len(chunks), "batches of size", chunk_size)
-        # for i in range(len(chunks)):
-        #     bar.update(i)
-        #     dicts_chunk = chunks[i]
-        #     pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
-        #     dicts_chunk = pool.map(_process_one_dict, dicts_chunk)
-        #     print(dicts_chunk)
-        #     print("saving")
-        #     self.save_results(dicts_chunk)
         if metadata["multiprocessing"] == 1:
             print("\nMultiprocessing: 1 core")
             newdicts = []
@@ -286,15 +284,22 @@ class AnnotateVectorNeighborhoods(Experiment):
 #            dicts = [_process_one_dict(x) for x in dicts]
 #             self.save_results(dicts)
         else:
-        # #python multiprocessing
-        #     pool = Pool(self.multiprocessing, initializer=initializer(global_analyzer))
-        #     dicts = pool.map(_process_one_dict, dicts)
-        # #pathos
             print("\nMultiprocessing:", metadata["multiprocessing"], "cores")
-            # pool = ProcessingPool(nodes=config["experiments"]["multiprocessing"])
-            # dicts = pool.map(_process_one_dict, dicts)
-            dicts = p_map(_process_one_dict, dicts, num_cpus=config["experiments"]["multiprocessing"])
+        #python multiprocessing library
+            pool = Pool(metadata["multiprocessing"], initializer=initializer(global_analyzer))
+            dicts = pool.map(_process_one_dict, dicts)
+        # #pathos.multiprocessing
+
+        #     pool = ProcessingPool(nodes=metadata["multiprocessing"])
+        #     dicts = pool.map(_process_one_dict, dicts)
+
+
+            # dicts = p_map(_process_one_dict, dicts, num_cpus=metadata["multiprocessing"])
             # self.save_results(dicts)
+            # pool = MyPool(metadata["multiprocessing"])
+            # dicts = pool.map(_process_one_dict, dicts)
+            # pool.close()
+            # pool.join()
 
         dicts = self.add_distr_data(dicts)
         self.save_results(dicts, overwrite=True)
@@ -422,6 +427,7 @@ class AnnotateVectorNeighborhoods(Experiment):
                         col_dict[i] = relations[i]
                 for i in to_check_binary:
                     col_dict[i] = i in relations
+        save_result(col_dict)
         return col_dict
 
 def collect_targets_and_neighbors(dicts):
@@ -515,13 +521,13 @@ def init_analyzer(path, analyzer=None):
                                    wordlist=wordlist)
         return analyzer
 
-# class initializer():
-#     def __init__(self, global_analyzer):
-#         self.analyzer = global_analyzer
-#
-#     def __call__(self):
-#         global global_analyzer
-#         global_analyzer = self.analyzer
+class initializer():
+    def __init__(self, global_analyzer):
+        self.analyzer = global_analyzer
+
+    def __call__(self):
+        global global_analyzer
+        global_analyzer = self.analyzer
 
 def _process_one_dict(col_dict):
     """Helper function that for performing the annotation in a
@@ -585,10 +591,12 @@ if __name__ == '__main__':
     # global analyzer
     analyzer = ldt.relations.pair.RelationsInPair(
             normalizer=normalizer, derivation_dict=derivation,
-            lex_dict=lex_dict, distr_dict="None")
+            lex_dict=lex_dict)
     annotation = AnnotateVectorNeighborhoods(experiment_name="testing",
                                              overwrite=True,
                                              ldt_analyzer=analyzer,
                                              ld_scores="all",
                                              multiprocessing=4, debugging=True)
     annotation.get_results()
+
+
