@@ -182,7 +182,7 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
 
     # pylint: disable=arguments-differ
     @functools.lru_cache(maxsize=config["cache_size"])
-    def get_relation(self, word, relation, synonyms=True): #pylint:
+    def get_relation(self, word, relation, synonyms=True, silent=True): #pylint:
         # disable=arguments-differ
         """ Single interface to all WordNet relations
 
@@ -230,7 +230,8 @@ class WordNet(BaseWordNet, DictionaryWithDefinitions):
             try:
                 res = self._get_nyms(word, relation=relation, synonyms=synonyms)
             except timeout_decorator.timeout_decorator.TimeoutError:
-                print("WordNet query timed out: ", word, relation)
+                if not silent:
+                    print("WordNet query timed out: ", word, relation)
                 res = []
             except: # wn.WordNetError:
                 return []

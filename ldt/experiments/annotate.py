@@ -31,13 +31,14 @@ import os
 import uuid
 import pandas as pd
 import numpy as np
+from tqdm import tqdm
 #import multiprocessing
 #import multiprocessing.pool
 # from billiard import
 from p_tqdm import p_map
 #from progressbar.bar import ProgressBar
-from pathos.multiprocessing import ProcessingPool
-from multiprocessing import Pool
+# from pathos.multiprocessing import ProcessingPool
+# from multiprocessing import Pool
 #import multiprocessing.managers as m
 from vecto.utils.data import load_json
 
@@ -277,12 +278,12 @@ class AnnotateVectorNeighborhoods(Experiment):
         if metadata["multiprocessing"] == 1:
             print("\nMultiprocessing: 1 core")
             newdicts = []
-            for d in dicts:
+            for d in tqdm(dicts):
                 newdicts.append(_process_one_dict(d))
-                # newdicts.append(self._process_one_dict_meth(d))
+                # # newdicts.append(self._process_one_dict_meth(d))
                 dicts = newdicts
-#            dicts = [_process_one_dict(x) for x in dicts]
-#             self.save_results(dicts)
+            # dicts = [_process_one_dict(x) for x in dicts]
+            # self.save_results(dicts)
         else:
             print("\nMultiprocessing:", metadata["multiprocessing"], "cores")
         #python multiprocessing library
@@ -296,10 +297,10 @@ class AnnotateVectorNeighborhoods(Experiment):
             # t_dicts = []
             # for d in dicts:
             #     t_dicts.append((d,))
-            pool = ProcessingPool(nodes=metadata["multiprocessing"])
-            dicts = pool.map(self._process_one_dict_meth, dicts)
+            # pool = ProcessingPool(nodes=metadata["multiprocessing"])
+            # dicts = pool.map(self._process_one_dict_meth, dicts)
 
-            # dicts = p_map(_process_one_dict, dicts, num_cpus=metadata["multiprocessing"])
+            dicts = p_map(_process_one_dict, dicts, num_cpus=metadata["multiprocessing"])
             # self.save_results(dicts)
             # pool = MyPool(metadata["multiprocessing"])
             # dicts = pool.map(_process_one_dict, dicts)
@@ -373,7 +374,7 @@ class AnnotateVectorNeighborhoods(Experiment):
             except KeyError:
                 pass
         self.save_results(res, overwrite=True)
-        print("\nAnnotation done.")
+        print("\nAnnotation done:", self.metadata["out_path"])
 
 
 
@@ -480,7 +481,6 @@ def collect_prior_data(output_dir):
          pairs.
 
     """
-    print("\nCollecting prior data in", output_dir)
     processed_files = os.listdir(output_dir)
     if "metadata.json" in processed_files:
         processed_files.remove("metadata.json")
@@ -492,6 +492,8 @@ def collect_prior_data(output_dir):
         dicts = input_df.to_dict(orient="records")
         for pair in dicts:
             prior_res[pair["Target"]+":"+pair["Neighbor"]] = pair
+    print("\nCollected", len(prior_res), "previously processed word pairs in",
+          output_dir)
     return prior_res
 
 def init_analyzer(path, analyzer=None):

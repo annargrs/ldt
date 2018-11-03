@@ -114,7 +114,9 @@ class RelationsInPair(Dictionary):
     def is_a_word(self, word):
         raise NotImplementedError
 
-    @timeout_decorator.timeout(config["experiments"]["timeout"], use_signals=False)
+    # @timeout_decorator.timeout(config["experiments"]["timeout"], use_signals=False)
+    @timeout_decorator.timeout(config["experiments"]["timeout"],
+                               use_signals=True)
     @functools.lru_cache(maxsize=config["cache_size"])
     def _analyze(self, target, neighbor, silent=True, distr_data=True):
         """The main function for analyzing the input strings and identifying
@@ -259,6 +261,15 @@ def _binary_rels(target, neighbor):
     return list(set(res))
 
 
+def get_candidate_words(dictionary):
+    res = [dictionary["OriginalForm"]]
+    for f in ["Lemmas", "Stems"]:
+        try:
+            res += list(dictionary[f])
+        except KeyError:
+            pass
+    return res
+
 def are_related_as(target, neighbor):
     """Helper function for identifying matches in lexicgraphic relations.
 
@@ -279,26 +290,35 @@ def are_related_as(target, neighbor):
     """
 
     res = []
+    neighbor_candidates = get_candidate_words(neighbor.info)
+    target_candidates = get_candidate_words(target.info)
+
     for rel in ["Hyponyms", "Hypernyms"]:
         if rel in target.info:
-            for word in [neighbor.info["OriginalForm"]] + list(neighbor.info["Lemmas"]) + list(neighbor.info["Stems"]):
+            for word in neighbor_candidates:
                 if word in target.info[rel]:
                     res.append(rel)
+            # for word in [neighbor.info["OriginalForm"]] + list(neighbor.info["Lemmas"]) + list(neighbor.info["Stems"]):
+            #     if word in target.info[rel]:
+            #         res.append(rel)
 
     rels = ["Synonyms", "Antonyms", "Meronyms", "OtherRelations"]
     for rel in rels:
         if rel in neighbor.info and rel in target.info:
-            for word in [target.info["OriginalForm"]] + list(
-                    target.info["Lemmas"]) + list(target.info["Stems"]):
+            # for word in [target.info["OriginalForm"]] + list(
+            #         target.info["Lemmas"]) + list(target.info["Stems"]):
+            for word in target_candidates:
                 if word in neighbor.info[rel]:
                     res.append(rel)
         if rel not in res:
             if rel in neighbor.info and rel in target.info:
-                for word in [neighbor.info["OriginalForm"]] + list(
-                        neighbor.info["Lemmas"]) + list(neighbor.info["Stems"]):
+                for word in neighbor_candidates:
+                # for word in [neighbor.info["OriginalForm"]] + list(
+                #         neighbor.info["Lemmas"]) + list(neighbor.info["Stems"]):
                     if word in target.info[rel]:
                         res.append(rel)
     return list(set(res))
+
 
 
 if __name__ == '__main__':

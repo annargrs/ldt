@@ -195,12 +195,9 @@ class Experiment(metaclass=abc.ABCMeta):
         if self._overwrite:
             return self.embeddings
         seen = []
-        print(self.embeddings)
         for path in self.embeddings:
-            print("Checking path", path)
             to_check = [path]
             emb_uuid = self._check_uuid_in_metadata(field="embeddings", path=path)
-            print(emb_uuid)
             to_check += [emb_uuid]
             for i in to_check:
                 if i:
@@ -208,7 +205,6 @@ class Experiment(metaclass=abc.ABCMeta):
                         if "end_time" in self.metadata["timestamp"][i]:
                             seen.append(path)
         unprocessed = [x for x in self.embeddings if not x in seen]
-        print("the following files will be processed:", unprocessed)
         return unprocessed
 
     def _postprocess_metadata(self):

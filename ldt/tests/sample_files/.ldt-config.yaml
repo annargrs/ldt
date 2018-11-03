@@ -89,18 +89,17 @@ experiments:
   experiment_name: testing
 
   # how many neighbors to extract and annotate
-  top_n: 10
+  top_n: 100
 
   # overwriting any previous data, if an experiment with the same name has already been performed:
   overwrite: True
 
-  # how many CPUs to use for the annotation jobs.
-  multiprocessing: 1
-
-  #number of word pairs in a multiprocessing batch: more is more efficient, but at a higher risk of data loss
-  batch_size: 1000
+  # how many CPUs to use for the annotation jobs. Keep in mind that too many may cause 
+  # the Wiktionary server to refuse to cooperate.
+  multiprocessing: 2
 
   # timeout for individual word pair queries: some words take longer to analyze
-  # and drag down the whole process. Timeout of 30 seconds loses about 10
-  # words in a thousand in ld_909 vocab sample on Wikipedia embeddings.
+  # and drag down the whole process. The optimal timeout value will depend on how many  
+  # factors like your processor speed, multiprocessing, RAM, and Internet connection
+  # speed. Experiment to find the optimal combination of speed and coverage.
   timeout: 30
