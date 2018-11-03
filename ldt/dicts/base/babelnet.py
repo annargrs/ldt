@@ -66,12 +66,11 @@ class BaseBabelNet(Dictionary):
             self.language = lookup_language_by_code(self.language, reverse=True)
         self._language = self.language.upper()
         if babelnet_key:
-            if babelnet_key != "None":
-                self.babelnet_key = babelnet_key
-            else:
-                raise AuthorizationError("Please provide a BabelNet key. If you "
-                                         "don't have one, register at "
-                                         "https://babelnet.org/register ")
+            self.babelnet_key = babelnet_key
+        else:
+            raise AuthorizationError("Please provide a BabelNet key. If you "
+                                     "don't have one, register at "
+                                     "https://babelnet.org/register ")
 
     def _set_language(self, language):
         """This method ensures the language arg is a 2-letter code."""

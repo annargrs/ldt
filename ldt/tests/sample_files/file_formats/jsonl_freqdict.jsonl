@@ -1,0 +1,2 @@
+{"cat": {"dog": 1, "cheese": 5}, "mouse": {"cat": 5, "cheese": 6}}
+{"dog": {"dog": 1, "cheese": 5}, "rabbit": {"cat": 5, "cheese": 6}}

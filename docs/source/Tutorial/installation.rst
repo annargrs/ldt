@@ -19,26 +19,9 @@ Package requirements (will be installed automatically by pip):
 * `ruamel.yaml <https://pypi.org/project/ruamel.yaml/>`_
 * `timeout-decorator <https://pypi.org/project/timeout-decorator/>`_
 * `inflect <https://pypi.org/project/inflect/>`_
+* `p_tqdm <https://github.com/swansonk14/p_tqdm>`_ and the underlying `pathos.multiprocessing <https://pypi.org/project/pathos/>`_
 
 To run LDT will expect to find an ``.ldt-config.yaml`` configuration file in the user home folder, as described in the section :ref:`Configuration file`.
-
---------------
-NLTK resources
---------------
-
-NLTK has many resources, of which three are used by LDT: ``wordnet``, ``stopwords``, ``lemmatizer``.
-You can install them individually from within Python shell:
-
-.. code-block:: python
-
-   import nltk
-   nltk.download("wordnet")
-
-or from command line:
-
-.. code-block:: python
-
-   python -m nltk.downloader wordnet
 
 ------------
 Spellchecker
@@ -54,3 +37,8 @@ although any other engine can also be used. Enchant needs to be installed for th
 * Windows: we did not test this, but a binary package should be available from PyPi upon installation of pyenchant, and
   it should be possible to copy any required OpenOffice spellchecker dictionaries into pyenchant folder (advice from
   `here <https://faculty.math.illinois.edu/~gfrancis/illimath/windows/aszgard_mini/movpy-2.0.0-py2.4.4/manuals/PyEnchant/PyEnchant%20Tutorial.htm>`_).
+
+Next you will need to configure LDT and download some additional resources.
+See sections :ref:`Configuration file`, :ref:`Corpus-specific resources` and
+:ref:`Language-specific resources`.
+

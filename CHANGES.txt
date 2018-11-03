@@ -1,3 +1,11 @@
+v.0.4.0, 2018-10-24
+
+* multicore processing in annotation module
+* query timeout setting
+* optimized loading of cooccurrence data in ldt resources
+* corpus statistics now optional
+* minor fixes
+
 v. 0.3.0, 2018-10-08
 
 * experiments package:

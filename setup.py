@@ -1,11 +1,20 @@
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
+from setuptools.command.install import install as _install
 import io
 import codecs
 import os
 import sys
 
 import ldt
+
+class Install(_install):
+    def run(self):
+        _install.do_egg_install(self)
+        import nltk
+        nltk.download("punkt")
+        nltk.download("wordnet")
+        nltk.download("stopwords")
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -44,8 +53,8 @@ setup(
     install_requires=["ruamel.yaml", "wiktionaryparser==0.0.7",
                       "hurry.filesize", "timeout-decorator", "inflect",
                       "nltk", "vecto", "pandas", "pyenchant", "outdated",
-                      "tqdm"],
-    cmdclass={'test': PyTest},
+                      "p_tqdm"],
+    cmdclass={'test': PyTest, "install": Install},
     author_email='anna_rogers@uml.edu',
     description='Linguistic diagnostics for word embeddings',
     long_description=long_description,

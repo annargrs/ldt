@@ -193,7 +193,7 @@ def update_wiktionary_cache(language=config["default_language"],
 def load_wiktionary_cache(language=config["default_language"],
                           lowercasing=config["lowercasing"],
                           path_to_cache=config["path_to_resources"],
-                          wikisaurus =False):
+                          wikisaurus =False, silent=True):
     '''
 
     Args:
@@ -214,15 +214,17 @@ def load_wiktionary_cache(language=config["default_language"],
 
     '''
 
-    print("Loading wiktionary cache.")
+    if not silent:
+        print("Loading wiktionary cache.")
     path_to_cache = get_cache_dir(path_to_cache)
     filename = find_vocab_file(language, path_to_cache, wikisaurus=wikisaurus)
 
     if filename != "none":
         date = filename.split("_")[0]
-        print("The current cache file was updated on", date,
-              "\nYou can run wiktionary.update_wiktionary_cache ("
-              "language='') to update it")
+        if not silent:
+            print("The current cache file was updated on", date)#,
+#                  "\nYou can run wiktionary.update_wiktionary_cache ("
+#                  "language='') to update it")
     else:
         update_wiktionary_cache(language, path_to_cache, wikisaurus=wikisaurus)
         filename = find_vocab_file(language, path_to_cache, wikisaurus=wikisaurus)

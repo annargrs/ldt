@@ -2,14 +2,22 @@
 Corpus-specific resources
 =========================
 
-It is possible to use LDT as simply another dictionary resource. However, if you are interested in LDT as a tool for
-exploring and profiling word embeddings, comparing models will only be fair if they started from the same raw corpus.
-To this end, we are sharing the data that we used in our experiments. `Get in touch <http://www.cs.uml.edu/~arogers/>`_
-if you'd like to make your data available here in the same way.
+It is possible to use LDT for profiling any pre-trained word-level embeddings.
+However, distributional information is obviously corpus-specific, and can
+only be retrieved if the source corpus is known, and collocation data is
+available. See `here <http://ldtoolkit
+.space/analysis/examples/#use-case-1-explaining-performance-on-downstream-tasks>`_
+for evidence of different behavior of word2vec and GloVe with regards to word
+vector neighbors that are related, but were infrequent in the source corpus
+or did not cooccur at all.
 
-Corpus resources files for English Wikipedia, August 2013 dump can be `downloaded here <https://my.pcloud.com/publink/show?code=XZzMFe7Z20t1QWsappQy7BlRdvrqcbrAM6HV>`_. The archive includes:
+The next release of ldt (0.4.0) will include functionality for building
+required distributional resources for any given tokenized corpus. For now, we
+are sharing `the data that we used in our experiments on English Wikipedia
+(August 2013) <https://my.pcloud.com/publink/show?code=XZzMFe7Z20t1QWsappQy7BlRdvrqcbrAM6HV>`_. This includes:
+
   - frequency dictionary,
-  - cooccurrence data for linear unbound context window size 2,
+  - cooccurrence data for linear unbound context window size 2 (more to come),
   - vocab file containing 269,864 words by which which all embeddings were filtered in the experiments described in the `LDT paper <http://aclweb.org/anthology/C18-1228>`_.
 
 The corpus itself, pre-processed:
@@ -24,4 +32,11 @@ The dump was originally presented in `this paper <http://www.aclweb.org/antholog
 to compare the effect of 4 types of syntactic context (symmetrical/positional linear and dependency-based). They also
 generated 60 Skip-Gram, CBOW and GloVe embeddings with vector sizes 25, 50, 100, 250 and 500 in each of these conditions.
 All the original embeddings are available in
-`vecto library <http://vecto.readthedocs.io/en/docs/tutorial/getting_vectors.html#pre-trained-vsms>`_.
+`vecto library <http://vecto.readthedocs.io/en/docs/tutorial/getting_vectors
+.html#pre-trained-vsms>`_, and you can download them to explore ldt capabilities.
+
+`Get in touch <anna_rogers@uml.edu>`_ if you'd like to make your data available here in the same way.
+
+If you would like to just experiment with ldt on some pre-trained embeddings
+for which you don't have the distributional information, just comment out
+the relevant lines in the :ref:`Configuration file`.

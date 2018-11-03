@@ -23,11 +23,11 @@ from outdated import warn_if_outdated
 
 warn_if_outdated('ldt', __version__)
 
-# downloading NLTK resources
-
-# nltk.download("wordnet")
-# nltk.download("stopwords")
-# nltk.download("punkt")
+# downloading NLTK resources if they're missing
+# if not "unittest" in sys.modules or "sphinx" in sys.modules:
+#     nltk.download("wordnet")
+#     nltk.download("stopwords")
+#     nltk.download("punkt")
 
 TESTFILE = os.path.dirname(os.path.realpath(__file__))
 TESTFILE = os.path.join(TESTFILE, "tests/sample_files/.ldt-config.yaml")
@@ -60,10 +60,16 @@ def load_config(path=CONFIGPATH):
             [os.path.join(options["path_to_resources"], "sample_embeddings")]
         options["wiktionary_cache"] = False
         options["experiments"]["top_n"] = 2
+        options["experiments"]["batch_size"] = 2
+        options["experiments"]["timeout"] = None
+        options["experiments"]["multiprocessing"] = 1
+        options["corpus"] = "Wiki201308"
     options["path_to_cache"] = \
         os.path.join(options["path_to_resources"], "cache")
-    if options["cache_size"] == "None":
-        options["cache_size"] = None
+    for i in options:
+        if options[i] == "None":
+            options[i] = None
+
     return options
 
 #pylint: disable=invalid-name

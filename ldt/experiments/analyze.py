@@ -38,7 +38,7 @@ class LDScoring(Experiment):
     def __init__(self, experiment_name=config["experiments"]["experiment_name"],
                  extra_metadata=None,
                  overwrite=config["experiments"]["overwrite"],
-                 ld_scores="all", output_dir=
+                 ld_scores="main", output_dir=
                  os.path.join(config["path_to_resources"], "experiments")):
 
         """ Annotating pre-computed top *n* neighbors for a given vocab sample
@@ -100,8 +100,8 @@ class LDScoring(Experiment):
             overwrite=overwrite, embeddings=None, output_dir=output_dir,
             dataset=None, experiment_subfolder="analysis")
 
-        self._metadata["task"] = "ld_scores_analysis"
-        self._metadata["uuid"] = str(uuid.uuid4())
+        self.metadata["task"] = "ld_scores_analysis"
+        self.metadata["uuid"] = str(uuid.uuid4())
         self._load_dataset(dataset=None)
         neighbors_metadata_path = self.output_dir.replace(
             "analysis", "neighbors_annotated")
@@ -112,11 +112,11 @@ class LDScoring(Experiment):
                           "was not found at "+neighbors_metadata_path)
         else:
             neighbors_metadata = load_json(neighbors_metadata_path)
-            self._metadata["embeddings"] = neighbors_metadata["embeddings"]
-            self._metadata["annotation"] = neighbors_metadata
-            del self._metadata["annotation"]["embeddings"]
+            self.metadata["embeddings"] = neighbors_metadata["embeddings"]
+            self.metadata["annotation"] = neighbors_metadata
+            del self.metadata["annotation"]["embeddings"]
             self.embeddings = []
-            for embedding in self._metadata["embeddings"]:
+            for embedding in self.metadata["embeddings"]:
                 self.embeddings.append(embedding["path"])
 
 
@@ -137,14 +137,21 @@ class LDScoring(Experiment):
         self.binary_vars = [x for x in self.supported_vars if not \
             x in self.continuous_vars]
 
-        output_vars = ["SharedPOS", "SharedMorphForm", "SharedDerivation",
-                       "NonCooccurring", "CloseNeighbors", "FarNeighbors",
+        output_vars = ["Model", "SharedPOS", "SharedMorphForm",
+                       "SharedDerivation", "NonCooccurring",
+                       "CloseNeighbors", "FarNeighbors",
                        "LowFreqNeighbors", 'HighFreqNeighbors', "GDeps",
                        "Associations", "ShortestPathMedian", "CloseInOntology",
                        "Synonyms", "Antonyms",  "Meronyms", "Hyponyms",
                        "Hypernyms", "OtherRelations", "Numbers", "ProperNouns",
                        "Misspellings", "URLs", "Filenames", "ForeignWords",
                        "Hashtags", "Noise"]
+
+        # corpus_specific = ["NonCooccurring", "LowFreqNeighbors",
+        #                    "HighFreqNeighbors"]
+        #
+        # if not config["corpus"]:
+        #     output_vars = [x for x in output_vars if not x in corpus_specific]
 
         output_scores_error = "The ld_scores argument is invalid. It should " \
                               "be 'all' for all supported relations, " \
@@ -153,6 +160,15 @@ class LDScoring(Experiment):
 
         if ld_scores == "all":
             self.output_vars = output_vars
+        elif ld_scores == "main":
+            exclude = ["ShortestPathMedian", "URLs", "Filenames", "Hashtags",
+                       "Noise"]
+            if not config["corpus"]:
+                exclude += ["NonCooccurring", "LowFreqNeighbors",
+                            'HighFreqNeighbors', "GDeps"]
+
+            self.output_vars = [x for x in output_vars if not x in exclude]
+
         else:
             if isinstance(ld_scores, list):
                 unsupported = [x for x in ld_scores if not x in output_vars]
@@ -161,10 +177,11 @@ class LDScoring(Experiment):
                 else:
                     self.output_vars = [x for x in output_vars if x in
                                         ld_scores]
+                    self.output_vars = ["Model"] + self.output_vars
             else:
                 raise ValueError(output_scores_error)
-        self._metadata["ld_scores"] = self.output_vars
-        self.message = None
+        self.metadata["ld_scores"] = self.output_vars
+        self.message = None #"\n Annotation done! Analyzing the data now."
 
     def _load_dataset(self, dataset):
         """Dataset for generating vector neighborhoods was already processed in
@@ -205,7 +222,7 @@ class LDScoring(Experiment):
         def percentage(num, len_df=len_df):
             """Helper for formatting % numbers"""
             return round(100*num/len_df, 2)
-        res = {"Embedding": filename}
+        res = {"Model": filename}
         for var in self.binary_vars:
             if var in input_df.columns:
                 try:
@@ -228,7 +245,7 @@ class LDScoring(Experiment):
             highfreq_neighbors = [x for x in highfreq_neighbors if x >
                                   lowfreq_threshold]
             res["HighFreqNeighbors"] = percentage(len(highfreq_neighbors))
-            res["LowFreqNeighbors"] = 1-res["HighFreqNeighbors"]
+            res["LowFreqNeighbors"] = 100-res["HighFreqNeighbors"]
         if "Similarity" in input_df.columns:
             far_neighbors = [x for x in list(
                 input_df["Similarity"]) if x <= far_neighbors_threshold]
@@ -236,12 +253,18 @@ class LDScoring(Experiment):
                 input_df["Similarity"]) if x >= close_neighbors_threshold]
             res["FarNeighbors"] = percentage(len(far_neighbors))
             res["CloseNeighbors"] = percentage(len(close_neighbors))
-        return res
+        filtered_res = {}
+        for i in res:
+            if i in self.output_vars:
+                filtered_res[i] = res[i]
+        return filtered_res
 
 
     def get_results(self):
         """The basic routine for processing embeddings one-by-one, and saving
         the timestamps of when each file was started and finished."""
+
+        self._start_experiment()
 
         if not self._overwrite:
             if os.path.isfile(os.path.join(self.output_dir, "ld_scores.tsv")):
@@ -258,11 +281,18 @@ class LDScoring(Experiment):
                     if i in self.output_vars:
                         self.output_vars.remove(i)
 
-            res_df = pd.DataFrame(res, columns=["Embedding"]+self.output_vars)
+            res_df = pd.DataFrame(res, columns=self.output_vars)
+            # res_df = res_df.set_index("Model")
+            res_df = res_df.transpose()
+            res_df.columns = res_df.iloc[0]
+            res_df = res_df[1:]
             res_df.to_csv(os.path.join(self.output_dir, "ld_scores.tsv"),
-                          index=False, sep="\t")
-            self._metadata["timestamp"] = datetime.datetime.now().isoformat()
+                          index=True, sep="\t", header=1,
+                          index_label="LDScores")
+            self.metadata["timestamp"] = datetime.datetime.now().isoformat()
             self.save_metadata()
+        print("\nLD analysis is finished, the embedding profiles are saved in",
+              self.output_dir, ".")
 
 if __name__ == '__main__':
     annotation = LDScoring(experiment_name="testing", overwrite=True)

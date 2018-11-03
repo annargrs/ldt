@@ -10,12 +10,61 @@ The core of LD methodology is large-scale automatic annotation of relations in w
 
 The overall algorithm for initial processing of input words is as follows:
 
-.. figure:: /_static/ldt_full_workflow.png
+.. figure:: /_static/ldt-scheme2.png
+   :width: 400px
    :align: center
 
 Section :ref:`Collecting all linguistic information about a word` and section :ref:`Detecting relations in pairs of words` describe how LDT aggregates information from various linguistic resources to achieve automatic annotation of all possible relations in word pairs. Section :ref:`Linguistic resources in LDT` of the tutorial describes the various linguistic resources that you can use and configure in this process.
 
-See :module:`ldt.experiments.demo` for a demo of full LDT workflow in experiments with embeddings.
+The next step is :ref:`Running reproducible experiments with LDT`.
+Once you install and configure LDT, a starter script with default settings
+for English can be run simply as follows:
+
+::
+
+   python3 -m ldt.experiments.default_workflow
+
+The output will be something like this:
+
++-------------------+--------+--------+--------+
+| LD score          | CBOW   | GloVe  | SG     |
++-------------------+--------+--------+--------+
+| SharedMorphForm   | 51.819 | 52.061 | 52.9   |
++-------------------+--------+--------+--------+
+| SharedPOS         | 30.061 | 35.507 | 31.706 |
++-------------------+--------+--------+--------+
+| SharedDerivation  | 4.468  | 3.938  | 5.084  |
++-------------------+--------+--------+--------+
+| Synonyms          | 0.413  | 0.443  | 0.447  |
++-------------------+--------+--------+--------+
+| Antonyms          | 0.128  | 0.133  | 0.144  |
++-------------------+--------+--------+--------+
+| Hyponyms          | 0.035  | 0.035  | 0.038  |
++-------------------+--------+--------+--------+
+| OtherRelations    | 0.013  | 0.013  | 0.013  |
++-------------------+--------+--------+--------+
+| Misspellings      | 13.546 | 9.914  | 12.809 |
++-------------------+--------+--------+--------+
+| ProperNouns       | 30.442 | 27.278 | 27.864 |
++-------------------+--------+--------+--------+
+| CloseNeighbors    | 3.102  | 0.16   | 2.278  |
++-------------------+--------+--------+--------+
+| FarNeighbors      | 25.209 | 49.934 | 21.41  |
++-------------------+--------+--------+--------+
+
+The numbers here indicate percentage of neighbor vectors that held the
+indicated relation with each target word in the sample. The information is
+coming from a ton of dictionaries (see below), and you can fine-tune which
+ones you want to use.
+
+LDT profile explains what kinds of information your embedding model
+actually captures. That can help you predict how your model will do on
+a  particular task, and also give some ideas about how it can be improved.
+Check out the `results of a large-scale experiment with 60 embeddings and 21
+datasets. <http://ldtoolkit.space/analysis/correlation/>`_
+
+And yes, you heard it right, you can use your own vocabulary sample - the one
+that actually makes sense for whatever  downstream task you're optimizing for!
 
 ---------------------------------------------------------------------
 I don't care about word embeddings, just show me the new dictionaries

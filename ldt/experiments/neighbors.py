@@ -23,6 +23,8 @@ import uuid
 import pandas as pd
 import vecto.embeddings
 from vecto.utils.data import load_json
+# from progressbar.bar import ProgressBar
+from tqdm import tqdm
 
 from ldt import load_resource
 from ldt import __version__
@@ -82,14 +84,15 @@ class VectorNeighborhoods(Experiment):
             overwrite=overwrite, embeddings=embeddings, output_dir=output_dir,
             dataset=dataset, experiment_subfolder="neighbors")
 
-        self.message = "\n\nIf your embeddings are not normalized, retrieving " \
+        self.message = "\nStarting vector neighborhoods extraction." \
+                       "\nIf your embeddings are not normalized, retrieving " \
                        "neighbors will take more time. By default LDT " \
                        "normalizes them on loading. If you need them not " \
                        "normalized, use normalize=False option.\n"
 
-        self._metadata["task"] = "get_neighbors"
-        self._metadata["uuid"] = str(uuid.uuid4())
-        self._metadata["top_n"] = top_n
+        self.metadata["task"] = "get_neighbors"
+        self.metadata["uuid"] = str(uuid.uuid4())
+        self.metadata["top_n"] = top_n
         self._load_dataset(dataset=dataset)
 
         self._normalize = normalize
@@ -112,16 +115,16 @@ class VectorNeighborhoods(Experiment):
             os.path.join(config["path_to_resources"], "experiments",
                          "vocab_samples", dataset, "metadata.json")
         if os.path.isfile(dataset_metadata_path):
-            self._metadata["dataset"] = load_json(dataset_metadata_path)
+            self.metadata["dataset"] = load_json(dataset_metadata_path)
         else:
-            self._metadata["dataset"] = dataset
+            self.metadata["dataset"] = dataset
         dataset_path = dataset_metadata_path.strip("metadata.json")
         # assume there is a single ".vocab" file in the dataset folder
 
         file = [x for x in os.listdir(dataset_path) if x.endswith(".vocab")][0]
         dataset = load_resource(os.path.join(dataset_path, file),
                                 format="vocab")
-        self.dataset = dataset
+        self.dataset = list(dataset)
 
     def _process(self, embeddings_path):
         """Extracting top_n neighbors from each of the embeddings,
@@ -136,7 +139,7 @@ class VectorNeighborhoods(Experiment):
         Returns:
             None
         """
-        print("Extracting neighbors:", embeddings_path)
+        print("Extracting word vector neighborhoods:", embeddings_path)
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -146,7 +149,13 @@ class VectorNeighborhoods(Experiment):
 
             # get dictionary with list of lists
             neighbors = []
-            for word in self.dataset:
+            # bar = ProgressBar(max_value=len(self.dataset))
+            # for i in range(len(self.dataset)):
+            for word in tqdm(self.dataset):
+                # bar.update(i)
+                # word = self.dataset[i]
+            # for word in tqdm(self.dataset):
+            # for word in self.dataset:
                 neighbor_list = embeddings.get_most_similar_words(
                     word, cnt=self._top_n + 1)[1:]
                 for i in enumerate(neighbor_list):
@@ -166,3 +175,8 @@ class VectorNeighborhoods(Experiment):
                                                     "model"]+".tsv"),
                        header=True, index=False, sep="\t")
             embeddings = None
+
+if __name__ == '__main__':
+    annotation = VectorNeighborhoods(experiment_name="testing",
+                                     overwrite=False)
+    annotation.get_results()

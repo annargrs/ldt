@@ -54,10 +54,10 @@ def default_workflow(experiment_name=
     # performing annotation
     annotation = ldt.experiments.AnnotateVectorNeighborhoods(
         experiment_name=experiment_name, overwrite=overwrite,
-        ldt_analyzer=analyzer)
+        ld_scores="main", debugging=True, ldt_analyzer=analyzer)
     annotation.get_results()
 
     # analysing the results
     scoring = ldt.experiments.LDScoring(experiment_name=experiment_name,
-                                        overwrite=overwrite)
+                                        overwrite=overwrite, ld_scores="main")
     scoring.get_results()

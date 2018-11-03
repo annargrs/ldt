@@ -33,7 +33,7 @@ class ResourceDict(Dictionary):
     def __init__(self, path=None, resource="names",
                  language=config["default_language"],
                  lowercasing=config["lowercasing"],
-                 corpus=config["corpus"], freq=False):
+                 corpus=config["corpus"], freq=False, wordlist=None):
         """ Initializing the vocab lookup class.
 
         Args:
@@ -78,16 +78,23 @@ class ResourceDict(Dictionary):
             self.path = path_to_dict
 
         try:
-            if resource != "cooccurrence":
+            if resource not in ["cooccurrence", "gdeps"]:
                 data = load_resource(self.path, format="infer",
                                      lowercasing=lowercasing, silent=True)
             else:
+
                 if freq:
                     data = load_resource(self.path, format="json_freqdict",
                                          lowercasing=lowercasing, silent=True)
+
                 else:
-                    data = load_resource(self.path, format="json",
-                                         lowercasing=lowercasing, silent=True)
+                    data = load_resource(self.path, format="infer",
+                                         lowercasing=lowercasing, silent=True,
+                                         wordlist=wordlist)
+
+                # else:
+                #     data = load_resource(self.path, format="json",
+                #                          lowercasing=lowercasing, silent=True)
             self.data = data
         except FileNotFoundError:
             print("No resource was found, please check the file path "

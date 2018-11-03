@@ -2,7 +2,8 @@
 Language-specific resources
 ===========================
 
-As specified in the :doc: `sample configuration file <configuration>`, LDT expects to find a ``language_resources`` subfolder in the specified resources path. Language-specific resources are to be located in the subfolders of that folder, named with `2-letter name codes <https://en.wiktionary.org/wiki/Wiktionary:List_of_languages>`_.
+As specified in the :ref:`Configuration`, LDT
+expects to find a ``language_resources`` subfolder in the specified resources path. Language-specific resources are to be located in the subfolders of that folder, named with `2-letter name codes <https://en.wiktionary.org/wiki/Wiktionary:List_of_languages>`_.
 
 The following resources can be `downloaded <https://my.pcloud.com/publink/show?code=XZ8MFe7ZTgD3AwGKcVhf4rgzAJCy3V578yKk>`_ for English:
 

@@ -25,14 +25,21 @@ Todo:
     * multicore processing
 
 """
+import ldt
 
 import os
 import uuid
-
 import pandas as pd
-# import progressbar
+import numpy as np
 from tqdm import tqdm
-
+#import multiprocessing
+#import multiprocessing.pool
+# from billiard import
+from p_tqdm import p_map
+#from progressbar.bar import ProgressBar
+# from pathos.multiprocessing import ProcessingPool
+# from multiprocessing import Pool
+#import multiprocessing.managers as m
 from vecto.utils.data import load_json
 
 from ldt.experiments.metadata import Experiment
@@ -41,8 +48,29 @@ from ldt.dicts.normalize import Normalization
 from ldt.dicts.derivation.meta import DerivationAnalyzer
 from ldt.dicts.semantics.metadictionary import MetaDictionary
 from ldt.relations.pair import RelationsInPair
-
+from ldt.relations.distribution import DistributionDict
 from ldt.load_config import config
+
+
+# class NoDaemonProcess(multiprocessing.Process):
+#   def __init__(self, group=None, target=None, name=None, args=(), kwargs={},
+#                *, daemon=None):
+#     super(NoDaemonProcess, self).__init__(group, target, name, args, kwargs, daemon=daemon)
+#     if 'daemon' in multiprocessing.process._current_process._config:
+#       del multiprocessing.process._current_process._config['daemon']
+#     self._config = multiprocessing.process._current_process._config.copy()
+#   # make 'daemon' attribute always return False
+#   def _get_daemon(self):
+#     return False
+#   def _set_daemon(self, value):
+#     pass
+#   daemon = property(_get_daemon, _set_daemon)
+#
+# # We sub-class multiprocessing.pool.Pool instead of multiprocessing.Pool
+# # because the latter is only a wrapper function, not a proper class.
+# class MyPool(multiprocessing.pool.Pool):
+#     Process = NoDaemonProcess
+
 
 class AnnotateVectorNeighborhoods(Experiment):
     """This class provides a simple interface for annotating pre-computed top_n
@@ -52,10 +80,12 @@ class AnnotateVectorNeighborhoods(Experiment):
     #pylint: disable=too-many-arguments
     def __init__(self, experiment_name=config["experiments"]["experiment_name"],
                  extra_metadata=None,
-                 overwrite=config["experiments"]["overwrite"], ld_scores="all",
+                 overwrite=config["experiments"]["overwrite"], ld_scores="main",
                  output_dir=os.path.join(config["path_to_resources"],
                                          "experiments"),
-                 ldt_analyzer=None, gdeps=False, cooccurrence=False):
+                 ldt_analyzer=None,
+                 multiprocessing=config["experiments"]["multiprocessing"],
+                 debugging=False):
 
         """ Annotating pre-computed top *n* neighbors for a given vocab sample
 
@@ -77,10 +107,6 @@ class AnnotateVectorNeighborhoods(Experiment):
                 resources set up as desired (see tutorial and
                 class documentation). If None, default settings for English
                 will be used.
-            gdeps (bool): whether to use google dependency cooccurrence data
-                (memory-intensive, off by default)
-            cooccurrence (bool): whether to use corpus cooccurrence data
-                (memory-intensive, off by default)
             ld_scores (str or list of str): "all" for all supported scores,
                 or a list of ld_scores. Supported values are:
 
@@ -123,31 +149,38 @@ class AnnotateVectorNeighborhoods(Experiment):
             overwrite=overwrite, embeddings=None, output_dir=output_dir,
             dataset=None, experiment_subfolder="neighbors_annotated")
 
-        self._metadata["task"] = "annotate_neighbors"
-        self._metadata["uuid"] = str(uuid.uuid4())
-        self._metadata["ldt_config"] = config
+        self.metadata["task"] = "annotate_neighbors"
+        self.metadata["uuid"] = str(uuid.uuid4())
+        self.metadata["ldt_config"] = config
+        self.metadata["output_dir"] = self.output_dir
+        self.metadata["debugging"] = debugging
+        self.metadata["multiprocessing"] = multiprocessing
+
         self._load_dataset(dataset=None)
         neighbors_metadata_path = self.output_dir.replace(
             "neighbors_annotated", "neighbors")
+
         neighbors_metadata_path = os.path.join(neighbors_metadata_path,
                                                "metadata.json")
         if not os.path.isfile(neighbors_metadata_path):
             raise IOError("The metadata for the neighborhood generation task "
                           "was not found at "+neighbors_metadata_path)
         else:
+            self.metadata["neighbors_metadata_path"] = neighbors_metadata_path
             neighbors_metadata = load_json(neighbors_metadata_path)
-            self._metadata["embeddings"] = neighbors_metadata["embeddings"]
+            self.metadata["embeddings"] = neighbors_metadata["embeddings"]
             self.embeddings = []
-            for embedding in self._metadata["embeddings"]:
+            for embedding in self.metadata["embeddings"]:
                 self.embeddings.append(embedding["path"])
 
-        self.message = "Starting LD annotation. This will take a while for " \
+        self.message = "\n\nStarting LD annotation. This will take a while " \
+                       "for " \
                        "the first files, but the remainder should go faster, " \
                        "because many neighbor pairs will be the same."
 
-        self._metadata["failed_pairs"] = []
-        self._metadata["missed_pairs"] = []
-        self._metadata["total_pairs"] = 0
+        # self.metadata["failed_pairs"] = []
+        self.metadata["missed_pairs"] = []
+        self.metadata["total_pairs"] = 0
 
         self.supported_vars = ["SharedPOS", "SharedMorphForm",
                                "SharedDerivation", "NonCooccurring",
@@ -162,6 +195,11 @@ class AnnotateVectorNeighborhoods(Experiment):
         self.continuous_vars = ['ShortestPath', 'TargetFrequency',
                                 'NeighborFrequency']
 
+        corpus_specific = ["NonCooccurring", "TargetFrequency", "NeighborFrequency"]
+        if not config["corpus"]:
+            for i in [self.supported_vars, self.continuous_vars]:
+                i = [x for x in i if not i in corpus_specific]
+
         self.binary_vars = [x for x in self.supported_vars if not \
             x in self.continuous_vars]
 
@@ -172,10 +210,15 @@ class AnnotateVectorNeighborhoods(Experiment):
 
         if ld_scores == "all":
             self._ld_scores = self.supported_vars
-            if not gdeps:
-                self._ld_scores.remove("GDeps")
-            if not cooccurrence:
-                self._ld_scores.remove("NonCooccurring")
+
+        elif ld_scores == "main":
+            exclude = ["ShortestPath", "URLs", "Filenames", "Hashtags",
+                       "Noise"]
+            if not config["corpus"]:
+                exclude += ["NonCooccurring", "GDeps", "TargetFrequency",
+                            "NeighborFrequency"]
+            self._ld_scores = [x for x in self.supported_vars if not x in
+                                                                     exclude]
         else:
             if isinstance(ld_scores, list):
                 unsupported = [x for x in ld_scores if not
@@ -188,22 +231,20 @@ class AnnotateVectorNeighborhoods(Experiment):
             else:
                 raise ValueError(ld_scores_error)
 
-        self._metadata["annotated_information"] = self._ld_scores
+        self.metadata["ld_scores"] = self._ld_scores
+        self.metadata["continuous_vars"] = self.continuous_vars
+        self.metadata["binary_vars"] = self.binary_vars
 
-        if ldt_analyzer:
-            self.analyzer = ldt_analyzer
-        else:
-            # setting up default ldt resources to be used
-            normalizer = Normalization(language="English",
-                                       order=("wordnet", "custom"),
-                                       lowercasing=True)
-            derivation = DerivationAnalyzer()
-            lex_dict = MetaDictionary()
+        self.ldt_analyzer = ldt_analyzer
 
-            self.analyzer = RelationsInPair(normalizer=normalizer,
-                                            derivation_dict=derivation,
-                                            lex_dict=lex_dict, gdeps=gdeps,
-                                            cooccurrence=cooccurrence)
+        # global metadata
+        # metadata = self.metadata
+        #
+        # global global_analyzer
+        # global_analyzer = ldt_analyzer
+        # global_analyzer = init_analyzer(path=neighbors_metadata_path,
+        #                                 analyzer=ldt_analyzer)
+
 
     def _load_dataset(self, dataset):
         """Dataset for generating vector neighborhoods was already processed in
@@ -213,59 +254,217 @@ class AnnotateVectorNeighborhoods(Experiment):
 
     def _process(self, embeddings_path):
 
-        prior_data = collect_prior_data(self.output_dir)
+        global prior_data
+        prior_data = collect_prior_data(self.metadata["output_dir"])
+        # print("collected prior data", len(prior_data))
+
+        global metadata
+        metadata = self.metadata
+
+        global global_analyzer
+        global_analyzer = self.ldt_analyzer
 
         filename = self.get_fname_for_embedding(embeddings_path)
         neighbor_file_path = os.path.join(self.output_dir.replace(
             "neighbors_annotated", "neighbors"), filename+".tsv")
-        print("Annotating "+neighbor_file_path)
+        print("\nAnnotating "+neighbor_file_path)
+        self.metadata["out_path"] = os.path.join(self.output_dir,
+                                                 filename+".tsv")
 
         input_df = pd.read_csv(neighbor_file_path, header=0, sep="\t")
-        self._metadata["total_pairs"] += len(input_df)
+        self.metadata["total_pairs"] += len(input_df)
         dicts = input_df.to_dict(orient="records")
 
-        for i in tqdm(range(len(dicts))):
-            col_dict = dicts[i]
-            neighbor = col_dict["Neighbor"]
-            target = col_dict["Target"]
-            if target+":"+neighbor in prior_data:
-                col_dict.update(prior_data[target+":"+neighbor])
-            else:
-                relations = self.analyzer.analyze(target, neighbor)
-                if not relations:
-                    self._metadata["failed_pairs"].append(tuple([target, neighbor]))
-                else:
-                    if not "Missing" in relations:
-                        to_check_continuous = self.continuous_vars
-                        to_check_binary = self.binary_vars
-                    else:
-                        to_check_binary = ["NonCooccurring", "GDeps"]
-                        to_check_continuous = ["TargetFrequency",
-                                               "NeighborFrequency"]
-                        self._metadata["missed_pairs"].append(
-                            tuple([target, neighbor]))
-                    for i in to_check_continuous:
-                        if i in relations:
-                            col_dict[i] = relations[i]
-                    for i in to_check_binary:
-                        col_dict[i] = i in relations
+        if metadata["multiprocessing"] == 1:
+            print("\nMultiprocessing: 1 core")
+            newdicts = []
+            for d in tqdm(dicts):
+                newdicts.append(_process_one_dict(d))
+                # # newdicts.append(self._process_one_dict_meth(d))
+                dicts = newdicts
+            # dicts = [_process_one_dict(x) for x in dicts]
+            # self.save_results(dicts)
+        else:
+            print("\nMultiprocessing:", metadata["multiprocessing"], "cores")
+        #python multiprocessing library
+            # pool = Pool(metadata["multiprocessing"], initializer=initializer(global_analyzer))
+            # dicts = pool.map(_process_one_dict, dicts)
+        # #pathos.multiprocessing
 
+        #     pool = ProcessingPool(nodes=metadata["multiprocessing"])
+        #     dicts = pool.map(_process_one_dict, dicts)
+        #try with method
+            # t_dicts = []
+            # for d in dicts:
+            #     t_dicts.append((d,))
+            # pool = ProcessingPool(nodes=metadata["multiprocessing"])
+            # dicts = pool.map(self._process_one_dict_meth, dicts)
+
+            dicts = p_map(_process_one_dict, dicts, num_cpus=metadata["multiprocessing"])
+            # self.save_results(dicts)
+            # pool = MyPool(metadata["multiprocessing"])
+            # dicts = pool.map(_process_one_dict, dicts)
+            # pool.close()
+            # pool.join()
+
+        dicts = self.add_distr_data(dicts)
+        self.save_results(dicts, overwrite=True)
+
+    def save_results(self, dicts, overwrite=False):
         output_df = pd.DataFrame(dicts,
                                  columns=["Target", "Rank", "Neighbor",
                                           "Similarity"]+self._ld_scores)
-        output_df.to_csv(os.path.join(self.output_dir, filename+".tsv"),
-                         index=False, sep="\t")
+        if not os.path.exists(self.metadata["out_path"]):
+            output_df.to_csv(self.metadata["out_path"], index=False,
+                             sep="\t", header=True)
+        else:
+            if not overwrite:
+            # existing_df = pd.read_csv(self.metadata["out_path"], header=0, sep="\t")
+            # existing_dicts = existing_df.to_dict(orient="records")
+            # if not existing_dicts == dicts:
+                output_df.to_csv(self.metadata["out_path"], index=False, sep="\t",
+                                 mode="a", header=False)
+            else:
+                output_df.to_csv(self.metadata["out_path"], index=False,
+                                 sep="\t", header=True)
+
 
     def _postprocess_metadata(self):
         """Helper method for logging unique failed target:neighbor pairs and
         calculating the overall coverage (considered as number of non-unique
         pairs for which dictionary data was successfully found)."""
 
-        total_fails = self._metadata["failed_pairs"]+self._metadata[
-            "missed_pairs"]
-        total_fails = list(set(total_fails))
-        self._metadata["coverage"] = \
-            1 - round(len(total_fails)/self._metadata["total_pairs"], 2)
+        del self.metadata["continuous_vars"]
+        del self.metadata["binary_vars"]
+
+        # find missing data
+        input_df = pd.read_csv(self.metadata["out_path"], header=0,
+                               sep="\t")
+        dicts = input_df.to_dict(orient="records")
+        set_dicts = {}
+        for i in dicts:
+            set_dicts[i["Target"]+":"+i["Neighbor"]] = i
+            if not self._ld_scores[0] in i:
+                self.metadata["missed_pairs"].append(i["Target"]+":"+i["Neighbor"])
+            else:
+                try:
+                    if np.isnan(i[self._ld_scores[0]]):
+                        self.metadata["missed_pairs"].append(i["Target"] + ":" + i["Neighbor"])
+                except TypeError:
+                    continue
+                try:
+                    if pd.isnull(i[self._ld_scores[0]]):
+                        self.metadata["missed_pairs"].append(i["Target"] + ":" + i["Neighbor"])
+                except TypeError:
+                    continue
+
+        self.metadata["coverage"] = \
+            1 - round(len(self.metadata["missed_pairs"]) / self.metadata[
+                "total_pairs"], 2)
+
+        #order the dataframe in the original order
+        res = []
+        input_neighbors_df = pd.read_csv(self.metadata["out_path"].replace(
+                "neighbors_annotated", "neighbors"), header=0, sep="\t")
+        neighbor_dicts = input_neighbors_df.to_dict(orient="records")
+        for i in neighbor_dicts:
+            k = i["Target"]+":"+i["Neighbor"]
+            try:
+                res.append(set_dicts[k])
+            except KeyError:
+                pass
+        self.save_results(res, overwrite=True)
+        print("\nAnnotation done:", self.metadata["out_path"])
+
+
+
+
+    def add_distr_data(self, dicts):
+        distr_scores = ["NonCooccurring", "GDeps", "TargetFrequency", "NeighborFrequency"]
+        scores = [x for x in distr_scores if x in self._ld_scores]
+        if not scores:
+            return dicts
+        print("\nLoading and adding distributional data. This could take a few minutes for a large dataset.")
+        gdeps = "GDeps" in self._ld_scores
+        cooccurrence = "NonCooccurring" in self._ld_scores
+        if gdeps or cooccurrence:
+            wordlist = collect_targets_and_neighbors(dicts)
+        else:
+            wordlist = None
+        frequencies = "TargetFrequency" in self._ld_scores or "NeighborFrequency" in self._ld_scores
+        distr_dict = DistributionDict(gdeps=gdeps,
+                                      cooccurrence=cooccurrence,
+                                      wordlist=wordlist,
+                                      frequencies=frequencies)
+        for d in dicts:
+            distr_scores = distr_dict.analyze(target=d["Target"],
+                                              neighbor=d["Neighbor"])
+            d.update(distr_scores)
+        distr_dict = None
+        return dicts
+
+    def _process_one_dict_meth(self, col_dict):
+        """Helper function that for performing the annotation in a
+        multiprocessing-friendly way. Relies on global analyzer, metadata and
+        prior_data objects."""
+        # col_dict = col_dict[0]
+        print(col_dict)
+        neighbor = col_dict["Neighbor"]
+        target = col_dict["Target"]
+    #    print(target + ":" + neighbor in prior_data)
+        if target + ":" + neighbor in prior_data:
+    #        print("using prior results")
+            # print(prior_data[target + ":" + neighbor])
+            col_dict.update(prior_data[target + ":" + neighbor])
+        else:
+            # relations = self.analyzer.analyze(target, neighbor, silent=True,
+            #                                   debugging=metadata["debugging"])
+            relations = global_analyzer.analyze(target, neighbor,
+                                                silent=True, debugging=metadata["debugging"])
+            if relations:
+                if not "Missing" in relations:
+                    to_check_continuous = metadata["continuous_vars"]
+                    to_check_binary = metadata["binary_vars"]
+                else:
+                    to_check_binary = [x for x in ["NonCooccurring", "GDeps"] if
+                                       x in metadata["ld_scores"]]
+                    to_check_continuous = [x for x in
+                                           ["TargetFrequency", "NeighborFrequency"]
+                                           if x in metadata["ld_scores"]]
+                    metadata["missed_pairs"].append(tuple([target, neighbor]))
+                for i in to_check_continuous:
+                    if i in relations:
+                        col_dict[i] = relations[i]
+                for i in to_check_binary:
+                    col_dict[i] = i in relations
+        print("processed", col_dict)
+        save_result(col_dict)
+        return col_dict
+
+def collect_targets_and_neighbors(dicts):
+
+    """Collecting all the target and neighbor words produced by the
+    neighbor extraction step, which will be used to filter off unneeded
+    words in the large distributional resources and save memory."""
+
+    # output_dir = self.output_dir.strip("metadata.json")
+    # neighbor_files = os.listdir(self.output_dir)
+    # if "metadata.json" in neighbor_files:
+    #     neighbor_files.remove("metadata.json")
+    # for f in neighbor_files:
+    #     input_df = pd.read_csv(os.path.join(output_dir, f), header=0,
+    #                            sep="\t")
+    #     res += list(input_df["Target"])
+    #     res += list(input_df["Neighbor"])
+    # self.wordlist = res
+    # return set(res)
+    res = []
+    for d in dicts:
+        res.append(d["Target"])
+        res.append(d["Neighbor"])
+    res = set(res)
+    return res
+
 
 
 def collect_prior_data(output_dir):
@@ -293,12 +492,123 @@ def collect_prior_data(output_dir):
         dicts = input_df.to_dict(orient="records")
         for pair in dicts:
             prior_res[pair["Target"]+":"+pair["Neighbor"]] = pair
+    print("\nCollected", len(prior_res), "previously processed word pairs in",
+          output_dir)
     return prior_res
 
+def init_analyzer(path, analyzer=None):
 
+    """Helper for initializing the RelationsInPair instance if one is not
+    provided, and updating it with the wordlist if one is provided"""
+
+    wordlist = collect_targets_and_neighbors(path)
+    print("\nLoading filtered distributional resources. This takes a while "
+          "for a large experiment.")
+
+    if analyzer:
+        # todo move this to RelationsInPair
+        if "GDeps" in metadata["ld_scores"] and config["corpus"]:
+            analyzer._distr_dict._reload_resource(resource="gdeps",
+                                                      wordlist=wordlist)
+            analyzer._gdeps = True
+        if "NonCooccurring" in metadata["ld_scores"] and config["corpus"]:
+            analyzer._distr_dict._reload_resource(resource="cooccurrence",
+                wordlist=wordlist)
+            analyzer._cooccurrence = True
+
+        return analyzer
+    else:
+        # setting up default ldt resources to be used
+        normalizer = Normalization(language="English",
+                                   order=("wordnet", "custom"),
+                                   lowercasing=True)
+        derivation = DerivationAnalyzer()
+        lex_dict = MetaDictionary()
+
+        analyzer = RelationsInPair(normalizer=normalizer,
+                                   derivation_dict=derivation,
+                                   lex_dict=lex_dict,
+                                   gdeps="GDeps" in metadata["ld_scores"],
+                                   cooccurrence="NonCooccurring" in metadata["ld_scores"],
+                                   wordlist=wordlist)
+        return analyzer
+
+class initializer():
+    def __init__(self, global_analyzer):
+        self.analyzer = global_analyzer
+
+    def __call__(self):
+        global global_analyzer
+        global_analyzer = self.analyzer
+
+def _process_one_dict(col_dict):
+    """Helper function that for performing the annotation in a
+    multiprocessing-friendly way. Relies on global analyzer, metadata and
+    prior_data objects."""
+    neighbor = col_dict["Neighbor"]
+    target = col_dict["Target"]
+#    print(target + ":" + neighbor in prior_data)
+    if target + ":" + neighbor in prior_data:
+#        print("using prior results")
+        # print(prior_data[target + ":" + neighbor])
+        col_dict.update(prior_data[target + ":" + neighbor])
+    else:
+        relations = global_analyzer.analyze(target, neighbor, silent=True,
+                                            debugging=metadata["debugging"])
+        if relations:
+            if not "Missing" in relations:
+                to_check_continuous = metadata["continuous_vars"]
+                to_check_binary = metadata["binary_vars"]
+            else:
+                to_check_binary = [x for x in ["NonCooccurring", "GDeps"] if
+                                   x in metadata["ld_scores"]]
+                to_check_continuous = [x for x in
+                                       ["TargetFrequency", "NeighborFrequency"]
+                                       if x in metadata["ld_scores"]]
+                metadata["missed_pairs"].append(tuple([target, neighbor]))
+            for i in to_check_continuous:
+                if i in relations:
+                    col_dict[i] = relations[i]
+            for i in to_check_binary:
+                col_dict[i] = i in relations
+    save_result(col_dict)
+    return col_dict
+
+def save_result(dicts, overwrite=False):
+    if isinstance(dicts, dict):
+        dicts = [dicts]
+    output_df = pd.DataFrame(dicts,
+                             columns=["Target", "Rank", "Neighbor",
+                                      "Similarity"]+metadata["ld_scores"])
+    if not os.path.exists(metadata["out_path"]):
+        output_df.to_csv(metadata["out_path"], index=False,
+                         sep="\t", header=True)
+    else:
+        if not overwrite:
+            output_df.to_csv(metadata["out_path"], index=False, sep="\t",
+                             mode="a", header=False)
+        else:
+            output_df.to_csv(metadata["out_path"], index=False,
+                             sep="\t", header=True)
 
 
 if __name__ == '__main__':
+    normalizer = ldt.dicts.normalize.Normalization(language="English",
+                                                   order=("wordnet", "custom"),
+                                                   lowercasing=True)
+    derivation = ldt.dicts.derivation.meta.DerivationAnalyzer()
+    lex_dict = ldt.dicts.semantics.metadictionary.MetaDictionary(
+            language="English", order=("wordnet", "wiktionary"))
+
+    # global analyzer
+    analyzer = ldt.relations.pair.RelationsInPair(
+            normalizer=normalizer, derivation_dict=derivation,
+            lex_dict=lex_dict)
     annotation = AnnotateVectorNeighborhoods(experiment_name="testing",
-                                             overwrite=True)
+                                             overwrite=True,
+                                             ldt_analyzer=analyzer,
+                                             ld_scores="all",
+                                             multiprocessing=4, debugging=True)
     annotation.get_results()
+
+
