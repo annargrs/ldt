@@ -13,21 +13,47 @@ import sys
 import shutil
 import ruamel.yaml as yaml
 import outdated
+import nltk
 
 from ldt.helpers.exceptions import ResourceError
 from ldt._version import __version__
 
 warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
 
+from outdated import check_outdated
 from outdated import warn_if_outdated
 
-warn_if_outdated('ldt', __version__)
+# warn_if_outdated('ldt', __version__)
+try:
+    is_outdated, latest_version = check_outdated('ldt', __version__)
+    if is_outdated:
+        print("You are using ldt v."+__version__+". Upgrade to v."+latest_version,
+              "with \n   pip install --upgrade ldt\nSee what's new: "
+              "https://github.com/annargrs/ldt/blob/master/CHANGES.txt")
+except ValueError:
+    print("This is LDT", __version__, "- an unpublished development version.")
 
-# downloading NLTK resources if they're missing
-# if not "unittest" in sys.modules or "sphinx" in sys.modules:
-#     nltk.download("wordnet")
-#     nltk.download("stopwords")
-#     nltk.download("punkt")
+
+def nltk_download():
+    # downloading NLTK resources if they're missing
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        nltk.download('punkt')
+    try:
+        nltk.data.find('corpora/wordnet')
+    except LookupError:
+        nltk.download('wordnet')
+    try:
+        nltk.data.find('corpora/stopwords')
+    except LookupError:
+        nltk.download('stopwords')
+
+if not "unittest" in sys.modules or "sphinx" in sys.modules:
+    nltk_download()
+    # nltk.download("wordnet")
+    # nltk.download("stopwords")
+    # nltk.download("punkt")
 
 TESTFILE = os.path.dirname(os.path.realpath(__file__))
 TESTFILE = os.path.join(TESTFILE, "tests/sample_files/.ldt-config.yaml")

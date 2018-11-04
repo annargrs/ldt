@@ -1,4 +1,4 @@
-v.0.4.0, 2018-10-24
+v.0.3.9, 2018-11-04
 
 * multicore processing in annotation module
 * query timeout setting
