@@ -10,7 +10,7 @@ The core of LD methodology is large-scale automatic annotation of relations in w
 
 The overall algorithm for initial processing of input words is as follows:
 
-.. figure:: /_static/ldt-scheme2.png
+.. figure:: /_static/ldt-scheme_resized.png
    :width: 400px
    :align: center
 
