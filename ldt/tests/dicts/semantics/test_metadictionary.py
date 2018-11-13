@@ -17,9 +17,9 @@ class Tests(unittest.TestCase):
     def setUpClass(cls):
         """Setting up the test variables."""
         cls.test_dict_fr = ldt.dicts.semantics.metadictionary.MetaDictionary(
-            language="French", cache=False)
+            language="French", cache=False, babelnet_key=None)
         cls.test_dict_en = ldt.dicts.semantics.metadictionary.MetaDictionary(
-            language="English", cache=False)
+            language="English", cache=False, babelnet_key=None)
 
     @classmethod
     def tearDownClass(cls):
@@ -75,4 +75,5 @@ class Tests(unittest.TestCase):
         self.assertTrue(worked)
 
 if __name__ == '__main__':
+    ldt.config = ldt._test_config
     unittest.main()

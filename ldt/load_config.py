@@ -21,9 +21,7 @@ from ldt._version import __version__
 warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
 
 from outdated import check_outdated
-from outdated import warn_if_outdated
 
-# warn_if_outdated('ldt', __version__)
 try:
     is_outdated, latest_version = check_outdated('ldt', __version__)
     if is_outdated:
@@ -51,25 +49,12 @@ def nltk_download():
 
 if not "unittest" in sys.modules or "sphinx" in sys.modules:
     nltk_download()
-    # nltk.download("wordnet")
-    # nltk.download("stopwords")
-    # nltk.download("punkt")
 
-TESTFILE = os.path.dirname(os.path.realpath(__file__))
-TESTFILE = os.path.join(TESTFILE, "tests/sample_files/.ldt-config.yaml")
-
-if "unittest" in sys.modules or "sphinx" in sys.modules:
-    CONFIGPATH = TESTFILE
-else:
-    CONFIGPATH = os.path.expanduser('~/.ldt-config.yaml')
-    if not os.path.exists(CONFIGPATH):
-        print("Creating a sample configuration file in", CONFIGPATH)
-        shutil.copyfile(TESTFILE, CONFIGPATH)
-
-def load_config(path=CONFIGPATH):
+def load_config(path, testing=False):
     """Loading config file from either the user home directory or the test
     directory"""
-    print("Loading configuration file:", path)
+    if not testing:
+        print("Loading configuration file:", path)
     if not os.path.isfile(path):
         raise ResourceError("Configuration yaml file was not found at "+path)
 
@@ -80,7 +65,7 @@ def load_config(path=CONFIGPATH):
             raise ResourceError("Something is wrong with the configuration "
                                 "yaml file.")
 
-    if "unittest" in sys.modules:
+    if testing:
         options["path_to_resources"] = TESTFILE.strip(".ldt-config.yaml")
         options["experiments"]["embeddings"] = \
             [os.path.join(options["path_to_resources"], "sample_embeddings")]
@@ -98,9 +83,25 @@ def load_config(path=CONFIGPATH):
 
     return options
 
+TESTFILE = os.path.dirname(os.path.realpath(__file__))
+TESTFILE = os.path.join(TESTFILE, "tests/sample_files/.ldt-config.yaml")
+
+CONFIGPATH = os.path.expanduser('~/.ldt-config.yaml')
+if not os.path.exists(CONFIGPATH):
+    print("Creating a sample configuration file in", CONFIGPATH)
+    shutil.copyfile(TESTFILE, CONFIGPATH)
+
+# if "unittest" in sys.modules or "sphinx" in sys.modules:
+#     CONFIGPATH = TESTFILE
+# else:
+
+
 #pylint: disable=invalid-name
 global config
-config = load_config()
+config = load_config(path=CONFIGPATH, testing=False)
+
+global _test_config
+_test_config = load_config(path=TESTFILE, testing=True)
 
 # def update_config(new_config_path):
 #     """Updating the config with the contents of an alternative yaml file."""

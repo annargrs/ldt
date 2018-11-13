@@ -4,9 +4,9 @@ import ldt
 import os
 import shutil
 
-from ldt.load_config import config
+from ldt.load_config import _test_config
 
-path_to_resources = config["path_to_resources"]
+path_to_resources = _test_config["path_to_resources"]
 
 class Tests(unittest.TestCase):
     '''
@@ -42,4 +42,5 @@ class Tests(unittest.TestCase):
             os.remove(os.path.join(path_to_cache, f))
 
 if __name__ == '__main__':
+    ldt.config = ldt._test_config
     unittest.main()

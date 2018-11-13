@@ -32,4 +32,5 @@ class Tests(unittest.TestCase):
         self.assertEqual(self.test_dict.get_shortest_path("cat", "dog"), 0.05)
 
 if __name__ == '__main__':
+    ldt.config = ldt._test_config
     unittest.main()

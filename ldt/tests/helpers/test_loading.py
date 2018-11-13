@@ -2,7 +2,9 @@ import unittest
 import os
 from hurry.filesize import size
 import ldt
-from ldt.load_config import config
+#from ldt.load_config import config
+from ldt.load_config import _test_config
+
 class Tests(unittest.TestCase):
     """The tests in this block inspect the file loaders for different
     formats."""
@@ -10,7 +12,9 @@ class Tests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Setting up the test variables."""
-        cls.path = config["path_to_cache"].replace("cache", "file_formats")
+        ldt.config = ldt._test_config
+        cls.path = _test_config["path_to_cache"].replace("cache",
+                                                         "file_formats")
         cls.res_vocab = {"banana", "apple", "5", "123abc"}
         cls.res_vocab_upper = {"Banana", "apple", "5", "123abc"}
         cls.res_2cols_freqdict = {"falcon": 2, "mid": 20, "5": 14, "has_not": 3}
@@ -131,4 +135,5 @@ class Tests(unittest.TestCase):
         self.assertEqual(6, res["mouse"]["cheese"])
 
 if __name__ == '__main__':
+
     unittest.main()

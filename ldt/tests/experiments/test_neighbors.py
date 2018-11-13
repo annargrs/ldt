@@ -8,10 +8,10 @@ import json
 
 import pandas as pd
 
-from ldt.load_config import config
+from ldt.load_config import _test_config
 from ldt.helpers.ignore import ignore_warnings
 
-path_to_resources = config["path_to_resources"]
+path_to_resources = _test_config["path_to_resources"]
 
 class Tests(unittest.TestCase):
     """
@@ -68,7 +68,7 @@ class Tests(unittest.TestCase):
 
     def test_dir(self):
         """Creation of subfolder per specific experiment"""
-        dir = os.path.join(config["path_to_resources"], "experiments",
+        dir = os.path.join(_test_config["path_to_resources"], "experiments",
                            "testing", "neighbors")
         self.assertTrue(os.path.isdir(dir))
 
@@ -79,7 +79,7 @@ class Tests(unittest.TestCase):
 
     def test_metadata(self):
         """Testing that the experiment metadata is saved"""
-        metadata_path = os.path.join(config["path_to_resources"],
+        metadata_path = os.path.join(_test_config["path_to_resources"],
                                      "experiments", "testing", "neighbors",
                                      "metadata.json")
         with open(metadata_path, "r") as f:
@@ -88,7 +88,7 @@ class Tests(unittest.TestCase):
 
     def test_metadata_embeddings(self):
         """Testing that the embeddings metadata is incorporated"""
-        metadata_path = os.path.join(config["path_to_resources"],
+        metadata_path = os.path.join(_test_config["path_to_resources"],
                                      "experiments", "testing", "neighbors",
                                      "metadata.json")
         with open(metadata_path, "r") as f:
@@ -97,7 +97,7 @@ class Tests(unittest.TestCase):
 
     def test_metadata_dataset(self):
         """Testing that the dataset metadata is incorporated"""
-        metadata_path = os.path.join(config["path_to_resources"],
+        metadata_path = os.path.join(_test_config["path_to_resources"],
                                      "experiments", "testing", "neighbors",
                                      "metadata.json")
         with open(metadata_path, "r") as f:
@@ -106,7 +106,7 @@ class Tests(unittest.TestCase):
 
     def test_metadata_uuid(self):
         """Testing that the dataset metadata is incorporated"""
-        metadata_path = os.path.join(config["path_to_resources"],
+        metadata_path = os.path.join(_test_config["path_to_resources"],
                                      "experiments", "testing", "neighbors",
                                      "metadata.json")
         with open(metadata_path, "r") as f:
@@ -114,7 +114,7 @@ class Tests(unittest.TestCase):
         self.assertTrue("uuid" in metadata and len(metadata["uuid"]) == 36)
 
     def test_neighbor_extraction(self):
-        dir = os.path.join(config["path_to_resources"], "experiments",
+        dir = os.path.join(_test_config["path_to_resources"], "experiments",
                            "testing", "neighbors")
         files = os.listdir(dir)
         fname = ""
@@ -140,12 +140,12 @@ class Tests(unittest.TestCase):
 
     def test_dir_annotation(self):
         """Creation of subfolder per specific experiment"""
-        dir = os.path.join(config["path_to_resources"], "experiments",
+        dir = os.path.join(_test_config["path_to_resources"], "experiments",
                            "testing", "neighbors_annotated")
         self.assertTrue(os.path.isdir(dir))
 
     def test_annotation(self):
-        f = os.path.join(config["path_to_resources"], "experiments",
+        f = os.path.join(_test_config["path_to_resources"], "experiments",
                            "testing", "neighbors_annotated",
                            "sample_embeddings.tsv")
         res_df = pd.read_csv(f, header=0, sep="\t")
@@ -157,13 +157,13 @@ class Tests(unittest.TestCase):
 
     def test_dir_analysis(self):
         """Creation of subfolder per specific experiment"""
-        dir = os.path.join(config["path_to_resources"], "experiments",
+        dir = os.path.join(_test_config["path_to_resources"], "experiments",
                            "testing", "analysis")
         self.assertTrue(os.path.isdir(dir))
 
     def test_analysis(self):
         """Creation of subfolder per specific experiment"""
-        file = os.path.join(config["path_to_resources"], "experiments",
+        file = os.path.join(_test_config["path_to_resources"], "experiments",
                             "testing", "analysis", "ld_scores.tsv")
         res_df = pd.read_csv(file, header=0, sep="\t")
         hashtags = res_df.at[res_df['LDScores'].eq(
@@ -171,4 +171,5 @@ class Tests(unittest.TestCase):
         self.assertEqual(hashtags, 0.0)
 
 if __name__ == '__main__':
+    ldt.config = ldt._test_config
     unittest.main()
