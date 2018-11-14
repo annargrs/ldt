@@ -19,6 +19,8 @@ By default, embeddings are normalized before cosine similarity is computed.
 import os
 import warnings
 import uuid
+import multiprocessing
+import functools
 
 import pandas as pd
 import vecto.embeddings
@@ -45,6 +47,7 @@ class VectorNeighborhoods(Experiment):
                  overwrite=config["experiments"]["overwrite"],
                  top_n=config["experiments"]["top_n"], normalize=True,
                  embeddings=config["experiments"]["embeddings"],
+                 multiprocessing=config["experiments"]["multiprocessing"],
                  output_dir=os.path.join(config["path_to_resources"],
                                          "experiments"),
                  dataset=config["experiments"]["vocab_sample"]):
@@ -93,8 +96,8 @@ class VectorNeighborhoods(Experiment):
         self.metadata["task"] = "get_neighbors"
         self.metadata["uuid"] = str(uuid.uuid4())
         self.metadata["top_n"] = top_n
+        self.metadata["multiprocessing"] = multiprocessing
         self._load_dataset(dataset=dataset)
-
         self._normalize = normalize
         self._top_n = top_n
 
@@ -126,6 +129,20 @@ class VectorNeighborhoods(Experiment):
                                 format="vocab")
         self.dataset = list(dataset)
 
+    def _get_neighbors(self, embeddings, words):
+        neighbors = []
+        for word in words:
+            neighbor_list = embeddings.get_most_similar_words(
+                word, cnt=self._top_n + 1)[1:]
+            for i in enumerate(neighbor_list):
+                pair = []
+                pair.append(word)
+                pair.append(i[0] + 1)
+                pair.append(neighbor_list[i[0]][0])
+                pair.append(neighbor_list[i[0]][1])
+                neighbors.append(pair)
+        return neighbors
+
     def _process(self, embeddings_path):
         """Extracting top_n neighbors from each of the embeddings,
         saving the results as tab-separated file in the output directory.
@@ -147,24 +164,15 @@ class VectorNeighborhoods(Experiment):
             if self._normalize:
                 embeddings.normalize()
 
-            # get dictionary with list of lists
             neighbors = []
-            # bar = ProgressBar(max_value=len(self.dataset))
-            # for i in range(len(self.dataset)):
-            for word in tqdm(self.dataset):
-                # bar.update(i)
-                # word = self.dataset[i]
-            # for word in tqdm(self.dataset):
-            # for word in self.dataset:
-                neighbor_list = embeddings.get_most_similar_words(
-                    word, cnt=self._top_n + 1)[1:]
-                for i in enumerate(neighbor_list):
-                    pair = []
-                    pair.append(word)
-                    pair.append(i[0] + 1)
-                    pair.append(neighbor_list[i[0]][0])
-                    pair.append(neighbor_list[i[0]][1])
-                    neighbors.append(pair)
+            with multiprocessing.Pool(self.metadata["multiprocessing"]) as pool:
+                print('Multiprocessing neighbors extraction on {} threads'
+                      .format(self.metadata["multiprocessing"]))
+                get_neighbors = functools.partial(self._get_neighbors,
+                                                  embeddings)
+                for _neighbors in pool.imap_unordered(get_neighbors,
+                                                      tqdm(self.dataset)):
+                    neighbors.extend(_neighbors)
 
             # formatting the output
             res = pd.DataFrame(neighbors, columns=["Target", "Rank",
