@@ -1,4 +1,7 @@
 import unittest
+import os
+
+os.environ["TESTING_LDT"] = "TRUE"
 
 import ldt
 from ldt.dicts.semantics.lex_dictionary import LexicographicDictionary

@@ -3,6 +3,10 @@
 patterns."""
 
 import unittest
+import os
+
+os.environ["TESTING_LDT"] = "TRUE"
+
 import ldt
 
 from ldt.helpers.ignore import ignore_warnings
@@ -100,3 +104,5 @@ class Tests(unittest.TestCase):
         self.assertTrue(self.test_dict.are_related(self.postwar,
                                                    self.prewar))
 
+if __name__ == '__main__':
+    unittest.main()

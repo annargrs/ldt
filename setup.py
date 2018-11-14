@@ -8,14 +8,6 @@ import sys
 
 import ldt
 
-#class Install(_install):
-#    def run(self):
-#        _install.do_egg_install(self)
-#        import nltk
-#        nltk.download("punkt")
-#        nltk.download("wordnet")
-#        nltk.download("stopwords")
-
 here = os.path.abspath(os.path.dirname(__file__))
 
 packages = find_packages(here, exclude=["*.tests", "*.tests.*", "tests.*", "tests"])

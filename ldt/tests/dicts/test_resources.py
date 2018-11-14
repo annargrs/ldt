@@ -3,6 +3,9 @@
 import unittest
 import os
 
+os.environ["TESTING_LDT"] = "TRUE"
+
+
 import ldt
 
 class Tests(unittest.TestCase):

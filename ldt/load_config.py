@@ -12,20 +12,16 @@ import warnings
 import sys
 import shutil
 import ruamel.yaml as yaml
-import outdated
 import nltk
+import outdated
 
 from ldt.helpers.exceptions import ResourceError
 from ldt._version import __version__
 
 warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
 
-from outdated import check_outdated
-from outdated import warn_if_outdated
-
-# warn_if_outdated('ldt', __version__)
 try:
-    is_outdated, latest_version = check_outdated('ldt', __version__)
+    is_outdated, latest_version = outdated.check_outdated('ldt', __version__)
     if is_outdated:
         print("You are using ldt v."+__version__+". Upgrade to v."+latest_version,
               "with \n   pip install --upgrade ldt\nSee what's new: "
@@ -35,7 +31,7 @@ except ValueError:
 
 
 def nltk_download():
-    # downloading NLTK resources if they're missing
+    """Downloading the necessary NLTK resources if they are missing."""
     try:
         nltk.data.find('tokenizers/punkt')
     except LookupError:
@@ -49,16 +45,12 @@ def nltk_download():
     except LookupError:
         nltk.download('stopwords')
 
-if not "unittest" in sys.modules or "sphinx" in sys.modules:
-    nltk_download()
-    # nltk.download("wordnet")
-    # nltk.download("stopwords")
-    # nltk.download("punkt")
+nltk_download()
 
 TESTFILE = os.path.dirname(os.path.realpath(__file__))
 TESTFILE = os.path.join(TESTFILE, "tests/sample_files/.ldt-config.yaml")
 
-if "unittest" in sys.modules or "sphinx" in sys.modules:
+if "TESTING_LDT" in os.environ or "TRAVIS" in os.environ or "sphinx" in sys.modules:
     CONFIGPATH = TESTFILE
 else:
     CONFIGPATH = os.path.expanduser('~/.ldt-config.yaml')
@@ -80,16 +72,17 @@ def load_config(path=CONFIGPATH):
             raise ResourceError("Something is wrong with the configuration "
                                 "yaml file.")
 
-    if "unittest" in sys.modules:
-        options["path_to_resources"] = TESTFILE.strip(".ldt-config.yaml")
+    if "TRAVIS" in os.environ or "/tests/sample_files/" in path:
+    # if TESTING:
+        options["path_to_resources"] = path.strip(".ldt-config.yaml")
         options["experiments"]["embeddings"] = \
             [os.path.join(options["path_to_resources"], "sample_embeddings")]
         options["wiktionary_cache"] = False
         options["experiments"]["top_n"] = 2
-        options["experiments"]["batch_size"] = 2
         options["experiments"]["timeout"] = None
         options["experiments"]["multiprocessing"] = 1
         options["corpus"] = "Wiki201308"
+
     options["path_to_cache"] = \
         os.path.join(options["path_to_resources"], "cache")
     for i in options:
@@ -101,17 +94,3 @@ def load_config(path=CONFIGPATH):
 #pylint: disable=invalid-name
 global config
 config = load_config()
-
-# def update_config(new_config_path):
-#     """Updating the config with the contents of an alternative yaml file."""
-#     if not os.path.isfile(new_config_path):
-#         print("Path not found: ", new_config_path)
-#         return None
-#     with open(new_config_path) as stream:
-#         try:
-#             new_config = yaml.safe_load(stream)
-#             return new_config
-#         except:
-#             print("Something is wrong with the configuration yaml file: ",
-#                   new_config_path)
-

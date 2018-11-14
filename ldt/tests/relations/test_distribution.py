@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """Testing retrieval of distributional information."""
 import unittest
+import os
+
+os.environ["TESTING_LDT"] = "TRUE"
 
 import ldt
 

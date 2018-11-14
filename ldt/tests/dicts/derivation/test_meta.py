@@ -2,11 +2,14 @@
 
 import unittest
 import time
-import ldt
+import os
 
+os.environ["TESTING_LDT"] = "TRUE"
+
+import ldt
 from ldt.helpers.ignore import ignore_warnings
 
-test_dict = ldt.dicts.derivation.meta.DerivationAnalyzer(language="en")
+#test_dict = ldt.dicts.derivation.meta.DerivationAnalyzer(language="en")
 
 class Tests(unittest.TestCase):
     """

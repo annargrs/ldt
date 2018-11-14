@@ -2,8 +2,11 @@
 """Testing the analysis of relations in word pairs"""
 
 import unittest
-import ldt
+import os
 
+os.environ["TESTING_LDT"] = "TRUE"
+
+import ldt
 from ldt.helpers.ignore import ignore_warnings
 
 class Tests(unittest.TestCase):

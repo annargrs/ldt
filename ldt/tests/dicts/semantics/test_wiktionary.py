@@ -4,6 +4,8 @@ import ldt
 import os
 import time
 
+os.environ["TESTING_LDT"] = "TRUE"
+
 from ldt.helpers.ignore import ignore_warnings
 
 class Tests(unittest.TestCase):

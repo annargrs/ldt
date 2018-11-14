@@ -1,9 +1,10 @@
 import unittest
-
-import ldt
 import os
 import shutil
 
+os.environ["TESTING_LDT"] = "TRUE"
+
+import ldt
 from ldt.load_config import config
 
 path_to_resources = config["path_to_resources"]

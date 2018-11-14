@@ -1,6 +1,9 @@
 import unittest
 import os
 from hurry.filesize import size
+
+os.environ["TESTING_LDT"] = "TRUE"
+
 import ldt
 from ldt.load_config import config
 class Tests(unittest.TestCase):
