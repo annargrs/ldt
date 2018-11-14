@@ -174,6 +174,7 @@ class Experiment(metaclass=abc.ABCMeta):
                 self.metadata["timestamp"][emb_uuid]["start_time"] = \
                     datetime.datetime.now().isoformat()
             else:
+                self.metadata["timestamp"][i] = {}
                 self.metadata["timestamp"][i]["start_time"] = \
                     datetime.datetime.now().isoformat()
 
