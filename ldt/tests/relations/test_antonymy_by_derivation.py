@@ -104,3 +104,6 @@ class Tests(unittest.TestCase):
         self.assertTrue(self.test_dict.are_related(self.postwar,
                                                    self.prewar))
 
+if __name__ == '__main__':
+    ldt.config = ldt._test_config
+    unittest.main()

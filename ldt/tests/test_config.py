@@ -20,4 +20,5 @@ class Tests(unittest.TestCase):
         self.assertEqual("English", res["default_language"])
 
 if __name__ == '__main__':
+    ldt.config = ldt._test_config
     unittest.main()

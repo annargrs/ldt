@@ -70,4 +70,5 @@ class Tests(unittest.TestCase):
 
 #anti-librarian
 if __name__ == '__main__':
+    ldt.config = ldt._test_config
     unittest.main()

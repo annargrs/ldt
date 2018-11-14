@@ -87,4 +87,5 @@ class Tests(unittest.TestCase):
         self.assertTrue(self.file_dict.is_a_word("path/to/cat/cat.jpg"))
 
 if __name__ == '__main__':
+    ldt.config = ldt._test_config
     unittest.main()

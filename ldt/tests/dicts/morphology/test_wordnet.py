@@ -40,4 +40,5 @@ class Tests(unittest.TestCase):
         self.assertTrue(worked)
 
 if __name__ == '__main__':
+    ldt.config = ldt._test_config
     unittest.main()
