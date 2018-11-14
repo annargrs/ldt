@@ -51,7 +51,8 @@ TESTFILE = os.path.dirname(os.path.realpath(__file__))
 TESTFILE = os.path.join(TESTFILE, "tests/sample_files/.ldt-config.yaml")
 
 if "TESTING_LDT" in os.environ or "sphinx" in sys.modules:
-    CONFIGPATH = TESTFILE
+    if "unittest" in sys.modules and not "sklearn" in sys.modules:
+        CONFIGPATH = TESTFILE
 else:
     CONFIGPATH = os.path.expanduser('~/.ldt-config.yaml')
     if not os.path.exists(CONFIGPATH):
@@ -86,7 +87,7 @@ def load_config(path=CONFIGPATH):
             raise ResourceError("Something is wrong with the configuration "
                                 "yaml file.")
 
-    if "/tests/sample_files/" in path:
+    if "TRAVIS" in os.environ or "/tests/sample_files/" in path:
     # if TESTING:
         options["path_to_resources"] = path.strip(".ldt-config.yaml")
         options["experiments"]["embeddings"] = \
