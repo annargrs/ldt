@@ -31,7 +31,7 @@ except ValueError:
 
 
 def nltk_download():
-    # downloading NLTK resources if they're missing
+    """Downloading the necessary NLTK resources if they are missing."""
     try:
         nltk.data.find('tokenizers/punkt')
     except LookupError:
@@ -58,20 +58,6 @@ else:
         print("Creating a sample configuration file in", CONFIGPATH)
         shutil.copyfile(TESTFILE, CONFIGPATH)
 
-
-# if "TESTING_LDT" in os.environ or "sphinx" in sys.modules:
-#     TESTING = True
-# else:
-#     TESTING = False
-#
-# if TESTING:
-#     CONFIGPATH = TESTFILE
-# else:
-#     CONFIGPATH = os.path.expanduser('~/.ldt-config.yaml')
-#     if not os.path.exists(CONFIGPATH):
-#         print("Creating a sample configuration file in", CONFIGPATH)
-#         shutil.copyfile(TESTFILE, CONFIGPATH)
-
 def load_config(path=CONFIGPATH):
     """Loading config file from either the user home directory or the test
     directory"""
@@ -93,7 +79,6 @@ def load_config(path=CONFIGPATH):
             [os.path.join(options["path_to_resources"], "sample_embeddings")]
         options["wiktionary_cache"] = False
         options["experiments"]["top_n"] = 2
-        options["experiments"]["batch_size"] = 2
         options["experiments"]["timeout"] = None
         options["experiments"]["multiprocessing"] = 1
         options["corpus"] = "Wiki201308"
