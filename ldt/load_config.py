@@ -78,7 +78,7 @@ def load_config(path=CONFIGPATH, TESTING=TESTING):
             raise ResourceError("Something is wrong with the configuration "
                                 "yaml file.")
 
-   if TESTING:
+    if TESTING:
         options["path_to_resources"] = path.strip(".ldt-config.yaml")
         options["experiments"]["embeddings"] = \
             [os.path.join(options["path_to_resources"], "sample_embeddings")]
