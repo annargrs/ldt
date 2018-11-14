@@ -50,7 +50,8 @@ nltk_download()
 TESTFILE = os.path.dirname(os.path.realpath(__file__))
 TESTFILE = os.path.join(TESTFILE, "tests/sample_files/.ldt-config.yaml")
 
-if "TESTING_LDT" in os.environ or "sphinx" in sys.modules:
+if "TESTING_LDT" in os.environ or "TRAVIS" in os.environ or "sphinx" in \
+        sys.modules:
     if "unittest" in sys.modules and not "sklearn" in sys.modules:
         CONFIGPATH = TESTFILE
 else:
