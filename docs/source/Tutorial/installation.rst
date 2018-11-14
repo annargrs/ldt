@@ -8,6 +8,10 @@ You need Python 3.5 or above. The latest stable version of LDT is now available 
 
 >>> pip install ldt
 
+The latest development version can be installed with:
+
+>>> pip install git+https://github.com/annargrs/ldt.git
+
 Package requirements (will be installed automatically by pip):
 
 * `nltk <http://www.nltk.org/install.html>`_
