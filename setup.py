@@ -8,14 +8,6 @@ import sys
 
 import ldt
 
-class Install(_install):
-    def run(self):
-        _install.do_egg_install(self)
-        import nltk
-        nltk.download("punkt")
-        nltk.download("wordnet")
-        nltk.download("stopwords")
-
 here = os.path.abspath(os.path.dirname(__file__))
 
 packages = find_packages(here, exclude=["*.tests", "*.tests.*", "tests.*", "tests"])
@@ -54,7 +46,7 @@ setup(
                       "hurry.filesize", "timeout-decorator", "inflect",
                       "nltk", "vecto", "pandas", "pyenchant", "outdated",
                       "p_tqdm"],
-    cmdclass={'test': PyTest, "install": Install},
+    cmdclass={'test': PyTest},# "install": Install},
     author_email='anna_rogers@uml.edu',
     description='Linguistic diagnostics for word embeddings',
     long_description=long_description,

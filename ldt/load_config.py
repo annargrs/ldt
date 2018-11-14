@@ -19,20 +19,43 @@ from ldt._version import __version__
 
 warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
 
-from outdated import warn_if_outdated
+try:
+    is_outdated, latest_version = check_outdated('ldt', __version__)
+    if is_outdated:
+        print("You are using ldt v."+__version__+". Upgrade to v."+latest_version,
+              "with \n   pip install --upgrade ldt\nSee what's new: "
+              "https://github.com/annargrs/ldt/blob/master/CHANGES.txt")
+except ValueError:
+    print("This is LDT", __version__, "- an unpublished development version.")
 
-warn_if_outdated('ldt', __version__)
 
-# downloading NLTK resources if they're missing
-# if not "unittest" in sys.modules or "sphinx" in sys.modules:
-#     nltk.download("wordnet")
-#     nltk.download("stopwords")
-#     nltk.download("punkt")
+def nltk_download():
+    # downloading NLTK resources if they're missing
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        nltk.download('punkt')
+    try:
+        nltk.data.find('corpora/wordnet')
+    except LookupError:
+        nltk.download('wordnet')
+    try:
+        nltk.data.find('corpora/stopwords')
+    except LookupError:
+        nltk.download('stopwords')
 
 TESTFILE = os.path.dirname(os.path.realpath(__file__))
 TESTFILE = os.path.join(TESTFILE, "tests/sample_files/.ldt-config.yaml")
 
-if "unittest" in sys.modules or "sphinx" in sys.modules:
+if "TESTING_LDT" in os.environ or "sphinx" in sys.modules:
+    TESTING=True
+else:
+    TESTING=False
+
+if TESTING:
+    nltk_download()
+
+if TESTING:
     CONFIGPATH = TESTFILE
 else:
     CONFIGPATH = os.path.expanduser('~/.ldt-config.yaml')
@@ -54,7 +77,8 @@ def load_config(path=CONFIGPATH):
             raise ResourceError("Something is wrong with the configuration "
                                 "yaml file.")
 
-    if "unittest" in sys.modules:
+#    if "unittest" in sys.modules:
+    if TESTING:
         options["path_to_resources"] = TESTFILE.strip(".ldt-config.yaml")
         options["experiments"]["embeddings"] = \
             [os.path.join(options["path_to_resources"], "sample_embeddings")]

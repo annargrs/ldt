@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import unittest
+import os
+
+os.environ["TESTING_LDT"] = "TRUE"
 
 import ldt
-
 from ldt.helpers.ignore import ignore_warnings
 
 

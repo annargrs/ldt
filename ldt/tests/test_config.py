@@ -2,6 +2,10 @@
 """Testing the loading of the configuration file."""
 
 import unittest
+import os
+
+os.environ["TESTING_LDT"] = "TRUE"
+
 import ldt
 from ldt.load_config import config
 

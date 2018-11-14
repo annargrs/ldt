@@ -1,6 +1,9 @@
 import unittest
 import os
 from hurry.filesize import size
+
+os.environ["TESTING_LDT"] = "TRUE"
+
 import ldt
 from ldt.load_config import config
 class Tests(unittest.TestCase):
@@ -131,4 +134,6 @@ class Tests(unittest.TestCase):
         self.assertEqual(6, res["mouse"]["cheese"])
 
 if __name__ == '__main__':
+    # global TESTING
+    # TESTING = True
     unittest.main()

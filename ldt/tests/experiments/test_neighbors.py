@@ -1,13 +1,13 @@
 import unittest
-
-import ldt
 import os
 import shutil
-
 import json
 
 import pandas as pd
 
+os.environ["TESTING_LDT"] = "TRUE"
+
+import ldt
 from ldt.load_config import config
 from ldt.helpers.ignore import ignore_warnings
 
