@@ -134,6 +134,4 @@ class Tests(unittest.TestCase):
         self.assertEqual(6, res["mouse"]["cheese"])
 
 if __name__ == '__main__':
-    # global TESTING
-    # TESTING = True
     unittest.main()

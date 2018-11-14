@@ -155,5 +155,4 @@ class Tests(unittest.TestCase):
         self.assertIn("intellect", res["roots"])
 
 if __name__ == '__main__':
-    ldt.config = ldt._test_config
     unittest.main()
