@@ -12,6 +12,7 @@ import warnings
 import sys
 import shutil
 import ruamel.yaml as yaml
+import nltk
 import outdated
 
 from ldt.helpers.exceptions import ResourceError
