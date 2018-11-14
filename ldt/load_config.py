@@ -79,6 +79,11 @@ def load_config(path=CONFIGPATH, TESTING=TESTING):
                                 "yaml file.")
 
     if TESTING:
+        print("yes, test config used")
+    else:
+        print("wrong config")
+
+    if TESTING:
         options["path_to_resources"] = path.strip(".ldt-config.yaml")
         options["experiments"]["embeddings"] = \
             [os.path.join(options["path_to_resources"], "sample_embeddings")]
