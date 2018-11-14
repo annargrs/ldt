@@ -172,8 +172,8 @@ class VectorNeighborhoods(Experiment):
                 get_neighbors = functools.partial(self._get_neighbors,
                                                   embeddings)
                 for _neighbors in pool.imap_unordered(get_neighbors,
-                                                      tqdm(self.dataset)):
-                    print('Processing {}/{}'.format(i, self.dataset))
+                                                      self.dataset):
+                    print('Processing {}/{}'.format(i, len(self.dataset)))
                     i += 1
                     neighbors.extend(_neighbors)
 
