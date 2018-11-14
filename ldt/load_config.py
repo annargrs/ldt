@@ -45,18 +45,12 @@ def nltk_download():
     except LookupError:
         nltk.download('stopwords')
 
+nltk_download()
+
 TESTFILE = os.path.dirname(os.path.realpath(__file__))
 TESTFILE = os.path.join(TESTFILE, "tests/sample_files/.ldt-config.yaml")
 
 if "TESTING_LDT" in os.environ or "sphinx" in sys.modules:
-    TESTING=True
-else:
-    TESTING=False
-
-if TESTING:
-    nltk_download()
-
-if TESTING:
     CONFIGPATH = TESTFILE
 else:
     CONFIGPATH = os.path.expanduser('~/.ldt-config.yaml')
@@ -64,7 +58,21 @@ else:
         print("Creating a sample configuration file in", CONFIGPATH)
         shutil.copyfile(TESTFILE, CONFIGPATH)
 
-def load_config(path=CONFIGPATH, TESTING=TESTING):
+
+# if "TESTING_LDT" in os.environ or "sphinx" in sys.modules:
+#     TESTING = True
+# else:
+#     TESTING = False
+#
+# if TESTING:
+#     CONFIGPATH = TESTFILE
+# else:
+#     CONFIGPATH = os.path.expanduser('~/.ldt-config.yaml')
+#     if not os.path.exists(CONFIGPATH):
+#         print("Creating a sample configuration file in", CONFIGPATH)
+#         shutil.copyfile(TESTFILE, CONFIGPATH)
+
+def load_config(path=CONFIGPATH):
     """Loading config file from either the user home directory or the test
     directory"""
     print("Loading configuration file:", path)
@@ -78,12 +86,8 @@ def load_config(path=CONFIGPATH, TESTING=TESTING):
             raise ResourceError("Something is wrong with the configuration "
                                 "yaml file.")
 
-    if TESTING:
-        print("yes, test config used")
-    else:
-        print("wrong config")
-
-    if TESTING:
+    if "/tests/sample_files/" in path:
+    # if TESTING:
         options["path_to_resources"] = path.strip(".ldt-config.yaml")
         options["experiments"]["embeddings"] = \
             [os.path.join(options["path_to_resources"], "sample_embeddings")]
