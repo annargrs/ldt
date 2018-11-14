@@ -63,7 +63,7 @@ else:
         print("Creating a sample configuration file in", CONFIGPATH)
         shutil.copyfile(TESTFILE, CONFIGPATH)
 
-def load_config(path=CONFIGPATH):
+def load_config(path=CONFIGPATH, TESTING=TESTING):
     """Loading config file from either the user home directory or the test
     directory"""
     print("Loading configuration file:", path)
@@ -79,7 +79,7 @@ def load_config(path=CONFIGPATH):
 
 #    if "unittest" in sys.modules:
     if TESTING:
-        options["path_to_resources"] = TESTFILE.strip(".ldt-config.yaml")
+        options["path_to_resources"] = path.strip(".ldt-config.yaml")
         options["experiments"]["embeddings"] = \
             [os.path.join(options["path_to_resources"], "sample_embeddings")]
         options["wiktionary_cache"] = False
