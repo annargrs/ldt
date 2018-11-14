@@ -20,7 +20,7 @@ from ldt._version import __version__
 warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
 
 try:
-    is_outdated, latest_version = check_outdated('ldt', __version__)
+    is_outdated, latest_version = outdated.check_outdated('ldt', __version__)
     if is_outdated:
         print("You are using ldt v."+__version__+". Upgrade to v."+latest_version,
               "with \n   pip install --upgrade ldt\nSee what's new: "

@@ -11,7 +11,6 @@ Subpackages
 
 from ._version import __version__
 from ldt.load_config import config
-from ldt.load_config import _test_config
 
 from ldt import helpers
 from ldt.helpers.loading import load_resource
