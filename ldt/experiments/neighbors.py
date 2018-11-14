@@ -165,6 +165,7 @@ class VectorNeighborhoods(Experiment):
                 embeddings.normalize()
 
             neighbors = []
+            i = 1
             with multiprocessing.Pool(self.metadata["multiprocessing"]) as pool:
                 print('Multiprocessing neighbors extraction on {} threads'
                       .format(self.metadata["multiprocessing"]))
@@ -172,6 +173,8 @@ class VectorNeighborhoods(Experiment):
                                                   embeddings)
                 for _neighbors in pool.imap_unordered(get_neighbors,
                                                       tqdm(self.dataset)):
+                    print('Processing {}/{}'.format(i, self.dataset))
+                    i += 1
                     neighbors.extend(_neighbors)
 
             # formatting the output
