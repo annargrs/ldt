@@ -12,9 +12,6 @@ Importing ldt in interactive session should indicate the location of the configu
 >>> import ldt
 Loading configuration file: /home/user/.ldt-config.yaml
 
-**Troubleshooting**: if LDT loads sample configuration file instead of the configuration file in the user home folder, check if you have unittests or sphinx loaded in sys.modules. If you do, you can remove them with ``del sys.modules["unittest"]``
-
-
 .. include:: .ldt-config.yaml
    :code: yaml
 

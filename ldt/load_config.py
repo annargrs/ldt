@@ -89,6 +89,11 @@ def load_config(path=CONFIGPATH):
         if options[i] == "None":
             options[i] = None
 
+    if "path/to/cache/and/resources" in options["path_to_resources"]:
+        print("Please set up your resource directory before using LDT. "
+              "See instructions at "
+              "https://ldt.readthedocs.io/Tutorial/resources/configuration.html")
+
     return options
 
 #pylint: disable=invalid-name
