@@ -176,6 +176,7 @@ class VectorNeighborhoods(Experiment):
                     print('Processing {}/{}'.format(i, len(self.dataset)))
                     i += 1
                     neighbors.extend(_neighbors)
+                print('Done extracting neigbors. Formatting...')
 
             # formatting the output
             res = pd.DataFrame(neighbors, columns=["Target", "Rank",
