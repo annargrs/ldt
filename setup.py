@@ -54,7 +54,11 @@ setup(
     package_dir={"ldt":"ldt"},
     include_package_data=True,
     package_data={'ldt': ['test/sample_files/ldt-config.yaml']},
-    entry_points={},
+    entry_points={
+        'console_scripts': [
+            'ldt = ldt.main:main'
+        ],
+    },
     zip_safe=False,
     platforms='any',
     test_suite='ldt.test.test_ldt',
