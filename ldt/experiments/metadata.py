@@ -167,7 +167,6 @@ class Experiment(metaclass=abc.ABCMeta):
             return None
 
         for i in self.embeddings:
-
             emb_uuid = self._check_uuid_in_metadata(field="embeddings", path=i)
             if emb_uuid:
                 self.metadata["timestamp"][emb_uuid] = {}
@@ -307,4 +306,3 @@ def create_metadata_stub(embedding, shared_subpath):
                                    "min_frequency": "",
                                    "lowercasing": ""}
     return metadata_stub
-
