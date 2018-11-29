@@ -19,6 +19,7 @@ By default, embeddings are normalized before cosine similarity is computed.
 import os
 import warnings
 import uuid
+import functools
 
 import pandas as pd
 import vecto.embeddings
@@ -94,7 +95,6 @@ class VectorNeighborhoods(Experiment):
         self.metadata["uuid"] = str(uuid.uuid4())
         self.metadata["top_n"] = top_n
         self._load_dataset(dataset=dataset)
-
         self._normalize = normalize
         self._top_n = top_n
 
@@ -126,6 +126,20 @@ class VectorNeighborhoods(Experiment):
                                 format="vocab")
         self.dataset = list(dataset)
 
+    def _get_neighbors(self, embeddings, word):
+        neighbors = []
+        # for word in words:
+        neighbor_list = embeddings.get_most_similar_words(
+            word, cnt=self._top_n + 1)[1:]
+        for i in enumerate(neighbor_list):
+            pair = []
+            pair.append(word)
+            pair.append(i[0] + 1)
+            pair.append(neighbor_list[i[0]][0])
+            pair.append(neighbor_list[i[0]][1])
+            neighbors.append(pair)
+        return neighbors
+
     def _process(self, embeddings_path):
         """Extracting top_n neighbors from each of the embeddings,
         saving the results as tab-separated file in the output directory.
@@ -146,27 +160,14 @@ class VectorNeighborhoods(Experiment):
             embeddings = vecto.embeddings.load_from_dir(embeddings_path)
             if self._normalize:
                 embeddings.normalize()
+                embeddings.cache_normalized_copy()
 
             # get dictionary with list of lists
             neighbors = []
-            # bar = ProgressBar(max_value=len(self.dataset))
-            # for i in range(len(self.dataset)):
             for word in tqdm(self.dataset):
-                # bar.update(i)
-                # word = self.dataset[i]
-            # for word in tqdm(self.dataset):
-            # for word in self.dataset:
-                neighbor_list = embeddings.get_most_similar_words(
-                    word, cnt=self._top_n + 1)[1:]
-                for i in enumerate(neighbor_list):
-                    pair = []
-                    pair.append(word)
-                    pair.append(i[0] + 1)
-                    pair.append(neighbor_list[i[0]][0])
-                    pair.append(neighbor_list[i[0]][1])
-                    neighbors.append(pair)
+                neighbors += self._get_neighbors(embeddings, word)
 
-            # formatting the output
+            # # formatting the output
             res = pd.DataFrame(neighbors, columns=["Target", "Rank",
                                                    "Neighbor",
                                                    "Similarity"])
@@ -176,7 +177,8 @@ class VectorNeighborhoods(Experiment):
                        header=True, index=False, sep="\t")
             embeddings = None
 
-if __name__ == '__main__':
-    annotation = VectorNeighborhoods(experiment_name="testing",
-                                     overwrite=False)
-    annotation.get_results()
+# if __name__ == '__main__':
+#     print(config)
+#     annotation = VectorNeighborhoods(experiment_name="testing",
+#                                      overwrite=True)
+#     annotation.get_results()

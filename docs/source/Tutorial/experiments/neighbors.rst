@@ -154,3 +154,19 @@ a neighbor of *quite* in SG DEPS model at rank 920.
 That being sad, the correlations with intrinsic and extrinsic tasks that we obtained
 for data from *top 100* and *top 1000* neighbor pairs were similar
 (`see for yourself <http://ldtoolkit.space/analysis/correlation/>`_).
+
+------------------------------------
+The neighbor extraction is too slow!
+------------------------------------
+
+The speed of this process depends on whether your numpy package has access
+to the right linear algebra library - MKL, OpenBLAS or whatever is available
+ for your system. With the OpenBLAS and 4 Ghz Core i7-6700K processor in
+ Ubuntu we're
+ processing 900 words for 300K 500-dimensional embeddings in under three minutes.
+
+ If you do have the library, but the neighbor extraction is   still slow, check if it is actually used by numpy. This can be done as
+  follows:
+
+>>> import numpy as np
+>>> np.show_config()

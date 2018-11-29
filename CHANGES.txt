@@ -1,3 +1,7 @@
+v. 0.4.1, 2018-11-29
+
+* faster neighbor extraction
+
 v. 0.4.0, 2018-11-14
 
 * bug fixes
