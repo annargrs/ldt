@@ -161,7 +161,8 @@ The neighbor extraction is too slow!
 
 The speed of this process depends on whether your numpy package has access
 to the right linear algebra library - MKL, OpenBLAS or whatever is available
- for your system. With the OpenBLAS and Corei7 processor in Ubuntu we're
+ for your system. With the OpenBLAS and 4 Ghz Core i7-6700K processor in
+ Ubuntu we're
  processing 900 words for 300K 500-dimensional embeddings in under three minutes.
 
  If you do have the library, but the neighbor extraction is   still slow, check if it is actually used by numpy. This can be done as
