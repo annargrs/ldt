@@ -53,15 +53,15 @@ class Tests(unittest.TestCase):
                                                 ld_scores=output_scores)
         cls.scoring.get_results()
 
-    # @classmethod
-    # def tearDownClass(cls):
-    #     """Clearning up the test dir."""
-    #     cls.experiment = None
-    #     subfolders = ["neighbors", "neighbors_annotated", "analysis"]
-    #     for sub in subfolders:
-    #         dir = os.path.join(config["path_to_resources"], "experiments",
-    #                            "testing", sub)
-    #         shutil.rmtree(dir)
+    @classmethod
+    def tearDownClass(cls):
+        """Clearning up the test dir."""
+        cls.experiment = None
+        subfolders = ["neighbors", "neighbors_annotated", "analysis"]
+        for sub in subfolders:
+            dir = os.path.join(config["path_to_resources"], "experiments",
+                               "testing", sub)
+            shutil.rmtree(dir)
 
 ######## tests for metadata and neighborhoods #############
 
@@ -123,6 +123,7 @@ class Tests(unittest.TestCase):
                 f = os.path.join(dir, f)
                 with open(f, "r") as sample_neighbor_file:
                     data = sample_neighbor_file.readlines()
+                    print(data)
                     res = 'hurricane\t1\tstorm\t0.9598022699356079\n' in data
                     self.assertTrue(res)
 
