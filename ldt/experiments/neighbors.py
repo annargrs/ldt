@@ -126,18 +126,18 @@ class VectorNeighborhoods(Experiment):
                                 format="vocab")
         self.dataset = list(dataset)
 
-    def _get_neighbors(self, embeddings, words):
+    def _get_neighbors(self, embeddings, word):
         neighbors = []
-        for word in words:
-            neighbor_list = embeddings.get_most_similar_words(
-                word, cnt=self._top_n + 1)[1:]
-            for i in enumerate(neighbor_list):
-                pair = []
-                pair.append(word)
-                pair.append(i[0] + 1)
-                pair.append(neighbor_list[i[0]][0])
-                pair.append(neighbor_list[i[0]][1])
-                neighbors.append(pair)
+        # for word in words:
+        neighbor_list = embeddings.get_most_similar_words(
+            word, cnt=self._top_n + 1)[1:]
+        for i in enumerate(neighbor_list):
+            pair = []
+            pair.append(word)
+            pair.append(i[0] + 1)
+            pair.append(neighbor_list[i[0]][0])
+            pair.append(neighbor_list[i[0]][1])
+            neighbors.append(pair)
         return neighbors
 
     def _process(self, embeddings_path):
@@ -164,24 +164,10 @@ class VectorNeighborhoods(Experiment):
 
             # get dictionary with list of lists
             neighbors = []
-            # bar = ProgressBar(max_value=len(self.dataset))
-            # for i in range(len(self.dataset)):
             for word in tqdm(self.dataset):
-                # bar.update(i)
-                # word = self.dataset[i]
-                # for word in tqdm(self.dataset):
-                # for word in self.dataset:
-                neighbor_list = embeddings.get_most_similar_words(
-                        word, cnt=self._top_n + 1)[1:]
-                for i in enumerate(neighbor_list):
-                    pair = []
-                    pair.append(word)
-                    pair.append(i[0] + 1)
-                    pair.append(neighbor_list[i[0]][0])
-                    pair.append(neighbor_list[i[0]][1])
-                neighbors.append(pair)
+                neighbors += self._get_neighbors(embeddings, word)
 
-            # formatting the output
+            # # formatting the output
             res = pd.DataFrame(neighbors, columns=["Target", "Rank",
                                                    "Neighbor",
                                                    "Similarity"])
@@ -191,7 +177,8 @@ class VectorNeighborhoods(Experiment):
                        header=True, index=False, sep="\t")
             embeddings = None
 
-if __name__ == '__main__':
-    annotation = VectorNeighborhoods(experiment_name="testing",
-                                     overwrite=False)
-    annotation.get_results()
+# if __name__ == '__main__':
+#     print(config)
+#     annotation = VectorNeighborhoods(experiment_name="testing",
+#                                      overwrite=True)
+#     annotation.get_results()
