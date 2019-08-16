@@ -25,7 +25,7 @@ Basic functionality:
 
 Todo:
 
-    * alternatives: pyhunspell, https://pypi.org/project/org.keyphrene/
+    * alternatives: cyhunspell
     * add names from wiki namespaces
     * not to check words with _
     * get german and spanish back
