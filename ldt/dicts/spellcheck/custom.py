@@ -48,7 +48,7 @@ class Spellchecker(Dictionary):
     """The base spellchecker class (pyenchant-based at the moment)."""
 
     def __init__(self, language=config["default_language"],
-                 foreign_languages=("german", "french"),
+                 foreign_languages=config["foreign_languages"],
                  engine_order="aspell,myspell"):
         """Initializaing a spellchecker for the target and a number of
         frequent "foreign" languages.

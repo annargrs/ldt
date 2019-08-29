@@ -5,6 +5,10 @@ path_to_resources: /the/path/to/cache/and/resources
 # default query language for all dictionaries
 default_language: English
 
+# the extra languages that could be expected in the data,
+#  and the words from which should be recognized as such rather than as noise
+#  or unknown words
+foreign_languages: [German, French]
 # if you are working with embeddings that were made from a lowercased corpus,
 # set to True.
 lowercasing: True
