@@ -4,7 +4,8 @@ import unittest
 
 import ldt
 
-test_dict = ldt.dicts.spellcheck.Spellchecker(engine_order="aspell,myspell")
+test_dict = ldt.dicts.spellcheck.Spellchecker(language="en_US",
+                                              foreign_languages=["fr_FR"])
 
 class Tests(unittest.TestCase):
     """
@@ -14,18 +15,16 @@ class Tests(unittest.TestCase):
 
     """
 
-    def test_dict_initialization(self):
-        self.assertIn("fr", test_dict.foreign_languages)
-
     def test_dict_error(self):
         with self.assertRaises(ldt.helpers.exceptions.LanguageError):
             test_dict2 = ldt.dicts.spellcheck.Spellchecker(language="cat")
 
     def test_dict_is_a_word(self):
+        #self.assertTrue(test_dict.is_a_word("cat"))
         self.assertTrue(test_dict.is_a_word("cat"))
 
     def test_dict_is_foreign(self):
-        self.assertTrue(test_dict.is_a_word("chateau"))
+        self.assertTrue(test_dict.is_a_word("briocherie"))
 
     def test_dict_with_charset(self):
         self.assertFalse(test_dict.filter_by_charset("ça", include=["latin",
@@ -36,11 +35,6 @@ class Tests(unittest.TestCase):
 
     def test_dict_suggest(self):
         self.assertIn("with", test_dict.suggest("iwth"))
-
-    #only aspell is installed in travis, so the order does not actually change
-    def test_dict_providers(self):
-        test_dict2 = ldt.dicts.spellcheck.Spellchecker(engine_order="aspell,myspell")
-        self.assertEqual(test_dict.provider, test_dict2.provider)
 
     def test_opcodes(self):
         test = test_dict.get_opcode_alignment("generaly", "generally")

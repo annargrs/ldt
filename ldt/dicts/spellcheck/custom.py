@@ -1,20 +1,10 @@
 # -*- coding: utf-8 -*-
 """ Spellchecker class
 
-This module creates the base ldt spellchecker class, currently based on
-`pyenchant <https://github.com/rfk/pyenchant>`_ library which in its turn relies
-on `enchant <https://github.com/AbiWord/enchant>`_. Pyenchant enables the
-use of various engines, including hunspell and aspell. Check the
-section :ref:`installation`.
-
-Dictionaries for US and UK English, German, and French are included in
-pyenchant distribution. If you need other languages, you will need to do the
-following.
-
-Note:
-    Pyenchant developer announced that he's retiring from the project. It
-    was last updated in February 2017. Moving to another spellchecker engine
-    may be necessary in the future.
+This module creates the base ldt spellchecker class, based on
+`cyhunspell <https://github.com/rfk/pyenchant>`_ . It makes use of hunspell
+dictionaries found on the user system. If more dictionaries are needed,
+they need to be added by the user.
 
 Basic functionality:
 
@@ -25,10 +15,8 @@ Basic functionality:
 
 Todo:
 
-    * alternatives: cyhunspell
     * add names from wiki namespaces
     * not to check words with _
-    * get german and spanish back
 
 """
 
@@ -37,7 +25,8 @@ import unicodedata
 
 from difflib import SequenceMatcher
 
-import enchant
+from hunspell import Hunspell
+from hunspell import HunspellFilePathError
 
 from ldt.dicts.dictionary import Dictionary
 from ldt.load_config import config
@@ -45,11 +34,11 @@ from ldt.helpers.resources import lookup_language_by_code
 from ldt.helpers.exceptions import LanguageError
 
 class Spellchecker(Dictionary):
-    """The base spellchecker class (pyenchant-based at the moment)."""
+    """The base spellchecker class (CyHunspell-based)."""
 
     def __init__(self, language=config["default_language"],
                  foreign_languages=config["foreign_languages"],
-                 engine_order="aspell,myspell"):
+                 hunspell_path = config["language_resources"]["hunspell_path"]):
         """Initializaing a spellchecker for the target and a number of
         frequent "foreign" languages.
 
@@ -65,72 +54,54 @@ class Spellchecker(Dictionary):
                 resource code for a specific sublanguage ("en_US").
             foreign_languages (tuple): other languages that could be expected
                 to be relatively frequent in the input. Ditto for the format.
-            engine_order (str): pyenchant variable for the order of
-                spellchecmer engine providers. Available providers vary by
-                system.
 
-        Note:
-             Aspell worked better then hunspell or myspell in our experiments.
         """
 
         super(Spellchecker, self).__init__(language=language)
 
-        #: pyenchant engine, to expose its normal pyenchant attributes
-        self.engine = enchant.Broker()
-
-        #: the order or spellcheck engine providers
-        self.engine_order = engine_order
-
-        #: setting that order for all the languages
-        self.engine.set_ordering('*', self.engine_order)
-
         #: (str): The main language of the spellchecker.
         self.language = check_language(language)
-
-        #: (enchant dict object): The spellchecker for the main language.
-        self.target = self._enchant_dict(self.language)
-
-        #the top-priority provider for the main language
-        self.provider = self.target.provider
+        self.hunspell_path = hunspell_path
+        #: (Hunspell spellchecker object): The spellchecker for the main
+        # language.
+        self.target = Hunspell(self.language,
+                               hunspell_data_dir=self.hunspell_path)
 
         def _set_language(self, language):
             """Setter for the language attribute."""
             self.language = check_language(language)
-            self.target = self._enchant_dict(self.language)
+            self.target = self._hunspell_dict(self.language)
 
         #: list(str): the language(s) to be considered "foreign".
         self.foreign_languages = [check_language(lang) for
                                   lang in foreign_languages]
 
-        #: list(enchant dict objects): the dicts for the foreign language(s).
+        #: list(spellechecker objects): the checkers for the foreign language(s).
         self.foreign = []
         for lang in self.foreign_languages:
-            self.foreign.append(self._enchant_dict(lang))
+            self.foreign.append(self._hunspell_dict(lang))
 
-    def _enchant_dict(self, language):
-        """ Helper for enchant dictionary initialization.
+    def _hunspell_dict(self, language):
+        """ Helper for CyHunspell dictionary initialization.
 
         Args:
             language (str): the language of the dictionary.
 
         Returns:
-                enchant dictionary object
+                CyHunspell spellchecker object for a given language
 
         Raises:
             LanguageError: the language is unavailable or improperly formatted
         """
 
+        error = "No spellchecking dictionary for language " + language + \
+                ". Either the dictionary is unavailable in Hunspell resources " \
+                "on your system, or the language argument is not formatted as " \
+                "required by Hunspell (e.g. 'en', 'en_US')."
         try:
-            return self.engine.request_dict(language)
-        except enchant.errors.DictNotFoundError:
-            raise LanguageError("No spellchecking dictionary for language " +
-                                language + ". Either it is not supported or "
-                                           "the "
-                                           "language argument is not "
-                                           "formatted "
-                                           "as required by pyenchant (e.g. "
-                                           "'en, "
-                                           "en_US').")
+            return Hunspell(language, hunspell_data_dir=self.hunspell_path)
+        except HunspellFilePathError:
+            raise LanguageError(error)
 
     def is_a_word(self, word):
         """Returns *True* is the word is in the dictionary.
@@ -147,7 +118,7 @@ class Spellchecker(Dictionary):
             (bool): *True* if the word is in the spellchecker dictionary for
             the target language.
         """
-        return self.target.check(word)
+        return self.target.spell(word)
 
 
     @functools.lru_cache(maxsize=config["cache_size"])
@@ -168,7 +139,7 @@ class Spellchecker(Dictionary):
         """
 
         for spelldict in self.foreign:
-            if spelldict.check(word):
+            if spelldict.spell(word):
                 return True
         return False
 
@@ -303,7 +274,7 @@ class Spellchecker(Dictionary):
 
 
 def check_language(language):
-    """Pyenchant accepts languages as 2-letter codes (e.g. "en"),
+    """CyHunspell accepts languages as 2-letter codes (e.g. "en"),
     or in fr_FR format of Hunspell dictionaries. This helper either formats
     the language to 2-letter code, or raises an error if it does not look
     like a Hunspell dictionary.
