@@ -24,7 +24,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(test_dict.is_a_word("cat"))
 
     def test_dict_is_foreign(self):
-        self.assertTrue(test_dict.is_a_word("briocherie"))
+        self.assertTrue(test_dict.is_a_word("violoniste"))
 
     def test_dict_with_charset(self):
         self.assertFalse(test_dict.filter_by_charset("ça", include=["latin",

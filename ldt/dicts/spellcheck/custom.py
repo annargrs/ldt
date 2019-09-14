@@ -207,8 +207,8 @@ class Spellchecker(Dictionary):
         Returns:
             (list): a list of alternative spellings
         """
-
-        return self.target.suggest(word)
+        for spelldict in self.targets:
+            return spelldict.suggest(word)
 
     # pylint: disable=no-self-use
     def get_opcode_alignment(self, misspelling, word):
