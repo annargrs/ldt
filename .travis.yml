@@ -17,11 +17,11 @@ addons:
   apt:
     update: true
     packages:
-    - enchant
-    - aspell
-    - aspell-en
-    - aspell-de
-    - aspell-fr
+#    - enchant
+#    - aspell
+#    - aspell-en
+#    - aspell-de
+#    - aspell-fr
 #    - myspell-dictionary-de
 #    - myspell-dictionary-fr
 
@@ -33,14 +33,14 @@ install:
   - python -m nltk.downloader stopwords
   - python -m nltk.downloader wordnet
   - python -m nltk.downloader punkt
-  - pip install -U pyenchant
+  - pip install -U cyhunspell
   - pip install -r requirements.txt
   - pip install -U coveralls
   - pip install -U coverage
   - pip install -U pylint
 
 before_script: # configure a headless display to test plot generation
-- sudo apt-get install -y enchant #libenchant-dev
+#- sudo apt-get install -y enchant #libenchant-dev
 #- "export DISPLAY=:99.0"
 #- "sh -e /etc/init.d/xvfb start"
 #- sleep 3 # give xvfb some time to start

@@ -1,4 +1,4 @@
-pyenchant
+cyhunspell
 ruamel.yaml
 wiktionaryparser==0.0.7
 hurry.filesize
