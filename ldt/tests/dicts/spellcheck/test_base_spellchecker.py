@@ -4,7 +4,7 @@ import unittest
 
 import ldt
 
-test_dict = ldt.dicts.spellcheck.Spellchecker(language="en_US",
+test_dict = ldt.dicts.spellcheck.Spellchecker(languages=["en_US"],
                                               foreign_languages=["fr_FR"])
 
 class Tests(unittest.TestCase):
@@ -17,7 +17,7 @@ class Tests(unittest.TestCase):
 
     def test_dict_error(self):
         with self.assertRaises(ldt.helpers.exceptions.LanguageError):
-            test_dict2 = ldt.dicts.spellcheck.Spellchecker(language="cat")
+            test_dict2 = ldt.dicts.spellcheck.Spellchecker(languages=["cat"])
 
     def test_dict_is_a_word(self):
         #self.assertTrue(test_dict.is_a_word("cat"))

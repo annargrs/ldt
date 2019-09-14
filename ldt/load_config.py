@@ -82,6 +82,9 @@ def load_config(path=CONFIGPATH):
         options["experiments"]["timeout"] = None
         options["experiments"]["multiprocessing"] = 1
         options["corpus"] = "Wiki201308"
+        options["language_resources"]["hunspell"]["path"] = \
+            os.path.join(options["path_to_resources"], "language_resources",
+                         "hunspell_data")
 
     options["path_to_cache"] = \
         os.path.join(options["path_to_resources"], "cache")

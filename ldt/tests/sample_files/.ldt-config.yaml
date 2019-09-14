@@ -5,10 +5,6 @@ path_to_resources: /the/path/to/cache/and/resources
 # default query language for all dictionaries
 default_language: English
 
-# the extra languages that could be expected in the data,
-#  and the words from which should be recognized as such rather than as noise
-#  or unknown words
-foreign_languages: [German, French]
 # if you are working with embeddings that were made from a lowercased corpus,
 # set to True.
 lowercasing: True
@@ -43,6 +39,15 @@ cache_size: None
 # Extra language-specific resources.
 
 language_resources:
+  hunspell:
+    # the path where hunspell .dic files are located on your system
+    path: /the/path/to/hunspell/dictionaries
+    # the hunspell dictionaries that should be used for your main language
+    target_language_codes: ['en_US']
+    # the extra languages that could be expected in the data, the words from which
+    # should be recognized as such rather than as noise or unknown words
+    # Hunspell dictionary format expected
+    foreign_language_codes: ['fr_FR']
   en:
     names: names.vocab
     numbers: numbers.vocab

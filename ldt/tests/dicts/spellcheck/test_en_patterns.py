@@ -16,9 +16,6 @@ class Tests(unittest.TestCase):
 
     """
 
-    def test_dict_initialization(self):
-        self.assertIn("fr", test_dict.foreign_languages)
-
     def test_dict_with_charset(self):
         self.assertTrue(test_dict.filter_by_charset("the-cat-and-the-fiddle"))
 

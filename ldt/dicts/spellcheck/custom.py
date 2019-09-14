@@ -36,9 +36,11 @@ from ldt.helpers.exceptions import LanguageError
 class Spellchecker(Dictionary):
     """The base spellchecker class (CyHunspell-based)."""
 
-    def __init__(self, language=config["default_language"],
-                 foreign_languages=config["foreign_languages"],
-                 hunspell_path = config["language_resources"]["hunspell_path"]):
+    def __init__(self, languages=config["language_resources"]["hunspell"][
+                     "target_language_codes"],
+                 foreign_languages=config["language_resources"]["hunspell"][
+                     "foreign_language_codes"],
+                 hunspell_path = config["language_resources"]["hunspell"]["path"]):
         """Initializaing a spellchecker for the target and a number of
         frequent "foreign" languages.
 
@@ -57,28 +59,27 @@ class Spellchecker(Dictionary):
 
         """
 
-        super(Spellchecker, self).__init__(language=language)
+        super(Spellchecker, self).__init__(language=languages)
 
         #: (str): The main language of the spellchecker.
-        self.language = check_language(language)
+        self.languages = languages
         self.hunspell_path = hunspell_path
-        #: (Hunspell spellchecker object): The spellchecker for the main
-        # language.
-        self.target = Hunspell(self.language,
-                               hunspell_data_dir=self.hunspell_path)
 
-        def _set_language(self, language):
-            """Setter for the language attribute."""
-            self.language = check_language(language)
-            self.target = self._hunspell_dict(self.language)
+        #: list(spellechecker objects): the checkers for the target language
+        # (possibly several dialects).
+        self.targets = []
+        for lang in self.languages:
+            self.targets.append(self._hunspell_dict(lang))
 
-        #: list(str): the language(s) to be considered "foreign".
-        self.foreign_languages = [check_language(lang) for
-                                  lang in foreign_languages]
+        def _set_languages(self, languages):
+            """Setter for the languages attribute."""
+            self.targets = []
+            for lang in self.languages:
+                self.targets.append(self._hunspell_dict(lang))
 
         #: list(spellechecker objects): the checkers for the foreign language(s).
         self.foreign = []
-        for lang in self.foreign_languages:
+        for lang in foreign_languages:
             self.foreign.append(self._hunspell_dict(lang))
 
     def _hunspell_dict(self, language):
@@ -97,7 +98,7 @@ class Spellchecker(Dictionary):
         error = "No spellchecking dictionary for language " + language + \
                 ". Either the dictionary is unavailable in Hunspell resources " \
                 "on your system, or the language argument is not formatted as " \
-                "required by Hunspell (e.g. 'en', 'en_US')."
+                "required by Hunspell (e.g. 'en_US')."
         try:
             return Hunspell(language, hunspell_data_dir=self.hunspell_path)
         except HunspellFilePathError:
@@ -118,7 +119,10 @@ class Spellchecker(Dictionary):
             (bool): *True* if the word is in the spellchecker dictionary for
             the target language.
         """
-        return self.target.spell(word)
+        for spelldict in self.targets:
+            if spelldict.spell(word):
+                return True
+        return False
 
 
     @functools.lru_cache(maxsize=config["cache_size"])
